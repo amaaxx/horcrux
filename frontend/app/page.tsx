@@ -51,47 +51,184 @@ export default function Home() {
           className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-4 h-auto md:h-[800px]"
         >
           
-          {/* Main Large Card (Spans 2 columns, 2 rows) */}
+          {/* ========================================== */}
+          {/* VESSEL 01: Ground Truth Engine (Main Card) */}
+          {/* ========================================== */}
           <motion.div 
             variants={item}
-            className="bg-surface border border-border rounded-3xl p-6 md:col-span-2 md:row-span-2 flex flex-col justify-end transition-colors hover:border-neutral-700 cursor-pointer"
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-8 md:col-span-2 md:row-span-2 flex flex-col justify-end transition-all hover:border-neutral-600 group cursor-pointer"
           >
-            <h2 className="text-2xl font-bold mb-2">Ground Truth Engine</h2>
-            <p className="text-neutral-400">RAG system built for absolute accuracy.</p>
+            {/* Hover Gradient Glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+            {/* Top Status Indicator */}
+            <div className="absolute top-8 left-8 flex items-center gap-3">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+              </span>
+              <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
+                Vessel_01 // System_Active
+              </span>
+            </div>
+
+            {/* Core Content */}
+            <div className="relative z-10">
+              <h2 className="text-3xl font-bold mb-3 tracking-tight group-hover:text-accent transition-colors duration-300">
+                Ground Truth Engine
+              </h2>
+              <p className="text-neutral-400 max-w-md mb-8 leading-relaxed">
+                An advanced RAG architecture engineered to eliminate AI hallucinations through deterministic semantic routing.
+              </p>
+
+              {/* Tech Stack Pills */}
+              <div className="flex flex-wrap gap-2">
+                {['Python', 'Vector DB', 'Next.js 15'].map((tech) => (
+                  <span 
+                    key={tech} 
+                    className="px-3 py-1 text-[11px] font-mono text-neutral-300 bg-neutral-800/50 rounded-full border border-neutral-700/50 backdrop-blur-sm"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
           </motion.div>
 
-          {/* Top Right Card */}
+          {/* ========================================== */}
+          {/* VESSEL 02: Strata (Top Right)              */}
+          {/* ========================================== */}
           <motion.div 
             variants={item}
-            className="bg-surface border border-border rounded-3xl p-6 flex flex-col justify-end transition-colors hover:border-neutral-700 cursor-pointer"
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group cursor-pointer"
           >
-            <h2 className="text-xl font-bold mb-2">Strata</h2>
-            <p className="text-neutral-400 text-sm">Recursive note architecture.</p>
+            <div className="absolute top-6 left-6">
+              <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
+                Vessel_02 // Strata
+              </span>
+            </div>
+
+            {/* Interactive "Recursive Layers" Visual */}
+            <div className="relative mt-12 h-20 w-full flex items-center justify-center">
+               <div className="absolute w-full h-12 bg-neutral-800 rounded-lg border border-neutral-700 transform transition-transform group-hover:-translate-y-3 group-hover:scale-[0.98] duration-500 z-10 shadow-lg" />
+               <div className="absolute w-full h-12 bg-neutral-800/80 rounded-lg border border-neutral-700/80 transform translate-y-2 scale-[0.95] transition-transform group-hover:-translate-y-0 group-hover:scale-[0.92] duration-500 z-0" />
+               <div className="absolute w-full h-12 bg-neutral-800/40 rounded-lg border border-neutral-700/50 transform translate-y-4 scale-[0.90] transition-transform group-hover:translate-y-3 group-hover:scale-[0.85] duration-500 -z-10" />
+            </div>
+
+            <div className="relative z-20 mt-4">
+              <h2 className="text-xl font-bold mb-1 group-hover:text-accent transition-colors duration-300">Strata</h2>
+              <p className="text-neutral-400 text-sm">Recursive note architecture.</p>
+            </div>
           </motion.div>
 
-          {/* Middle Right Card */}
+          {/* ========================================== */}
+          {/* VESSEL 03: BLW Portal (Middle Right)       */}
+          {/* ========================================== */}
           <motion.div 
             variants={item}
-            className="bg-surface border border-border rounded-3xl p-6 flex flex-col justify-end transition-colors hover:border-neutral-700 cursor-pointer"
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group cursor-pointer"
           >
-            <h2 className="text-xl font-bold mb-2">BLW Portal</h2>
-            <p className="text-neutral-400 text-sm">Intranet deployment.</p>
+            <div className="absolute top-6 left-6">
+              <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
+                Vessel_03 // BLW_Intranet
+              </span>
+            </div>
+
+            {/* Enterprise Security Loading Bar Visual */}
+            <div className="relative mt-12 flex-grow flex items-center justify-start opacity-50 group-hover:opacity-100 transition-opacity duration-500">
+               <div className="flex flex-col gap-2 w-full">
+                 <div className="h-1 w-full bg-neutral-800 rounded-full overflow-hidden">
+                   <div className="h-full bg-neutral-600 w-1/4 group-hover:bg-accent group-hover:w-full transition-all duration-1000 ease-in-out"></div>
+                 </div>
+                 <div className="flex justify-between w-full text-[9px] font-mono text-neutral-500">
+                   <span>Auth_Required</span>
+                   <span className="group-hover:text-accent transition-colors">Deployed</span>
+                 </div>
+               </div>
+            </div>
+
+            <div className="relative z-20 mt-4">
+              <h2 className="text-xl font-bold mb-1 group-hover:text-accent transition-colors duration-300">BLW Portal</h2>
+              <p className="text-neutral-400 text-sm">Enterprise deployment.</p>
+            </div>
           </motion.div>
 
-          {/* Bottom Left Card (Stats/Tech Stack) */}
+          {/* ========================================== */}
+          {/* VESSEL 04: Core Stack (Bottom Left)        */}
+          {/* ========================================== */}
           <motion.div 
             variants={item}
-            className="bg-surface border border-border rounded-3xl p-6 flex flex-col justify-end transition-colors hover:border-neutral-700"
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group"
           >
-            <h2 className="text-xl font-bold">Tech Stack</h2>
+            <div className="absolute top-6 left-6">
+              <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
+                Vessel_04 // Core_Stack
+              </span>
+            </div>
+
+            {/* Terminal-style Tech List */}
+            <div className="mt-12 z-20 w-full">
+              <div className="flex flex-col gap-3">
+                {[
+                  { name: "Next.js 15", category: "Framework" },
+                  { name: "TypeScript", category: "Language" },
+                  { name: "Python", category: "Backend" },
+                  { name: "Tailwind v4", category: "Styling" },
+                  { name: "C++ / DSA", category: "Logic" }
+                ].map((tech) => (
+                  <div key={tech.name} className="flex justify-between items-center group/tech cursor-crosshair">
+                    <span className="text-sm font-medium text-neutral-300 group-hover/tech:text-white transition-colors">
+                      {tech.name}
+                    </span>
+                    <span className="text-[10px] font-mono text-neutral-600 group-hover/tech:text-accent transition-colors">
+                      [{tech.category}]
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </motion.div>
 
-          {/* Bottom Middle Card (Contact/Links) */}
+          {/* ========================================== */}
+          {/* VESSEL 05: Comm Link (Bottom Middle/Right) */}
+          {/* ========================================== */}
           <motion.div 
             variants={item}
-            className="bg-surface border border-border rounded-3xl p-6 md:col-span-2 flex flex-col justify-end transition-colors hover:border-neutral-700 group cursor-pointer"
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-8 md:col-span-2 flex flex-col justify-end transition-all hover:border-neutral-600 group cursor-pointer"
           >
-            <h2 className="text-xl font-bold group-hover:text-accent transition-colors">Let's Talk ↗</h2>
+            {/* Radar / Signal Animation */}
+            <div className="absolute top-0 right-0 p-8 opacity-50 group-hover:opacity-100 transition-opacity duration-500">
+               <div className="relative flex h-8 w-8 items-center justify-center">
+                 <div className="animate-ping absolute inline-flex h-full w-full rounded-full border border-accent opacity-30"></div>
+                 <div className="relative inline-flex rounded-full h-2 w-2 bg-accent"></div>
+               </div>
+            </div>
+
+            <div className="absolute top-8 left-8">
+              <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
+                Vessel_05 // Comm_Link
+              </span>
+            </div>
+
+            {/* Core Content */}
+            <div className="relative z-20 flex flex-col md:flex-row items-start md:items-end justify-between w-full gap-6">
+              <div>
+                <p className="text-neutral-400 mb-2 font-mono text-sm">Initialize connection</p>
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight group-hover:text-accent transition-colors duration-300">
+                  Let's Talk <span className="inline-block transform group-hover:translate-x-2 transition-transform duration-300">↗</span>
+                </h2>
+              </div>
+              
+              {/* Social Pills */}
+              <div className="flex gap-3">
+                <a href="#" className="px-4 py-2 text-sm bg-neutral-800/50 rounded-full border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-500 transition-all backdrop-blur-sm">
+                  GitHub
+                </a>
+                <a href="#" className="px-4 py-2 text-sm bg-neutral-800/50 rounded-full border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-500 transition-all backdrop-blur-sm">
+                  LinkedIn
+                </a>
+              </div>
+            </div>
           </motion.div>
 
         </motion.section>

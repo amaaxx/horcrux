@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 
 export default function Home() {
@@ -22,8 +23,6 @@ export default function Home() {
       transition: { type: "spring", stiffness: 300, damping: 24 } 
     },
   };
-
-  // ... rest of your return statement
 
   return (
     <main className="min-h-screen bg-background text-white p-4 md:p-8 font-sans selection:bg-accent selection:text-white">
@@ -56,53 +55,55 @@ export default function Home() {
           {/* ========================================== */}
           {/* VESSEL 01: Ground Truth Engine (Main Card) */}
           {/* ========================================== */}
-          <motion.div 
-            variants={item}
-            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-8 md:col-span-2 md:row-span-2 flex flex-col justify-end transition-all hover:border-neutral-600 group"
-          >
-            {/* Hover Gradient Glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <Link href="/vessel/ground-truth-engine" className="md:col-span-2 md:row-span-2 block cursor-none">
+            <motion.div 
+              variants={item}
+              className="relative overflow-hidden bg-surface border border-border rounded-3xl p-8 h-full flex flex-col justify-end transition-all hover:border-neutral-600 group"
+            >
+              {/* Hover Gradient Glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-            {/* Top Status Indicator */}
-            <div className="absolute top-8 left-8 flex items-center gap-3">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-              </span>
-              <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
-                Vessel_01 // System_Active
-              </span>
-            </div>
-
-            {/* Core Content */}
-            <div className="relative z-10">
-              <h2 className="text-3xl font-bold mb-3 tracking-tight group-hover:text-accent transition-colors duration-300">
-                Ground Truth Engine
-              </h2>
-              <p className="text-neutral-400 max-w-md mb-8 leading-relaxed">
-                An advanced RAG architecture engineered to eliminate AI hallucinations through deterministic semantic routing.
-              </p>
-
-              {/* Tech Stack Pills */}
-              <div className="flex flex-wrap gap-2">
-                {['Python', 'Vector DB', 'Next.js 15'].map((tech) => (
-                  <span 
-                    key={tech} 
-                    className="px-3 py-1 text-[11px] font-mono text-neutral-300 bg-neutral-800/50 rounded-full border border-neutral-700/50 backdrop-blur-sm"
-                  >
-                    {tech}
-                  </span>
-                ))}
+              {/* Top Status Indicator */}
+              <div className="absolute top-8 left-8 flex items-center gap-3">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                </span>
+                <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
+                  Vessel_01 // System_Active
+                </span>
               </div>
-            </div>
-          </motion.div>
+
+              {/* Core Content */}
+              <div className="relative z-10">
+                <h2 className="text-3xl font-bold mb-3 tracking-tight group-hover:text-accent transition-colors duration-300">
+                  Ground Truth Engine
+                </h2>
+                <p className="text-neutral-400 max-w-md mb-8 leading-relaxed">
+                  An advanced RAG architecture engineered to eliminate AI hallucinations through deterministic semantic routing.
+                </p>
+
+                {/* Tech Stack Pills */}
+                <div className="flex flex-wrap gap-2">
+                  {['Python', 'Vector DB', 'Next.js 15'].map((tech) => (
+                    <span 
+                      key={tech} 
+                      className="px-3 py-1 text-[11px] font-mono text-neutral-300 bg-neutral-800/50 rounded-full border border-neutral-700/50 backdrop-blur-sm"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </Link>
 
           {/* ========================================== */}
           {/* VESSEL 02: Strata (Top Right)              */}
           {/* ========================================== */}
           <motion.div 
             variants={item}
-            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group  "
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group"
           >
             <div className="absolute top-6 left-6">
               <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
@@ -128,7 +129,7 @@ export default function Home() {
           {/* ========================================== */}
           <motion.div 
             variants={item}
-            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group  "
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group"
           >
             <div className="absolute top-6 left-6">
               <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
@@ -178,7 +179,7 @@ export default function Home() {
                   { name: "Tailwind v4", category: "Styling" },
                   { name: "C++ / DSA", category: "Logic" }
                 ].map((tech) => (
-                  <div key={tech.name} className="flex justify-between items-center group/tech  ">
+                  <div key={tech.name} className="flex justify-between items-center group/tech">
                     <span className="text-sm font-medium text-neutral-300 group-hover/tech:text-white transition-colors">
                       {tech.name}
                     </span>
@@ -196,7 +197,7 @@ export default function Home() {
           {/* ========================================== */}
           <motion.div 
             variants={item}
-            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-8 md:col-span-2 flex flex-col justify-end transition-all hover:border-neutral-600 group  "
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-8 md:col-span-2 flex flex-col justify-end transition-all hover:border-neutral-600 group"
           >
             {/* Radar / Signal Animation */}
             <div className="absolute top-0 right-0 p-8 opacity-50 group-hover:opacity-100 transition-opacity duration-500">

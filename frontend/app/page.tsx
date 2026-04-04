@@ -101,9 +101,10 @@ export default function Home() {
           {/* ========================================== */}
           {/* VESSEL 02: Strata (Top Right)              */}
           {/* ========================================== */}
+          <Link href="/vessel/strata" className="block cursor-none">
           <motion.div 
             variants={item}
-            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group"
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 h-full flex flex-col justify-between transition-all hover:border-neutral-600 group"
           >
             <div className="absolute top-6 left-6">
               <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
@@ -123,13 +124,15 @@ export default function Home() {
               <p className="text-neutral-400 text-sm">Recursive note architecture.</p>
             </div>
           </motion.div>
+          </Link>
 
           {/* ========================================== */}
           {/* VESSEL 03: BLW Portal (Middle Right)       */}
           {/* ========================================== */}
+          <Link href="/vessel/blw-portal" className="block cursor-none">
           <motion.div 
             variants={item}
-            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all hover:border-neutral-600 group"
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 h-full flex flex-col justify-between transition-all hover:border-neutral-600 group"
           >
             <div className="absolute top-6 left-6">
               <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
@@ -155,6 +158,7 @@ export default function Home() {
               <p className="text-neutral-400 text-sm">Enterprise deployment.</p>
             </div>
           </motion.div>
+          </Link>
 
           {/* ========================================== */}
           {/* VESSEL 04: Core Stack (Bottom Left)        */}

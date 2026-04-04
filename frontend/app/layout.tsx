@@ -1,3 +1,4 @@
+import CustomCursor from "@/components/CustomCursor";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -30,10 +31,9 @@ export default function RootLayout({ children,
       className={`${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
       suppressHydrationWarning
     >
-      <body 
-  className="bg-background text-white selection:bg-accent/30 selection:text-accent"
-  suppressHydrationWarning
->
+      <body className="bg-background text-white selection:bg-accent/30 selection:text-accent cursor-none" suppressHydrationWarning>
+  
+  <CustomCursor />
   {children}
 </body>
     </html>

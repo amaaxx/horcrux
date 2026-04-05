@@ -1,38 +1,61 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// The Database: This holds all the unique data for each project
-const vesselData = {
+// 1. Define the strict TypeScript blueprint for our projects
+type VesselProject = {
+  title: string;
+  subtitle: string;
+  problem: string;
+  solution: string;
+  stack: string[];
+  links?: {
+    live?: string;
+    github?: string; // The '?' makes this explicitly optional
+  };
+};
+
+// 2. Apply the blueprint to our database
+const vesselData: Record<string, VesselProject> = {
   "ground-truth-engine": {
     title: "Ground Truth Engine",
     subtitle: "Deterministic RAG Architecture",
     problem: "AI hallucination is a critical failure point in enterprise deployments. Standard LLMs generate confident but factually incorrect responses, making them unsuitable for rigid, data-sensitive environments.",
     solution: "By implementing a strict Retrieval-Augmented Generation (RAG) pipeline, we anchor the LLM's generative capabilities to a deterministic vector database, ensuring zero-hallucination outputs based solely on verified internal documents.",
-    stack: ["Python", "Vector DB", "FastAPI", "Next.js"]
+    stack: ["Python", "Vector DB", "FastAPI", "Next.js"],
+    links: {
+      live: "https://your-deployment-url.com",
+      github: "https://github.com/yourusername/ground-truth-engine"
+    }
   },
   "strata": {
     title: "Strata",
     subtitle: "Recursive Note Architecture",
     problem: "Standard note-taking applications rely on rigid folder structures or chaotic tagging systems, creating friction when organizing deeply nested or interconnected thoughts.",
     solution: "Engineered a full-stack digital workspace utilizing a recursive data model. This allows for infinite nesting of folders and notes, powered by a robust PostgreSQL backend and a highly responsive React/Tailwind frontend.",
-    stack: ["Next.js 15", "PostgreSQL", "React", "Tailwind v4"]
+    stack: ["Next.js 15", "PostgreSQL", "React", "Tailwind v4"],
+    links: {
+      live: "https://your-deployment-url.com",
+      github: "https://github.com/yourusername/strata"
+    }
   },
   "blw-portal": {
     title: "BLW Portal",
     subtitle: "Enterprise Intranet Deployment",
     problem: "Banaras Locomotive Works (Indian Railways) required a modernized, centralized digital workspace to handle operations and employee engagement across a massive workforce.",
     solution: "Developed and deployed a secure, high-performance portal directly onto the RailNet intranet. The system includes an automated architecture capable of managing data and interactions for over 5,000 employees.",
-    stack: ["Enterprise Tech", "Automated Engines", "RailNet"]
+    stack: ["Enterprise Tech", "Automated Engines", "RailNet"],
+    links: {
+      live: "https://blw.indianrailways.gov.in" 
+    }
   }
 };
 
-type VesselKey = keyof typeof vesselData;
+// Note: We removed the 'type VesselKey' line because Record<string, VesselProject> handles the routing safely now.
 
 export default async function VesselPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const slug = resolvedParams.slug as VesselKey;
+  const slug = resolvedParams.slug;
   
-  // If the URL doesn't match one of our projects, throw a 404
   const project = vesselData[slug];
   if (!project) {
     notFound();
@@ -40,7 +63,7 @@ export default async function VesselPage({ params }: { params: Promise<{ slug: s
 
   return (
     <main className="min-h-screen bg-background text-white p-6 md:p-16 font-sans selection:bg-accent/30 selection:text-accent cursor-none">
-      <div className="max-w-3xl mx-auto space-y-16 mt-12 md:mt-0 relative z-10">
+      <div className="max-w-3xl mx-auto space-y-12 mt-12 md:mt-0 relative z-10">
         
         {/* The "Back" Button */}
         <Link 
@@ -68,6 +91,32 @@ export default async function VesselPage({ params }: { params: Promise<{ slug: s
           <p className="text-xl text-neutral-400 font-mono text-sm">
             [ {project.subtitle} ]
           </p>
+
+          {/* Action Links */}
+          {project.links && (
+            <div className="flex flex-wrap gap-4 pt-4">
+              {project.links.live && (
+                <a 
+                  href={project.links.live} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="px-5 py-2.5 text-sm font-medium bg-accent/10 text-accent border border-accent/20 rounded-full hover:bg-accent/20 hover:border-accent/40 transition-all flex items-center gap-2 cursor-none group/btn"
+                >
+                  Launch Live System <span className="group-hover/btn:translate-x-1 group-hover:btn:-translate-y-1 transition-transform">↗</span>
+                </a>
+              )}
+              {project.links.github && (
+                <a 
+                  href={project.links.github} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="px-5 py-2.5 text-sm font-medium bg-neutral-800/50 text-neutral-300 border border-neutral-700/50 rounded-full hover:text-white hover:border-neutral-500 transition-all flex items-center gap-2 cursor-none"
+                >
+                  View Source Code
+                </a>
+              )}
+            </div>
+          )}
         </header>
 
         {/* Dynamic Content Area */}
@@ -83,7 +132,19 @@ export default async function VesselPage({ params }: { params: Promise<{ slug: s
           <h2 className="text-2xl font-bold text-white mt-8 mb-4 tracking-tight">The Problem Space</h2>
           <p className="leading-relaxed">{project.problem}</p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4 tracking-tight">The Solution Architecture</h2>
+          {/* Architecture Schematic Placeholder */}
+          <div className="my-16 p-8 border border-neutral-800 rounded-2xl bg-neutral-900/30 flex flex-col items-center justify-center text-center group/diagram transition-colors hover:border-neutral-700 cursor-none relative overflow-hidden">
+            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+            <div className="h-16 w-16 mb-4 rounded-full border border-neutral-700 flex items-center justify-center bg-neutral-800 relative z-10 group-hover/diagram:border-accent/50 transition-colors duration-500">
+              <span className="text-neutral-500 group-hover/diagram:text-accent transition-colors duration-500 font-mono">⌘</span>
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2 relative z-10">Architecture Schematic</h3>
+            <p className="text-sm text-neutral-500 max-w-sm relative z-10 font-mono">
+              System topology visualization goes here.
+            </p>
+          </div>
+
+          <h2 className="text-2xl font-bold text-white mt-8 mb-4 tracking-tight">The Solution Architecture</h2>
           <p className="leading-relaxed">{project.solution}</p>
         </article>
       </div>

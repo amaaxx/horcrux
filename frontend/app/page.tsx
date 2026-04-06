@@ -198,22 +198,25 @@ export default function Home() {
           </motion.div>
           </Link>
 
-          {/* ========================================== */}
+         {/* ========================================== */}
           {/* VESSEL 05: Comm Link (Bottom Middle/Right) */}
           {/* ========================================== */}
           <motion.div 
             variants={item}
             className="relative overflow-hidden bg-surface border border-border rounded-3xl p-8 md:col-span-2 flex flex-col justify-end transition-all duration-300 hover:border-neutral-600 active:scale-[0.98] active:border-neutral-500 group"
           >
+            {/* INVISIBLE CLICKABLE OVERLAY (Sibling, not Parent) */}
+            <Link href="/vessel/comm-link" className="absolute inset-0 z-10" aria-label="Open Comm Link" />
+
             {/* Radar / Signal Animation */}
-            <div className="absolute top-0 right-0 p-8 opacity-50 group-hover:opacity-100 transition-opacity duration-500">
+            <div className="absolute top-0 right-0 p-8 opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                <div className="relative flex h-8 w-8 items-center justify-center">
                  <div className="animate-ping absolute inline-flex h-full w-full rounded-full border border-accent opacity-30"></div>
                  <div className="relative inline-flex rounded-full h-2 w-2 bg-accent"></div>
                </div>
             </div>
 
-            <div className="absolute top-8 left-8">
+            <div className="absolute top-8 left-8 pointer-events-none">
               <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
                 Vessel_05 // Comm_Link
               </span>
@@ -221,15 +224,15 @@ export default function Home() {
 
             {/* Core Content */}
             <div className="relative z-20 flex flex-col md:flex-row items-start md:items-end justify-between w-full gap-6 mt-16 md:mt-0">
-              <div>
+              <div className="pointer-events-none">
                 <p className="text-neutral-400 mb-2 font-mono text-sm">Initialize connection</p>
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight group-hover:text-accent transition-colors duration-300">
                   Let's Talk <span className="inline-block transform group-hover:translate-x-2 transition-transform duration-300">↗</span>
                 </h2>
               </div>
               
-              {/* Social Pills */}
-              <div className="flex gap-3">
+              {/* Social Pills (Higher z-index to stay clickable) */}
+              <div className="flex gap-3 relative z-30">
                 <a href="https://github.com/amaaxx" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm bg-neutral-800/50 rounded-full border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-500 active:scale-95 transition-all backdrop-blur-sm">
                   GitHub
                 </a>

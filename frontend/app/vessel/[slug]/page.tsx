@@ -23,8 +23,8 @@ const vesselData: Record<string, VesselProject> = {
     solution: "By implementing a strict Retrieval-Augmented Generation (RAG) pipeline, we anchor the LLM's generative capabilities to a deterministic vector database, ensuring zero-hallucination outputs based solely on verified internal documents.",
     stack: ["Python", "Vector DB", "FastAPI", "Next.js"],
     links: {
-      live: "https://your-deployment-url.com",
-      github: "https://github.com/yourusername/ground-truth-engine"
+      live: "https://your-deployment-url.com", // You can update this later when Halkill is live
+      github: "https://github.com/amaaxx/halkill"
     }
   },
   "strata": {
@@ -34,8 +34,8 @@ const vesselData: Record<string, VesselProject> = {
     solution: "Engineered a full-stack digital workspace utilizing a recursive data model. This allows for infinite nesting of folders and notes, powered by a robust PostgreSQL backend and a highly responsive React/Tailwind frontend.",
     stack: ["Next.js 15", "PostgreSQL", "React", "Tailwind v4"],
     links: {
-      live: "https://your-deployment-url.com",
-      github: "https://github.com/yourusername/strata"
+      live: "https://your-deployment-url.com", // You can update this later when Laminar is live
+      github: "https://github.com/amaaxx/laminar"
     }
   },
   "blw-portal": {
@@ -45,7 +45,8 @@ const vesselData: Record<string, VesselProject> = {
     solution: "Developed and deployed a secure, high-performance portal directly onto the RailNet intranet. The system includes an automated architecture capable of managing data and interactions for over 5,000 employees.",
     stack: ["Enterprise Tech", "Automated Engines", "RailNet"],
     links: {
-      live: "https://blw.indianrailways.gov.in" 
+      live: "https://blw.indianrailways.gov.in",
+      github: "https://github.com/amaaxx/indian-railways" 
     }
   },
   "core-stack": {
@@ -55,7 +56,7 @@ const vesselData: Record<string, VesselProject> = {
     solution: "My primary architecture relies on Next.js 15 for the frontend edge delivery, ensuring high SEO and instant hydration. I anchor this to Python-based backends (FastAPI) for heavy data processing and AI integration. For raw algorithmic logic and core fundamentals, I rely on C++.",
     stack: ["Next.js 15", "TypeScript", "Python", "FastAPI", "C++", "Tailwind v4"],
     links: {
-      github: "https://github.com/yourusername" // Links to your global GitHub profile
+      github: "https://github.com/amaaxx"
     }
   }
 };

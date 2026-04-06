@@ -230,10 +230,10 @@ export default function Home() {
               
               {/* Social Pills */}
               <div className="flex gap-3">
-                <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm bg-neutral-800/50 rounded-full border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-500 active:scale-95 transition-all backdrop-blur-sm">
+                <a href="https://github.com/amaaxx" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm bg-neutral-800/50 rounded-full border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-500 active:scale-95 transition-all backdrop-blur-sm">
                   GitHub
                 </a>
-                <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm bg-neutral-800/50 rounded-full border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-500 active:scale-95 transition-all backdrop-blur-sm">
+                <a href="https://linkedin.com/in/amaaxx" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm bg-neutral-800/50 rounded-full border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-500 active:scale-95 transition-all backdrop-blur-sm">
                   LinkedIn
                 </a>
               </div>

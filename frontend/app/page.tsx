@@ -163,9 +163,10 @@ export default function Home() {
           {/* ========================================== */}
           {/* VESSEL 04: Core Stack (Bottom Left)        */}
           {/* ========================================== */}
+          <Link href="/vessel/core-stack" className="block">
           <motion.div 
             variants={item}
-            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 hover:border-neutral-600 active:scale-[0.98] active:border-neutral-500 group"
+            className="relative overflow-hidden bg-surface border border-border rounded-3xl p-6 h-full flex flex-col justify-between transition-all duration-300 hover:border-neutral-600 active:scale-[0.98] active:border-neutral-500 group"
           >
             <div className="absolute top-6 left-6">
               <span className="font-mono text-[10px] text-neutral-500 tracking-widest uppercase">
@@ -195,6 +196,7 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
+          </Link>
 
           {/* ========================================== */}
           {/* VESSEL 05: Comm Link (Bottom Middle/Right) */}

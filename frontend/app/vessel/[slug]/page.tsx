@@ -47,6 +47,16 @@ const vesselData: Record<string, VesselProject> = {
     links: {
       live: "https://blw.indianrailways.gov.in" 
     }
+  },
+  "core-stack": {
+    title: "Core Stack",
+    subtitle: "System Architecture & Arsenal",
+    problem: "Modern web development often fractures into either rapid prototyping with poor scaling, or over-engineered monoliths that stall momentum. The challenge is building a stack that guarantees both developer velocity and enterprise-grade scalability.",
+    solution: "My primary architecture relies on Next.js 15 for the frontend edge delivery, ensuring high SEO and instant hydration. I anchor this to Python-based backends (FastAPI) for heavy data processing and AI integration. For raw algorithmic logic and core fundamentals, I rely on C++.",
+    stack: ["Next.js 15", "TypeScript", "Python", "FastAPI", "C++", "Tailwind v4"],
+    links: {
+      github: "https://github.com/yourusername" // Links to your global GitHub profile
+    }
   }
 };
 

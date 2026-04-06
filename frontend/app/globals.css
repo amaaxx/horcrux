@@ -11,3 +11,10 @@ body {
   background-color: var(--color-background);
   color: #ffffff;
 }
+/* Level 100 Mobile Responsiveness: 
+   Only hide the cursor on devices with a real mouse (fine pointer) */
+@media (hover: hover) and (pointer: fine) {
+  body, a, button, [role="button"], input, select, textarea {
+    cursor: none !important;
+  }
+}

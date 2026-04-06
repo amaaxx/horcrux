@@ -62,13 +62,13 @@ export default async function VesselPage({ params }: { params: Promise<{ slug: s
   }
 
   return (
-    <main className="min-h-screen bg-background text-white p-6 md:p-16 font-sans selection:bg-accent/30 selection:text-accent cursor-none">
+    <main className="min-h-screen bg-background text-white p-6 md:p-16 font-sans selection:bg-accent/30 selection:text-accent">
       <div className="max-w-3xl mx-auto space-y-12 mt-12 md:mt-0 relative z-10">
         
         {/* The "Back" Button */}
         <Link 
           href="/" 
-          className="group flex items-center gap-4 text-neutral-500 hover:text-accent transition-colors w-fit text-xs font-mono uppercase tracking-widest cursor-none"
+          className="group flex items-center gap-4 text-neutral-500 hover:text-accent transition-colors w-fit text-xs font-mono uppercase tracking-widest"
         >
           <span className="transform group-hover:-translate-x-2 transition-transform duration-300">←</span> 
           Return_To_Grid
@@ -100,9 +100,9 @@ export default async function VesselPage({ params }: { params: Promise<{ slug: s
                   href={project.links.live} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="px-5 py-2.5 text-sm font-medium bg-accent/10 text-accent border border-accent/20 rounded-full hover:bg-accent/20 hover:border-accent/40 transition-all flex items-center gap-2 cursor-none group/btn"
+                  className="px-5 py-2.5 text-sm font-medium bg-accent/10 text-accent border border-accent/20 rounded-full hover:bg-accent/20 hover:border-accent/40 transition-all flex items-center gap-2 group/btn"
                 >
-                  Launch Live System <span className="group-hover/btn:translate-x-1 group-hover:btn:-translate-y-1 transition-transform">↗</span>
+                  Launch Live System <span className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform">↗</span>
                 </a>
               )}
               {project.links.github && (
@@ -110,7 +110,7 @@ export default async function VesselPage({ params }: { params: Promise<{ slug: s
                   href={project.links.github} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="px-5 py-2.5 text-sm font-medium bg-neutral-800/50 text-neutral-300 border border-neutral-700/50 rounded-full hover:text-white hover:border-neutral-500 transition-all flex items-center gap-2 cursor-none"
+                  className="px-5 py-2.5 text-sm font-medium bg-neutral-800/50 text-neutral-300 border border-neutral-700/50 rounded-full hover:text-white hover:border-neutral-500 transition-all flex items-center gap-2"
                 >
                   View Source Code
                 </a>
@@ -133,7 +133,7 @@ export default async function VesselPage({ params }: { params: Promise<{ slug: s
           <p className="leading-relaxed">{project.problem}</p>
 
           {/* Architecture Schematic Placeholder */}
-          <div className="my-16 p-8 border border-neutral-800 rounded-2xl bg-neutral-900/30 flex flex-col items-center justify-center text-center group/diagram transition-colors hover:border-neutral-700 cursor-none relative overflow-hidden">
+          <div className="my-16 p-8 border border-neutral-800 rounded-2xl bg-neutral-900/30 flex flex-col items-center justify-center text-center group/diagram transition-colors hover:border-neutral-700 relative overflow-hidden">
             <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
             <div className="h-16 w-16 mb-4 rounded-full border border-neutral-700 flex items-center justify-center bg-neutral-800 relative z-10 group-hover/diagram:border-accent/50 transition-colors duration-500">
               <span className="text-neutral-500 group-hover/diagram:text-accent transition-colors duration-500 font-mono">⌘</span>

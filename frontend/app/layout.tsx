@@ -31,7 +31,7 @@ export default function RootLayout({ children,
       className={`${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
       suppressHydrationWarning
     >
-      <body className="bg-background text-white selection:bg-accent/30 selection:text-accent cursor-none" suppressHydrationWarning>
+      <body className="bg-background text-white selection:bg-accent/30 selection:text-accent" suppressHydrationWarning>
   
   <CustomCursor />
   {children}

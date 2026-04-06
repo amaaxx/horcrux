@@ -8,13 +8,12 @@ export default function CommLink() {
   const [status, setStatus] = useState<"idle" | "connecting" | "ready" | "transmitting" | "sent">("idle");
   const [logs, setLogs] = useState<string[]>([]);
 
-  // Simulate the secure connection protocol on load (with Strict Mode cleanup)
   useEffect(() => {
     let isMounted = true;
     const timeoutIds: NodeJS.Timeout[] = [];
 
     setStatus("connecting");
-    setLogs([]); // Ensure logs are empty on fresh mount
+    setLogs([]); 
 
     const bootSequence = [
       "Establishing secure uplink...",
@@ -38,7 +37,6 @@ export default function CommLink() {
       delay += 800;
     });
 
-    // CLEANUP: If React Strict Mode unmounts this, kill the ghost timers.
     return () => {
       isMounted = false;
       timeoutIds.forEach(clearTimeout);
@@ -50,7 +48,6 @@ export default function CommLink() {
     setStatus("transmitting");
     setLogs((prev) => [...prev, "> Initiating data transfer..."]);
 
-    // Simulate API delay
     setTimeout(() => {
       setLogs((prev) => [...prev, "> Payload delivered successfully.", "> Closing channel."]);
       setStatus("sent");
@@ -58,8 +55,16 @@ export default function CommLink() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-white p-6 md:p-16 font-mono selection:bg-accent/30 selection:text-accent">
-      <div className="max-w-2xl mx-auto space-y-12 mt-12 md:mt-0 relative z-10">
+    <main className="relative min-h-[100dvh] flex flex-col justify-center bg-background text-white p-4 md:p-8 font-mono selection:bg-accent/30 selection:text-accent overflow-hidden">
+      
+      {/* The Spotlight Effect: Makes the empty space feel deliberate and cinematic */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-800/20 via-background to-background pointer-events-none z-0" />
+      
+      {/* Grid Pattern Overlay (Optional: adds a blueprint/technical feel to the void) */}
+      <div className="absolute inset-0 bg-grid-white/[0.01] bg-[size:30px_30px] pointer-events-none z-0" />
+
+      {/* Expanded to max-w-3xl to command more horizontal screen space */}
+      <div className="max-w-3xl w-full mx-auto space-y-8 relative z-10">
         
         {/* Navigation */}
         <Link 
@@ -71,7 +76,7 @@ export default function CommLink() {
         </Link>
 
         {/* Header */}
-        <header className="space-y-4 border-b border-neutral-800 pb-8">
+        <header className="space-y-4 border-b border-neutral-800 pb-6">
           <div className="flex items-center gap-3">
             <span className="relative flex h-2 w-2">
               {status !== "sent" && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>}
@@ -86,7 +91,7 @@ export default function CommLink() {
           </h1>
         </header>
 
-        {/* Terminal Window (Now with cinematic layout fluid-expansion) */}
+        {/* Terminal Window */}
         <motion.div 
           layout
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -100,7 +105,7 @@ export default function CommLink() {
             <span className="ml-2 text-[10px] text-neutral-500">root@amaaxx:~</span>
           </div>
 
-          <div className="p-6 md:p-8 space-y-8">
+          <div className="p-6 md:p-8 space-y-6">
             {/* System Logs */}
             <div className="space-y-2 text-xs md:text-sm text-neutral-400 min-h-[100px]">
               {logs.map((log, i) => (
@@ -113,7 +118,6 @@ export default function CommLink() {
                 </motion.div>
               ))}
               
-              {/* Blinking Cursor for both Connecting and Transmitting states */}
               {(status === "connecting" || status === "transmitting") && (
                 <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1 }}>
                   &gt; _
@@ -128,7 +132,7 @@ export default function CommLink() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 onSubmit={handleSubmit} 
-                className="space-y-6"
+                className="space-y-5"
               >
                 <div className="space-y-4">
                   <div className="flex flex-col gap-1">
@@ -155,7 +159,7 @@ export default function CommLink() {
                     <label className="text-[10px] text-accent uppercase tracking-widest">Payload</label>
                     <textarea 
                       required 
-                      rows={4}
+                      rows={3}
                       placeholder="Enter transmission data..." 
                       className="w-full bg-transparent border border-neutral-700 rounded-md p-3 text-sm text-white focus:outline-none focus:border-accent transition-colors placeholder:text-neutral-700 resize-none mt-1"
                     />

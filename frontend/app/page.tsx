@@ -99,8 +99,8 @@ export default function Home() {
                 Vessel_02 // Strata
               </span>
             </div>
-            {/* Fixed overflow: replaced mt-16 with my-auto to perfectly suspend the graphic */}
-            <div className="relative my-auto h-20 w-full flex items-center justify-center">
+            {/* MOBILE FIX: mt-14 forces clearance below absolute label, md:mt-auto hands it back to Flexbox on desktop */}
+            <div className="relative mt-14 md:mt-auto md:mb-auto h-20 w-full flex items-center justify-center">
                <div className="absolute w-full h-12 bg-neutral-800 rounded-lg border border-neutral-700 transform transition-transform group-hover:-translate-y-3 group-hover:scale-[0.98] duration-500 z-10 shadow-lg" />
                <div className="absolute w-full h-12 bg-neutral-800/80 rounded-lg border border-neutral-700/80 transform translate-y-2 scale-[0.95] transition-transform group-hover:-translate-y-0 group-hover:scale-[0.92] duration-500 z-0" />
                <div className="absolute w-full h-12 bg-neutral-800/40 rounded-lg border border-neutral-700/50 transform translate-y-4 scale-[0.90] transition-transform group-hover:translate-y-3 group-hover:scale-[0.85] duration-500 -z-10" />
@@ -123,8 +123,8 @@ export default function Home() {
                 Vessel_03 // BLW_Intranet
               </span>
             </div>
-            {/* Fixed overflow: replaced mt-16 with my-auto */}
-            <div className="relative my-auto w-full flex items-center justify-start opacity-50 group-hover:opacity-100 transition-opacity duration-500">
+            {/* MOBILE FIX: mt-14 added */}
+            <div className="relative mt-14 md:mt-auto md:mb-auto w-full flex items-center justify-start opacity-50 group-hover:opacity-100 transition-opacity duration-500">
                <div className="flex flex-col gap-2 w-full">
                  <div className="h-1 w-full bg-neutral-800 rounded-full overflow-hidden">
                    <div className="h-full bg-neutral-600 w-1/4 group-hover:bg-accent group-hover:w-full transition-all duration-1000 ease-in-out"></div>
@@ -153,8 +153,8 @@ export default function Home() {
                 Vessel_04 // Core_Stack
               </span>
             </div>
-            {/* Fixed overflow: replaced mt-16 with my-auto */}
-            <div className="my-auto z-20 w-full pt-8">
+            {/* MOBILE FIX: mt-14 added */}
+            <div className="mt-14 md:mt-auto md:mb-auto z-20 w-full pt-4 md:pt-0">
               <div className="flex flex-col gap-3">
                 {[
                   { name: "Next.js 15", category: "Framework" },
@@ -200,7 +200,6 @@ export default function Home() {
                 <p className="text-neutral-400 mb-2 font-mono text-sm">Initialize connection</p>
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight group-hover:text-accent transition-colors duration-300 flex items-center">
                   Let's Talk 
-                  {/* Upgraded SVG Arrow to prevent Windows Emoji rendering */}
                   <svg 
                     width="32" 
                     height="32" 

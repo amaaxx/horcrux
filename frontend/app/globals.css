@@ -7,7 +7,10 @@
   --color-accent: #3b82f6;
 }
 
-body {
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
   background-color: var(--color-background);
   color: #ffffff;
 }

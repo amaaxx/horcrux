@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// 1. Define the strict TypeScript blueprint for our projects
+// Strict type definition: ? makes github and live explicitly optional
 type VesselProject = {
   title: string;
   subtitle: string;
@@ -10,11 +10,11 @@ type VesselProject = {
   stack: string[];
   links?: {
     live?: string;
-    github?: string; // The '?' makes this explicitly optional
+    github?: string; 
   };
 };
 
-// 2. Apply the blueprint to our database
+// Record<string, VesselProject> forces TS to accept optional properties
 const vesselData: Record<string, VesselProject> = {
   "ground-truth-engine": {
     title: "Ground Truth Engine",
@@ -23,10 +23,11 @@ const vesselData: Record<string, VesselProject> = {
     solution: "By implementing a strict Retrieval-Augmented Generation (RAG) pipeline, we anchor the LLM's generative capabilities to a deterministic vector database, ensuring zero-hallucination outputs based solely on verified internal documents.",
     stack: ["Python", "Vector DB", "FastAPI", "Next.js"],
     links: {
-      live: "https://your-deployment-url.com", // You can update this later when Halkill is live
+      live: "https://your-deployment-url.com",
       github: "https://github.com/amaaxx/halkill"
     }
   },
+// ... the rest of your dictionary continues here
   "strata": {
     title: "Strata",
     subtitle: "Recursive Note Architecture",

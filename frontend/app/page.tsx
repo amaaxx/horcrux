@@ -164,13 +164,13 @@ export default function Home() {
           </Link>
 
           {/* VESSEL 02 */}
-          <Link href="/vessel/strata" className="block h-full">
+          <Link href="/vessel/Laminar" className="block h-full">
             <SpotlightCard
               variants={item}
               className="relative overflow-hidden bg-surface border border-border rounded-2xl md:rounded-3xl p-3 md:p-6 h-full flex flex-col transition-all duration-300 hover:border-neutral-600 hover:shadow-[0_0_45px_-8px_rgba(59,130,246,0.22)] active:scale-[0.99] group"
             >
               <div className="relative z-20 flex-none shrink-0">
-                <span className="font-mono text-[8px] md:text-[10px] text-neutral-500 tracking-widest uppercase">Vessel_02 // Strata</span>
+                <span className="font-mono text-[8px] md:text-[10px] text-neutral-500 tracking-widest uppercase">Vessel_02 // Laminar</span>
               </div>
 
               <div className="relative w-full flex items-center justify-center flex-1 min-h-0 my-2 md:my-4">
@@ -180,7 +180,7 @@ export default function Home() {
               </div>
 
               <div className="relative z-20 flex-none shrink-0">
-                <h2 className="text-sm md:text-xl font-bold mb-0.5 group-hover:text-accent transition-colors duration-300">Strata</h2>
+                <h2 className="text-sm md:text-xl font-bold mb-0.5 group-hover:text-accent transition-colors duration-300">Laminar</h2>
                 <p className="text-neutral-400 text-[10px] md:text-sm">Recursive note architecture.</p>
               </div>
             </SpotlightCard>

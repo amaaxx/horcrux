@@ -26,13 +26,13 @@ const vesselData: Record<string, VesselProject> = {
     solution: "By implementing a strict Retrieval-Augmented Generation (RAG) pipeline, we anchor the LLM's generative capabilities to a deterministic vector database, ensuring zero-hallucination outputs based solely on verified internal documents.",
     stack: ["Python", "Vector DB", "FastAPI", "Next.js"],
     links: {
-      live: "https://your-deployment-url.com",
+      live: "halkill.vercel.app",
       github: "https://github.com/amaaxx/halkill"
     },
     telemetry: { status: "Active", version: "v1.2.4", buildHash: "0x8F9A2C" }
   },
-  "strata": {
-    title: "Strata",
+  "Laminar": {
+    title: "Laminar",
     subtitle: "Recursive Note Architecture",
     problem: "Standard note-taking applications rely on rigid folder structures or chaotic tagging systems, creating friction when organizing deeply nested or interconnected thoughts.",
     solution: "Engineered a full-stack digital workspace utilizing a recursive data model. This allows for infinite nesting of folders and notes, powered by a robust PostgreSQL backend and a highly responsive React/Tailwind frontend.",
@@ -50,7 +50,7 @@ const vesselData: Record<string, VesselProject> = {
     solution: "Developed and deployed a secure, high-performance portal directly onto the RailNet intranet. The system includes an automated architecture capable of managing data and interactions for over 5,000 employees.",
     stack: ["Enterprise Tech", "Automated Engines", "RailNet"],
     links: {
-      live: "https://blw.indianrailways.gov.in",
+      live: "https://indian-railways-six.vercel.app/",
       github: "https://github.com/amaaxx/indian-railways"
     },
     telemetry: { status: "Deployed", version: "v2.0.0-LTS", buildHash: "0xRAILNET" }

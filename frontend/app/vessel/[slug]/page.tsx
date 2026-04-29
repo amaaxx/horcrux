@@ -26,7 +26,7 @@ const vesselData: Record<string, VesselProject> = {
     solution: "By implementing a strict Retrieval-Augmented Generation (RAG) pipeline, we anchor the LLM's generative capabilities to a deterministic vector database, ensuring zero-hallucination outputs based solely on verified internal documents.",
     stack: ["Python", "Vector DB", "FastAPI", "Next.js"],
     links: {
-      live: "halkill.vercel.app",
+      live: "https://halkill.vercel.app",
       github: "https://github.com/amaaxx/halkill"
     },
     telemetry: { status: "Active", version: "v1.2.4", buildHash: "0x8F9A2C" }
@@ -166,12 +166,22 @@ export default async function VesselPage({ params }: { params: Promise<{ slug: s
             {project.links && (
               <div className="flex flex-col gap-3">
                 {project.links.live && (
-                  <a href={project.links.live} target="_blank" rel="noopener noreferrer" className="w-full py-4 px-6 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-neutral-200 active:scale-[0.98] transition-all text-center flex items-center justify-center gap-2">
+                  <a 
+                    href={project.links.live.startsWith("http") ? project.links.live : `https://${project.links.live}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-full py-4 px-6 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-neutral-200 active:scale-[0.98] transition-all text-center flex items-center justify-center gap-2"
+                  >
                     Initialize System <span className="text-lg leading-none">↗</span>
                   </a>
                 )}
                 {project.links.github && (
-                  <a href={project.links.github} target="_blank" rel="noopener noreferrer" className="w-full py-4 px-6 bg-transparent border border-neutral-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:border-neutral-400 active:scale-[0.98] transition-all text-center">
+                  <a 
+                    href={project.links.github.startsWith("http") ? project.links.github : `https://${project.links.github}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-full py-4 px-6 bg-transparent border border-neutral-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:border-neutral-400 active:scale-[0.98] transition-all text-center"
+                  >
                     Source Code
                   </a>
                 )}

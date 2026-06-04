@@ -387,149 +387,7 @@ function VaultVisualContainer({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ── COMPONENT: SYSTEM TELEMETRY TERMINAL WIDGET ──────────────────────────────
-interface TelemetryProps {
-  showSchematics: boolean;
-  setShowSchematics: (v: boolean) => void;
-}
 
-function SystemTelemetryWidget({ showSchematics, setShowSchematics }: TelemetryProps) {
-  const { scrollY } = useScroll();
-  const scrollVelocity = useVelocity(scrollY);
-  const [velocityVal, setVelocityVal] = useState(0);
-  const [fps, setFps] = useState(120);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const velocityHistory = useRef<number[]>(new Array(50).fill(0));
-
-  useEffect(() => {
-    const unsubscribe = scrollVelocity.on("change", (latest) => {
-      setVelocityVal(Math.round(latest));
-    });
-    return () => unsubscribe();
-  }, [scrollVelocity]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFps(Math.round(118.6 + Math.random() * 1.4));
-    }, 700);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Draw canvas scroll speed waveform
-  useEffect(() => {
-    let animationFrameId: number;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Set physical display resolution based on DPR for crisp lines
-    const handleResize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.resetTransform();
-      ctx.scale(dpr, dpr);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    const draw = () => {
-      const latestSpeed = Math.min(Math.abs(scrollVelocity.get()), 3000);
-      velocityHistory.current.push(latestSpeed);
-      if (velocityHistory.current.length > 50) {
-        velocityHistory.current.shift();
-      }
-
-      const rect = canvas.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-
-      ctx.clearRect(0, 0, width, height);
-
-      // Draw subtle grid lines
-      ctx.strokeStyle = "rgba(79, 70, 229, 0.05)";
-      ctx.lineWidth = 0.5;
-      for (let i = 1; i < 4; i++) {
-        const y = (height / 4) * i;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      // Draw speed waveform
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(79, 70, 229, 0.8)";
-      ctx.lineWidth = 1.25;
-      const points = velocityHistory.current;
-      const step = width / (points.length - 1);
-
-      for (let i = 0; i < points.length; i++) {
-        const amp = points[i];
-        const ratio = amp / 3000;
-        const y = height - ratio * (height - 6) - 3;
-        const x = i * step;
-
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      }
-      ctx.stroke();
-
-      animationFrameId = requestAnimationFrame(draw);
-    };
-
-    animationFrameId = requestAnimationFrame(draw);
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [scrollVelocity]);
-
-  return (
-    <div className="fixed bottom-6 right-6 z-[90] p-4 rounded-2xl font-mono text-[9px] text-neutral-400 telemetry-panel min-w-[190px] flex flex-col gap-2.5">
-      <div className="flex justify-between items-center border-b border-white/5 pb-1.5 select-none">
-        <span className="text-[#4f46e5] font-extrabold tracking-wider">HORCRUX_KERNEL // DEVIP</span>
-        <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-      </div>
-      <div className="space-y-1 text-neutral-400 select-none">
-        <div className="flex justify-between">
-          <span>KINETIC_SPEED:</span>
-          <span className="text-neutral-200 font-bold">{Math.abs(velocityVal)} PX/S</span>
-        </div>
-        <div className="flex justify-between">
-          <span>REFRESH_RATE:</span>
-          <span className="text-neutral-200 font-bold">{fps} HZ</span>
-        </div>
-        <div className="flex justify-between">
-          <span>CORE_LOAD:</span>
-          <span className="text-green-400 font-bold">STABLE // OK</span>
-        </div>
-      </div>
-
-      {/* Telemetry scrolling waveform canvas */}
-      <canvas ref={canvasRef} className="telemetry-canvas" />
-
-      {/* Grid Toggler Controls */}
-      <div className="flex justify-between items-center mt-1 pt-1.5 border-t border-white/5">
-        <span className="text-[7px] text-neutral-500">SCHEMATIC_LINES:</span>
-        <button 
-          onClick={() => setShowSchematics(!showSchematics)}
-          className="telemetry-btn"
-          title="Toggle schematic layout blueprint grids"
-        >
-          <span className={`w-1.5 h-1.5 rounded-full ${showSchematics ? "bg-indigo-500 animate-pulse" : "bg-neutral-600"}`} />
-          {showSchematics ? "GRID_ON" : "GRID_OFF"}
-        </button>
-      </div>
-    </div>
-  );
-}
 
 // Inline SVG components to guarantee compilation across Next versions
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -580,8 +438,7 @@ export default function Home() {
   const scrollVelocity = useVelocity(scrollY);
   const smoothedVelocity = useSpring(scrollVelocity, { stiffness: 100, damping: 22 });
 
-  // Toggle state for CAD grid schematic lines (midlife.engineering style)
-  const [showSchematics, setShowSchematics] = useState(false);
+
 
   // Dynamic Background Morphing mapped across page scroll sections
   const pageBgColor = useTransform(
@@ -700,27 +557,7 @@ export default function Home() {
       {/* Parallax Dot-Grid Backdrop (Parallax Depth Parallels) */}
       <motion.div style={{ y: gridY }} className="parallax-grid-bg" />
 
-      {/* Schematic layout grids */}
-      {showSchematics && (
-        <>
-          {/* Vertical grids */}
-          <div className="schematic-grid">
-            <div className="schematic-line-v" />
-            <div className="schematic-line-v" />
-            <div className="schematic-line-v" />
-            <div className="schematic-line-v" />
-          </div>
-          {/* Horizontal grids */}
-          <div className="schematic-grid-h">
-            <div className="schematic-line-h" />
-            <div className="schematic-line-h" />
-            <div className="schematic-line-h" />
-          </div>
-        </>
-      )}
 
-      {/* Floating System Telemetry Terminal Widget (Midlife.engineering style) */}
-      <SystemTelemetryWidget showSchematics={showSchematics} setShowSchematics={setShowSchematics} />
       
       {/* Interactive Hero Light Leak follows user mouse */}
       <motion.div

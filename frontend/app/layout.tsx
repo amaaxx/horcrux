@@ -28,7 +28,7 @@ export default function RootLayout({ children,
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden`}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       suppressHydrationWarning
     >
       <body className="bg-[#05050a] text-neutral-200 selection:bg-accent/25 selection:text-white" suppressHydrationWarning>

@@ -83,8 +83,73 @@ export function GroundTruthVisual() {
         <path d="M 280 120 L 360 120" stroke="url(#cyanToIndigo)" strokeWidth="2" className="path-flow-fast" />
         <path d="M 280 120 L 360 120" stroke="#22d3ee" strokeWidth="0.5" opacity="0.5" />
 
-        <circle cx="120" cy="120" r="10" stroke="#22d3ee" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "120px 120px" }} />
-        <circle cx="280" cy="120" r="10" stroke="#4f46e5" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "280px 280px", animationDelay: "1.5s" }} />
+        {/* Animated flowing data packets */}
+        {/* Input to Router */}
+        <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
+          <animateMotion path="M 40 120 L 120 120" dur="1.2s" repeatCount="indefinite" />
+        </circle>
+        <circle r="2" fill="#e0f7fa">
+          <animateMotion path="M 40 120 L 120 120" dur="1.2s" begin="0.6s" repeatCount="indefinite" />
+        </circle>
+
+        {/* Router to DB Shards */}
+        <circle r="3.5" fill="#818cf8" filter="url(#glow)">
+          <animateMotion path="M 120 120 C 150 120, 150 60, 200 60" dur="1.6s" repeatCount="indefinite" />
+        </circle>
+        <circle r="2" fill="#e0f7fa">
+          <animateMotion path="M 120 120 C 150 120, 150 60, 200 60" dur="1.6s" begin="0.8s" repeatCount="indefinite" />
+        </circle>
+
+        <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
+          <animateMotion path="M 120 120 L 200 120" dur="1.4s" repeatCount="indefinite" />
+        </circle>
+        <circle r="2" fill="#e0f7fa">
+          <animateMotion path="M 120 120 L 200 120" dur="1.4s" begin="0.7s" repeatCount="indefinite" />
+        </circle>
+
+        <circle r="3.5" fill="#818cf8" filter="url(#glow)">
+          <animateMotion path="M 120 120 C 150 120, 150 180, 200 180" dur="1.8s" repeatCount="indefinite" />
+        </circle>
+        <circle r="2" fill="#e0f7fa">
+          <animateMotion path="M 120 120 C 150 120, 150 180, 200 180" dur="1.8s" begin="0.9s" repeatCount="indefinite" />
+        </circle>
+
+        {/* DB Shards to Context Synthesis */}
+        <circle r="3.5" fill="#c084fc" filter="url(#glow)">
+          <animateMotion path="M 200 60 C 250 60, 250 120, 280 120" dur="1.6s" repeatCount="indefinite" />
+        </circle>
+        <circle r="2" fill="#e0f7fa">
+          <animateMotion path="M 200 60 C 250 60, 250 120, 280 120" dur="1.6s" begin="0.8s" repeatCount="indefinite" />
+        </circle>
+
+        <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
+          <animateMotion path="M 200 120 L 280 120" dur="1.4s" repeatCount="indefinite" />
+        </circle>
+        <circle r="2" fill="#e0f7fa">
+          <animateMotion path="M 200 120 L 280 120" dur="1.4s" begin="0.7s" repeatCount="indefinite" />
+        </circle>
+
+        <circle r="3.5" fill="#c084fc" filter="url(#glow)">
+          <animateMotion path="M 200 180 C 250 180, 250 120, 280 120" dur="1.8s" repeatCount="indefinite" />
+        </circle>
+        <circle r="2" fill="#e0f7fa">
+          <animateMotion path="M 200 180 C 250 180, 250 120, 280 120" dur="1.8s" begin="0.9s" repeatCount="indefinite" />
+        </circle>
+
+        {/* Synthesis to Output */}
+        <circle r="4" fill="#22d3ee" filter="url(#glow)">
+          <animateMotion path="M 280 120 L 360 120" dur="1.2s" repeatCount="indefinite" />
+        </circle>
+        <circle r="2" fill="#e0f7fa">
+          <animateMotion path="M 280 120 L 360 120" dur="1.2s" begin="0.6s" repeatCount="indefinite" />
+        </circle>
+
+        {/* Pulsing rings around key nodes */}
+        <circle cx="120" cy="120" r="10" stroke="#22d3ee" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "120px 120px", animationDelay: "0s" }} />
+        <circle cx="120" cy="120" r="10" stroke="#22d3ee" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "120px 120px", animationDelay: "1.5s" }} />
+        
+        <circle cx="280" cy="120" r="10" stroke="#4f46e5" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "280px 120px", animationDelay: "0.5s" }} />
+        <circle cx="280" cy="120" r="10" stroke="#4f46e5" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "280px 120px", animationDelay: "2s" }} />
 
         {/* Input Query Node */}
         <circle cx="40" cy="120" r="7" fill="#09090e" stroke="#22d3ee" strokeWidth="2" />

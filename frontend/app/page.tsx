@@ -394,7 +394,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative w-full min-h-screen bg-[#05050a] text-neutral-200 selection:bg-white/20 overflow-hidden font-sans" suppressHydrationWarning>
+    <main className="relative w-full min-h-screen bg-[#05050a] text-neutral-200 selection:bg-white/20 overflow-x-hidden font-sans" suppressHydrationWarning>
       
       {/* Interactive Hero Light Leak follows user mouse */}
       <motion.div
@@ -610,15 +610,33 @@ export default function Home() {
                   <Cpu className="w-5 h-5 text-neutral-600" />
                 </div>
                 
-                <div className="mt-8">
-                  <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-200 mb-2">Next.js 15</h3>
-                  <p className="text-neutral-400 text-xs md:text-sm max-w-md leading-relaxed mb-4">
-                    Leveraging Next.js 15 with React 19 concurrent features. Architecting production systems utilizing advanced Server Actions, edge routing configurations, and zero-bundle server components.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {["React 19", "Server Components", "Edge Handlers", "Hydration Optimizations"].map((t) => (
-                      <span key={t} className="px-2.5 py-1 text-[10px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
-                    ))}
+                <div className="mt-8 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+                  <div className="flex-1">
+                    <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-200 mb-2">Next.js 15</h3>
+                    <p className="text-neutral-400 text-xs md:text-sm max-w-md leading-relaxed mb-4">
+                      Leveraging Next.js 15 with React 19 concurrent features. Architecting production systems utilizing advanced Server Actions, edge routing configurations, and zero-bundle server components.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {["React 19", "Server Components", "Edge Handlers", "Hydration Optimizations"].map((t) => (
+                        <span key={t} className="px-2.5 py-1 text-[10px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Next.js Mini Visual */}
+                  <div className="w-full md:w-40 h-28 shrink-0 rounded-2xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
+                    <svg className="w-24 h-20" viewBox="0 0 100 80" fill="none">
+                      <circle cx="50" cy="40" r="10" stroke="#4f46e5" strokeWidth="1.5" />
+                      <circle cx="50" cy="40" r="4" fill="#4f46e5" />
+                      <path d="M 50 30 L 50 12" stroke="#334155" strokeWidth="1.5" />
+                      <path d="M 40 40 L 15 40" stroke="#334155" strokeWidth="1.5" />
+                      <path d="M 60 40 L 85 40" stroke="#334155" strokeWidth="1.5" />
+                      <path d="M 50 50 L 50 68" stroke="#334155" strokeWidth="1.5" />
+                      <circle r="2" fill="#22d3ee"><animateMotion path="M 50 30 L 50 12" dur="1s" repeatCount="indefinite"/></circle>
+                      <circle r="2" fill="#22d3ee"><animateMotion path="M 50 50 L 50 68" dur="1.2s" repeatCount="indefinite"/></circle>
+                      <circle r="2" fill="#22d3ee"><animateMotion path="M 40 40 L 15 40" dur="0.9s" repeatCount="indefinite"/></circle>
+                      <circle r="2" fill="#22d3ee"><animateMotion path="M 60 40 L 85 40" dur="1.1s" repeatCount="indefinite"/></circle>
+                    </svg>
                   </div>
                 </div>
               </TiltCard>
@@ -632,15 +650,34 @@ export default function Home() {
                   <Server className="w-5 h-5 text-neutral-600" />
                 </div>
                 
-                <div className="mt-8">
-                  <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">Python & FastAPI</h3>
-                  <p className="text-neutral-400 text-xs leading-relaxed mb-4">
-                    Constructing high-performance asynchronous API endpoints using FastAPI. Strict type validation with Pydantic and async-native database drivers.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {["AsyncIO", "Pydantic v2", "FastAPI", "Uvicorn"].map((t) => (
-                      <span key={t} className="px-2 py-0.5 text-[9px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
-                    ))}
+                <div className="mt-8 flex flex-col justify-between h-full gap-4">
+                  <div>
+                    <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">Python & FastAPI</h3>
+                    <p className="text-neutral-400 text-xs leading-relaxed mb-4">
+                      Constructing high-performance asynchronous API endpoints using FastAPI. Strict type validation with Pydantic and async-native database drivers.
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {["AsyncIO", "Pydantic v2", "FastAPI", "Uvicorn"].map((t) => (
+                        <span key={t} className="px-2 py-0.5 text-[9px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Python & FastAPI Mini Visual */}
+                  <div className="w-full h-20 rounded-xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
+                    <svg className="w-20 h-16" viewBox="0 0 80 60" fill="none">
+                      <rect x="25" y="15" width="30" height="30" rx="6" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="40" cy="30" r="4" fill="#4f46e5" className="animate-ping" style={{ transformOrigin: "40px 30px" }} />
+                      <circle cx="40" cy="30" r="2.5" fill="#4f46e5" />
+                      <path d="M 10 20 C 25 5, 55 5, 70 20" stroke="#334155" strokeWidth="1" strokeDasharray="2 2" />
+                      <path d="M 70 40 C 55 55, 25 55, 10 40" stroke="#334155" strokeWidth="1" strokeDasharray="2 2" />
+                      <circle r="1.5" fill="#22d3ee">
+                        <animateMotion path="M 10 20 C 25 5, 55 5, 70 20" dur="1.6s" repeatCount="indefinite" />
+                      </circle>
+                      <circle r="1.5" fill="#c084fc">
+                        <animateMotion path="M 70 40 C 55 55, 25 55, 10 40" dur="1.6s" repeatCount="indefinite" />
+                      </circle>
+                    </svg>
                   </div>
                 </div>
               </TiltCard>
@@ -654,15 +691,33 @@ export default function Home() {
                   <Activity className="w-5 h-5 text-neutral-600" />
                 </div>
                 
-                <div className="mt-8">
-                  <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">React</h3>
-                  <p className="text-neutral-400 text-xs leading-relaxed mb-4">
-                    Orchestrating state machines, heavy list virtualization, and custom React hook bindings tailored for smooth rendering and high visual velocity.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {["Fiber Architecture", "Concurrent rendering", "Hooks Engine"].map((t) => (
-                      <span key={t} className="px-2 py-0.5 text-[9px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
-                    ))}
+                <div className="mt-8 flex flex-col justify-between h-full gap-4">
+                  <div>
+                    <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">React</h3>
+                    <p className="text-neutral-400 text-xs leading-relaxed mb-4">
+                      Orchestrating state machines, heavy list virtualization, and custom React hook bindings tailored for smooth rendering and high visual velocity.
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {["Fiber", "Concurrent UI", "Hooks Engine"].map((t) => (
+                        <span key={t} className="px-2 py-0.5 text-[9px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* React Mini Visual */}
+                  <div className="w-full h-20 rounded-xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
+                    <svg className="w-20 h-16" viewBox="0 0 80 60" fill="none">
+                      <circle cx="40" cy="12" r="4.5" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="22" cy="32" r="4.5" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="58" cy="32" r="4.5" stroke="#4f46e5" strokeWidth="1.5" />
+                      <circle cx="12" cy="50" r="3.5" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="32" cy="50" r="3.5" stroke="#334155" strokeWidth="1.5" />
+                      <line x1="40" y1="16" x2="22" y2="28" stroke="#334155" strokeWidth="1" />
+                      <line x1="40" y1="16" x2="58" y2="28" stroke="#334155" strokeWidth="1" />
+                      <line x1="22" y1="36" x2="12" y2="46" stroke="#334155" strokeWidth="1" />
+                      <line x1="22" y1="36" x2="32" y2="46" stroke="#334155" strokeWidth="1" />
+                      <circle cx="58" cy="32" r="8" stroke="#4f46e5" strokeWidth="0.5" className="animate-ping" style={{ transformOrigin: "58px 32px" }} />
+                    </svg>
                   </div>
                 </div>
               </TiltCard>
@@ -676,15 +731,32 @@ export default function Home() {
                   <Layers className="w-5 h-5 text-neutral-600" />
                 </div>
                 
-                <div className="mt-8">
-                  <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">LangChain</h3>
-                  <p className="text-neutral-400 text-xs leading-relaxed mb-4">
-                    Engineering multi-agent reasoning graphs, vector space routing algorithms, and hybrid RAG data pipelines for LLM integration.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {["Agentic Graphs", "Vector Embeddings", "RAG Pipelines"].map((t) => (
-                      <span key={t} className="px-2 py-0.5 text-[9px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
-                    ))}
+                <div className="mt-8 flex flex-col justify-between h-full gap-4">
+                  <div>
+                    <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">LangChain</h3>
+                    <p className="text-neutral-400 text-xs leading-relaxed mb-4">
+                      Engineering multi-agent reasoning graphs, vector space routing algorithms, and hybrid RAG data pipelines for LLM integration.
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {["Agentic Graphs", "Vector Embeddings", "RAG Pipelines"].map((t) => (
+                        <span key={t} className="px-2 py-0.5 text-[9px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* LangChain Mini Visual */}
+                  <div className="w-full h-20 rounded-xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
+                    <svg className="w-20 h-16" viewBox="0 0 80 60" fill="none">
+                      <circle cx="40" cy="15" r="5" stroke="#4f46e5" strokeWidth="1.5" />
+                      <circle cx="20" cy="45" r="4" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="60" cy="45" r="4" stroke="#334155" strokeWidth="1.5" />
+                      <path d="M 40 20 L 20 45" stroke="#334155" strokeWidth="1" />
+                      <path d="M 20 45 L 60 45" stroke="#334155" strokeWidth="1" />
+                      <path d="M 60 45 L 40 20" stroke="#334155" strokeWidth="1" />
+                      <circle r="1.5" fill="#4f46e5"><animateMotion path="M 40 20 L 20 45" dur="1.2s" repeatCount="indefinite" /></circle>
+                      <circle r="1.5" fill="#4f46e5"><animateMotion path="M 20 45 L 60 45" dur="1s" repeatCount="indefinite" /></circle>
+                      <circle r="1.5" fill="#4f46e5"><animateMotion path="M 60 45 L 40 20" dur="1.4s" repeatCount="indefinite" /></circle>
+                    </svg>
                   </div>
                 </div>
               </TiltCard>
@@ -698,15 +770,34 @@ export default function Home() {
                   <Zap className="w-5 h-5 text-neutral-600" />
                 </div>
                 
-                <div className="mt-8">
-                  <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">C++ & DSA</h3>
-                  <p className="text-neutral-400 text-xs leading-relaxed mb-4">
-                    Writing deterministic memory-efficient routines, low-latency algorithms, and resolving high-performance compute bottlenecks.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {["STL Algorithms", "Memory Control", "Thread Pools"].map((t) => (
-                      <span key={t} className="px-2 py-0.5 text-[9px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
-                    ))}
+                <div className="mt-8 flex flex-col justify-between h-full gap-4">
+                  <div>
+                    <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">C++ & DSA</h3>
+                    <p className="text-neutral-400 text-xs leading-relaxed mb-4">
+                      Writing deterministic memory-efficient routines, low-latency algorithms, and resolving high-performance compute bottlenecks.
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {["STL Algorithms", "Memory Control", "Thread Pools"].map((t) => (
+                        <span key={t} className="px-2 py-0.5 text-[9px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* C++ Mini Visual */}
+                  <div className="w-full h-20 rounded-xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
+                    <svg className="w-20 h-16" viewBox="0 0 80 60" fill="none">
+                      <circle cx="40" cy="15" r="4.5" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="25" cy="30" r="4.5" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="55" cy="30" r="4.5" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="15" cy="45" r="4" stroke="#334155" strokeWidth="1.5" />
+                      <circle cx="35" cy="45" r="4" stroke="#334155" strokeWidth="1.5" />
+                      <line x1="40" y1="19" x2="25" y2="26" stroke="#334155" strokeWidth="1" />
+                      <line x1="40" y1="19" x2="55" y2="26" stroke="#334155" strokeWidth="1" />
+                      <line x1="25" y1="34" x2="15" y2="41" stroke="#334155" strokeWidth="1" />
+                      <line x1="25" y1="34" x2="35" y2="41" stroke="#334155" strokeWidth="1" />
+                      <circle cx="40" cy="15" r="7.5" stroke="#4f46e5" strokeWidth="0.5" className="animate-pulse" style={{ transformOrigin: "40px 15px" }} />
+                      <circle cx="55" cy="30" r="7.5" stroke="#4f46e5" strokeWidth="0.5" className="animate-pulse" style={{ transformOrigin: "55px 30px", animationDelay: "0.8s" }} />
+                    </svg>
                   </div>
                 </div>
               </TiltCard>
@@ -720,17 +811,32 @@ export default function Home() {
                   <Database className="w-5 h-5 text-neutral-600" />
                 </div>
                 
-                <div className="mt-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
-                  <div>
+                <div className="mt-8 flex flex-col md:flex-row justify-between md:items-end gap-6">
+                  <div className="flex-1">
                     <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-200 mb-2">PostgreSQL</h3>
-                    <p className="text-neutral-400 text-xs md:text-sm max-w-xl leading-relaxed">
+                    <p className="text-neutral-400 text-xs md:text-sm max-w-xl leading-relaxed mb-4">
                       Managing transactional integrity and complex vector querying. Optimizing relational query execution plans, indexing schemas (GIN/GiST), and deploying dedicated pgvector storage setups.
                     </p>
+                    <div className="flex flex-wrap gap-2">
+                      {["ACID Transactions", "pgvector Indexing", "Query Optimization", "CDC Pipeline"].map((t) => (
+                        <span key={t} className="px-2.5 py-1 text-[10px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2 shrink-0">
-                    {["ACID Transactions", "pgvector Indexing", "Query Optimization", "CDC Pipeline"].map((t) => (
-                      <span key={t} className="px-2.5 py-1 text-[10px] font-mono rounded-full bg-white/5 border border-white/5 text-neutral-400">{t}</span>
-                    ))}
+                  
+                  {/* PostgreSQL Mini Visual */}
+                  <div className="w-full md:w-44 h-24 shrink-0 rounded-2xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
+                    <svg className="w-32 h-16" viewBox="0 0 160 80" fill="none">
+                      <rect x="15" y="15" width="40" height="8" rx="2" stroke="#334155" strokeWidth="1" />
+                      <rect x="15" y="27" width="40" height="8" rx="2" stroke="#334155" strokeWidth="1" />
+                      <rect x="15" y="39" width="40" height="8" rx="2" stroke="#334155" strokeWidth="1" />
+                      <path d="M 120 31 L 65 31" stroke="#334155" strokeWidth="1.2" strokeDasharray="2 2" />
+                      <circle cx="120" cy="31" r="3.5" fill="#4f46e5" />
+                      <circle r="1.5" fill="#22d3ee">
+                        <animateMotion path="M 120 31 L 65 31" dur="1.2s" repeatCount="indefinite" />
+                      </circle>
+                      <circle cx="55" cy="29" r="6" stroke="#22d3ee" strokeWidth="0.5" className="animate-ping" style={{ transformOrigin: "55px 29px" }} />
+                    </svg>
                   </div>
                 </div>
               </TiltCard>

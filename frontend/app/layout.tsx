@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "Horcrux // Amaan",
   description: "Digital artifacts and complex systems. A high-performance portfolio engine designed by Amaan.",
   icons: {
-    icon: "/favicon.ico", // Ensure you have a favicon or remove this line
+    icon: "/favicon.ico",
   },
 };
 
@@ -31,11 +31,20 @@ export default function RootLayout({ children,
       className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden`}
       suppressHydrationWarning
     >
-      <body className="bg-background text-white selection:bg-accent/30 selection:text-accent" suppressHydrationWarning>
-  
-  <CustomCursor />
-  {children}
-</body>
+      <body className="bg-[#05050a] text-neutral-200 selection:bg-accent/25 selection:text-white" suppressHydrationWarning>
+        
+        {/* Global Noise Overlay & fixed background auroras promoted to GPU layer */}
+        <div className="noise-overlay" />
+        
+        <div className="aurora-container">
+          <div className="aurora-blob aurora-1" />
+          <div className="aurora-blob aurora-2" />
+          <div className="aurora-blob aurora-3" />
+        </div>
+
+        <CustomCursor />
+        {children}
+      </body>
     </html>
   );
 }

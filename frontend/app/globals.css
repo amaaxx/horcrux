@@ -211,3 +211,140 @@ html.lenis, html.lenis body {
   letter-spacing: -0.05em;
   font-weight: 950;
 }
+
+/* 3D Parallax Dot-Grid Backdrop Layer */
+.parallax-grid-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1.2px, transparent 1.2px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Glassmorphic Telemetry Terminal Widget */
+.telemetry-panel {
+  background: rgba(9, 9, 14, 0.72);
+  backdrop-filter: blur(20px) saturate(110%);
+  -webkit-backdrop-filter: blur(20px) saturate(110%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+    0 16px 48px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* Schematic Lines (Cad / midlife.engineering style) */
+.schematic-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+.schematic-line-v {
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(79, 70, 229, 0.06) 20%, rgba(79, 70, 229, 0.06) 80%, transparent);
+  position: relative;
+}
+
+.schematic-line-v::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, #4f46e5, transparent);
+  animation: flowDown 12s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+}
+
+.schematic-line-v:nth-child(2)::after {
+  animation-delay: 3s;
+  animation-duration: 15s;
+}
+
+.schematic-line-v:nth-child(3)::after {
+  animation-delay: 6s;
+  animation-duration: 10s;
+}
+
+.schematic-line-v:nth-child(4)::after {
+  animation-delay: 1s;
+  animation-duration: 14s;
+}
+
+@keyframes flowDown {
+  0% { top: -10%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 110%; opacity: 0; }
+}
+
+.schematic-grid-h {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.schematic-line-h {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(79, 70, 229, 0.06) 20%, rgba(79, 70, 229, 0.06) 80%, transparent);
+}
+
+/* Telemetry Mini Waveform Graphic Canvas */
+.telemetry-canvas {
+  width: 100%;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  margin-top: 4px;
+  image-rendering: pixelated;
+}
+
+/* HUD System Buttons */
+.telemetry-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 8px;
+  font-weight: 700;
+  color: #a3a3a3;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.telemetry-btn:hover {
+  background: rgba(79, 70, 229, 0.18);
+  border-color: rgba(79, 70, 229, 0.4);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(79, 70, 229, 0.2);
+}
+
+.telemetry-btn:active {
+  transform: scale(0.96);
+}

@@ -1,19 +1,42 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 // ── 1. GROUND TRUTH ENGINE: DETAILED VECTOR DB / SEMANTIC NODE GRAPH ──────────
 export function GroundTruthVisual() {
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+
+  const isLineActive = (fromNode: string, toNode: string) => {
+    if (!hoveredNode) return true; // Default state: all active
+    return hoveredNode === fromNode || hoveredNode === toNode;
+  };
+
+  const getLineOpacity = (fromNode: string, toNode: string) => {
+    if (!hoveredNode) return 0.5;
+    return isLineActive(fromNode, toNode) ? 1.0 : 0.15;
+  };
+
+  const getLineStroke = (fromNode: string, toNode: string) => {
+    if (isLineActive(fromNode, toNode) && hoveredNode) {
+      return "#22d3ee";
+    }
+    return "url(#cyanToIndigo)";
+  };
+
+  const getLineStrokeWidth = (fromNode: string, toNode: string) => {
+    return isLineActive(fromNode, toNode) && hoveredNode ? 2.5 : 1.5;
+  };
+
   return (
-    <div className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden pointer-events-none bg-[#07070F]/50">
+    <div className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden bg-[#07070F]/50">
       {/* Background Cinematic Glows */}
       <div className="absolute w-64 h-64 rounded-full bg-indigo-500/10 blur-[80px] -top-12 -left-12" />
       <div className="absolute w-72 h-72 rounded-full bg-cyan-600/12 blur-[90px] -bottom-16 -right-16 animate-pulse" />
       
       {/* High-Fidelity Network Graph SVG */}
       <svg 
-        className="w-[90%] h-[90%] max-w-[420px] max-h-[300px] z-10" 
+        className="w-[90%] h-[90%] max-w-[420px] max-h-[300px] z-10 pointer-events-auto" 
         viewBox="0 0 400 240" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
@@ -65,150 +88,160 @@ export function GroundTruthVisual() {
         </defs>
 
         {/* Connections */}
-        <path d="M 40 120 L 120 120" stroke="url(#cyanToIndigo)" strokeWidth="1.5" className="path-flow-fast" />
-        <path d="M 40 120 L 120 120" stroke="#22d3ee" strokeWidth="0.5" opacity="0.4" />
+        <path d="M 40 120 L 120 120" stroke={getLineStroke("IN_QUERY", "SEM_ROUTER")} strokeWidth={getLineStrokeWidth("IN_QUERY", "SEM_ROUTER")} className="path-flow-fast" opacity={getLineOpacity("IN_QUERY", "SEM_ROUTER")} />
+        <path d="M 40 120 L 120 120" stroke="#22d3ee" strokeWidth="0.5" opacity={hoveredNode ? (isLineActive("IN_QUERY", "SEM_ROUTER") ? 0.6 : 0.1) : 0.4} />
 
-        <path d="M 120 120 C 150 120, 150 60, 200 60" stroke="url(#cyanToIndigo)" strokeWidth="1.5" className="path-flow-fast" />
-        <path d="M 120 120 L 200 120" stroke="url(#cyanToIndigo)" strokeWidth="1.5" className="path-flow-slow" />
-        <path d="M 120 120 C 150 120, 150 180, 200 180" stroke="url(#cyanToIndigo)" strokeWidth="1.5" className="path-flow-fast" />
-
-        <path d="M 120 120 C 150 120, 150 60, 200 60" stroke="#4f46e5" strokeWidth="0.5" opacity="0.3" />
-        <path d="M 120 120 L 200 120" stroke="#4f46e5" strokeWidth="0.5" opacity="0.3" />
-        <path d="M 120 120 C 150 120, 150 180, 200 180" stroke="#4f46e5" strokeWidth="0.5" opacity="0.3" />
-
-        <path d="M 200 60 C 250 60, 250 120, 280 120" stroke="url(#cyanToIndigo)" strokeWidth="1.5" className="path-flow-slow" />
-        <path d="M 200 120 L 280 120" stroke="url(#cyanToIndigo)" strokeWidth="1.5" className="path-flow-fast" />
-        <path d="M 200 180 C 250 180, 250 120, 280 120" stroke="url(#cyanToIndigo)" strokeWidth="1.5" className="path-flow-slow" />
-
-        <path d="M 280 120 L 360 120" stroke="url(#cyanToIndigo)" strokeWidth="2" className="path-flow-fast" />
-        <path d="M 280 120 L 360 120" stroke="#22d3ee" strokeWidth="0.5" opacity="0.5" />
-
-        {/* Animated flowing data packets */}
-        {/* Input to Router */}
-        <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
-          <animateMotion path="M 40 120 L 120 120" dur="1.2s" repeatCount="indefinite" />
-        </circle>
-        <circle r="2" fill="#e0f7fa">
-          <animateMotion path="M 40 120 L 120 120" dur="1.2s" begin="0.6s" repeatCount="indefinite" />
-        </circle>
-
-        {/* Router to DB Shards */}
-        <circle r="3.5" fill="#818cf8" filter="url(#glow)">
-          <animateMotion path="M 120 120 C 150 120, 150 60, 200 60" dur="1.6s" repeatCount="indefinite" />
-        </circle>
-        <circle r="2" fill="#e0f7fa">
-          <animateMotion path="M 120 120 C 150 120, 150 60, 200 60" dur="1.6s" begin="0.8s" repeatCount="indefinite" />
-        </circle>
-
-        <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
-          <animateMotion path="M 120 120 L 200 120" dur="1.4s" repeatCount="indefinite" />
-        </circle>
-        <circle r="2" fill="#e0f7fa">
-          <animateMotion path="M 120 120 L 200 120" dur="1.4s" begin="0.7s" repeatCount="indefinite" />
-        </circle>
-
-        <circle r="3.5" fill="#818cf8" filter="url(#glow)">
-          <animateMotion path="M 120 120 C 150 120, 150 180, 200 180" dur="1.8s" repeatCount="indefinite" />
-        </circle>
-        <circle r="2" fill="#e0f7fa">
-          <animateMotion path="M 120 120 C 150 120, 150 180, 200 180" dur="1.8s" begin="0.9s" repeatCount="indefinite" />
-        </circle>
+        <path d="M 120 120 C 150 120, 150 60, 200 60" stroke={getLineStroke("SEM_ROUTER", "V_SHARD_01")} strokeWidth={getLineStrokeWidth("SEM_ROUTER", "V_SHARD_01")} className="path-flow-fast" opacity={getLineOpacity("SEM_ROUTER", "V_SHARD_01")} />
+        <path d="M 120 120 L 200 120" stroke={getLineStroke("SEM_ROUTER", "V_SHARD_02")} strokeWidth={getLineStrokeWidth("SEM_ROUTER", "V_SHARD_02")} className="path-flow-slow" opacity={getLineOpacity("SEM_ROUTER", "V_SHARD_02")} />
+        <path d="M 120 120 C 150 120, 150 180, 200 180" stroke={getLineStroke("SEM_ROUTER", "V_SHARD_03")} strokeWidth={getLineStrokeWidth("SEM_ROUTER", "V_SHARD_03")} className="path-flow-fast" opacity={getLineOpacity("SEM_ROUTER", "V_SHARD_03")} />
 
         {/* DB Shards to Context Synthesis */}
-        <circle r="3.5" fill="#c084fc" filter="url(#glow)">
-          <animateMotion path="M 200 60 C 250 60, 250 120, 280 120" dur="1.6s" repeatCount="indefinite" />
-        </circle>
-        <circle r="2" fill="#e0f7fa">
-          <animateMotion path="M 200 60 C 250 60, 250 120, 280 120" dur="1.6s" begin="0.8s" repeatCount="indefinite" />
-        </circle>
+        <path d="M 200 60 C 250 60, 250 120, 280 120" stroke={getLineStroke("V_SHARD_01", "SYNTHESIS")} strokeWidth={getLineStrokeWidth("V_SHARD_01", "SYNTHESIS")} className="path-flow-slow" opacity={getLineOpacity("V_SHARD_01", "SYNTHESIS")} />
+        <path d="M 200 120 L 280 120" stroke={getLineStroke("V_SHARD_02", "SYNTHESIS")} strokeWidth={getLineStrokeWidth("V_SHARD_02", "SYNTHESIS")} className="path-flow-fast" opacity={getLineOpacity("V_SHARD_02", "SYNTHESIS")} />
+        <path d="M 200 180 C 250 180, 250 120, 280 120" stroke={getLineStroke("V_SHARD_03", "SYNTHESIS")} strokeWidth={getLineStrokeWidth("V_SHARD_03", "SYNTHESIS")} className="path-flow-slow" opacity={getLineOpacity("V_SHARD_03", "SYNTHESIS")} />
 
-        <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
-          <animateMotion path="M 200 120 L 280 120" dur="1.4s" repeatCount="indefinite" />
-        </circle>
-        <circle r="2" fill="#e0f7fa">
-          <animateMotion path="M 200 120 L 280 120" dur="1.4s" begin="0.7s" repeatCount="indefinite" />
-        </circle>
+        <path d="M 280 120 L 360 120" stroke={getLineStroke("SYNTHESIS", "DET_OUT")} strokeWidth={getLineStrokeWidth("SYNTHESIS", "DET_OUT")} className="path-flow-fast" opacity={getLineOpacity("SYNTHESIS", "DET_OUT")} />
+        <path d="M 280 120 L 360 120" stroke="#22d3ee" strokeWidth="0.5" opacity={hoveredNode ? (isLineActive("SYNTHESIS", "DET_OUT") ? 0.7 : 0.1) : 0.5} />
 
-        <circle r="3.5" fill="#c084fc" filter="url(#glow)">
-          <animateMotion path="M 200 180 C 250 180, 250 120, 280 120" dur="1.8s" repeatCount="indefinite" />
-        </circle>
-        <circle r="2" fill="#e0f7fa">
-          <animateMotion path="M 200 180 C 250 180, 250 120, 280 120" dur="1.8s" begin="0.9s" repeatCount="indefinite" />
-        </circle>
+        {/* Animated flowing data packets */}
+        <g opacity={hoveredNode ? 0.25 : 1.0}>
+          {/* Input to Router */}
+          <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
+            <animateMotion path="M 40 120 L 120 120" dur="1.2s" repeatCount="indefinite" />
+          </circle>
+          <circle r="2" fill="#e0f7fa">
+            <animateMotion path="M 40 120 L 120 120" dur="1.2s" begin="0.6s" repeatCount="indefinite" />
+          </circle>
 
-        {/* Synthesis to Output */}
-        <circle r="4" fill="#22d3ee" filter="url(#glow)">
-          <animateMotion path="M 280 120 L 360 120" dur="1.2s" repeatCount="indefinite" />
-        </circle>
-        <circle r="2" fill="#e0f7fa">
-          <animateMotion path="M 280 120 L 360 120" dur="1.2s" begin="0.6s" repeatCount="indefinite" />
-        </circle>
+          {/* Router to DB Shards */}
+          <circle r="3.5" fill="#818cf8" filter="url(#glow)">
+            <animateMotion path="M 120 120 C 150 120, 150 60, 200 60" dur="1.6s" repeatCount="indefinite" />
+          </circle>
+          <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
+            <animateMotion path="M 120 120 L 200 120" dur="1.4s" repeatCount="indefinite" />
+          </circle>
+          <circle r="3.5" fill="#818cf8" filter="url(#glow)">
+            <animateMotion path="M 120 120 C 150 120, 150 180, 200 180" dur="1.8s" repeatCount="indefinite" />
+          </circle>
+
+          {/* DB Shards to Context Synthesis */}
+          <circle r="3.5" fill="#c084fc" filter="url(#glow)">
+            <animateMotion path="M 200 60 C 250 60, 250 120, 280 120" dur="1.6s" repeatCount="indefinite" />
+          </circle>
+          <circle r="3.5" fill="#22d3ee" filter="url(#glow)">
+            <animateMotion path="M 200 120 L 280 120" dur="1.4s" repeatCount="indefinite" />
+          </circle>
+          <circle r="3.5" fill="#c084fc" filter="url(#glow)">
+            <animateMotion path="M 200 180 C 250 180, 250 120, 280 120" dur="1.8s" repeatCount="indefinite" />
+          </circle>
+
+          {/* Synthesis to Output */}
+          <circle r="4" fill="#22d3ee" filter="url(#glow)">
+            <animateMotion path="M 280 120 L 360 120" dur="1.2s" repeatCount="indefinite" />
+          </circle>
+        </g>
 
         {/* Pulsing rings around key nodes */}
         <circle cx="120" cy="120" r="10" stroke="#22d3ee" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "120px 120px", animationDelay: "0s" }} />
-        <circle cx="120" cy="120" r="10" stroke="#22d3ee" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "120px 120px", animationDelay: "1.5s" }} />
-        
         <circle cx="280" cy="120" r="10" stroke="#4f46e5" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "280px 120px", animationDelay: "0.5s" }} />
-        <circle cx="280" cy="120" r="10" stroke="#4f46e5" strokeWidth="1" className="pulse-ring" style={{ transformOrigin: "280px 120px", animationDelay: "2s" }} />
 
         {/* Input Query Node */}
-        <circle cx="40" cy="120" r="7" fill="#09090e" stroke="#22d3ee" strokeWidth="2" />
-        <circle cx="40" cy="120" r="3" fill="#22d3ee" />
+        <g 
+          className="cursor-pointer" 
+          onMouseEnter={() => setHoveredNode("IN_QUERY")} 
+          onMouseLeave={() => setHoveredNode(null)}
+          opacity={hoveredNode ? (hoveredNode === "IN_QUERY" ? 1 : 0.4) : 1}
+        >
+          <circle cx="40" cy="120" r="10" fill="transparent" />
+          <circle cx="40" cy="120" r="7" fill="#09090e" stroke="#22d3ee" strokeWidth="2" />
+          <circle cx="40" cy="120" r="3" fill="#22d3ee" />
+        </g>
 
         {/* Semantic Router Node */}
-        <motion.circle 
-          cx="120" 
-          cy="120" 
-          r="10" 
-          fill="#09090e" 
-          stroke="url(#cyanToIndigo)" 
-          strokeWidth="2.5"
-          filter="url(#glow)"
-          animate={{ strokeWidth: [2.5, 4, 2.5] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <circle cx="120" cy="120" r="5" fill="#e0f7fa" />
+        <g 
+          className="cursor-pointer" 
+          onMouseEnter={() => setHoveredNode("SEM_ROUTER")} 
+          onMouseLeave={() => setHoveredNode(null)}
+          opacity={hoveredNode ? (hoveredNode === "SEM_ROUTER" ? 1 : 0.4) : 1}
+        >
+          <motion.circle 
+            cx="120" 
+            cy="120" 
+            r="10" 
+            fill="#09090e" 
+            stroke="url(#cyanToIndigo)" 
+            strokeWidth="2.5"
+            filter="url(#glow)"
+            animate={{ strokeWidth: [2.5, 4, 2.5] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <circle cx="120" cy="120" r="5" fill="#e0f7fa" />
+        </g>
 
         {/* Vector DB Nodes */}
-        {[60, 120, 180].map((y, idx) => (
-          <g key={y}>
-            <circle cx="200" cy={y} r="8" fill="#09090e" stroke="#4f46e5" strokeWidth="2" />
-            <motion.circle 
-              cx="200" 
-              cy={y} 
-              r="3.5" 
-              fill="#818cf8"
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 2, delay: idx * 0.4, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <circle cx="200" cy={y} r="14" stroke="#4f46e5" strokeWidth="0.5" strokeDasharray="2 4" opacity="0.4" />
-          </g>
-        ))}
+        {[60, 120, 180].map((y, idx) => {
+          const nodeId = `V_SHARD_0${idx + 1}`;
+          return (
+            <g 
+              key={y}
+              className="cursor-pointer" 
+              onMouseEnter={() => setHoveredNode(nodeId)} 
+              onMouseLeave={() => setHoveredNode(null)}
+              opacity={hoveredNode ? (nodeId === hoveredNode ? 1 : 0.4) : 1}
+            >
+              <circle cx="200" cy={y} r="12" fill="transparent" />
+              <circle cx="200" cy={y} r="8" fill="#09090e" stroke="#4f46e5" strokeWidth="2" />
+              <motion.circle 
+                cx="200" 
+                cy={y} 
+                r="3.5" 
+                fill="#818cf8"
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 2, delay: idx * 0.4, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </g>
+          );
+        })}
 
         {/* Context Synthesis Node */}
-        <motion.circle 
-          cx="280" 
-          cy="120" 
-          r="11" 
-          fill="#09090e" 
-          stroke="url(#cyanToIndigo)" 
-          strokeWidth="2.5"
-          filter="url(#glow)"
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <circle cx="280" cy="120" r="4.5" fill="#c084fc" />
+        <g 
+          className="cursor-pointer" 
+          onMouseEnter={() => setHoveredNode("SYNTHESIS")} 
+          onMouseLeave={() => setHoveredNode(null)}
+          opacity={hoveredNode ? (hoveredNode === "SYNTHESIS" ? 1 : 0.4) : 1}
+        >
+          <motion.circle 
+            cx="280" 
+            cy="120" 
+            r="11" 
+            fill="#09090e" 
+            stroke="url(#cyanToIndigo)" 
+            strokeWidth="2.5"
+            filter="url(#glow)"
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <circle cx="280" cy="120" r="4.5" fill="#c084fc" />
+        </g>
 
         {/* Generation Output Node */}
-        <circle cx="360" cy="120" r="7" fill="#09090e" stroke="#22d3ee" strokeWidth="2" />
-        <circle cx="360" cy="120" r="3" fill="#22d3ee" />
+        <g 
+          className="cursor-pointer" 
+          onMouseEnter={() => setHoveredNode("DET_OUT")} 
+          onMouseLeave={() => setHoveredNode(null)}
+          opacity={hoveredNode ? (hoveredNode === "DET_OUT" ? 1 : 0.4) : 1}
+        >
+          <circle cx="360" cy="120" r="10" fill="transparent" />
+          <circle cx="360" cy="120" r="7" fill="#09090e" stroke="#22d3ee" strokeWidth="2" />
+          <circle cx="360" cy="120" r="3" fill="#22d3ee" />
+        </g>
 
-        <text x="40" y="142" fill="#64748b" fontSize="7" fontFamily="monospace" textAnchor="middle">IN_QUERY</text>
-        <text x="120" y="145" fill="#22d3ee" fontSize="7" fontFamily="monospace" textAnchor="middle" fontWeight="bold">SEM_ROUTER</text>
-        <text x="200" y="42" fill="#64748b" fontSize="7" fontFamily="monospace" textAnchor="middle">V_SHARD_01</text>
-        <text x="200" y="210" fill="#64748b" fontSize="7" fontFamily="monospace" textAnchor="middle">V_SHARD_03</text>
-        <text x="280" y="145" fill="#818cf8" fontSize="7" fontFamily="monospace" textAnchor="middle">SYNTHESIS</text>
-        <text x="360" y="142" fill="#22d3ee" fontSize="7" fontFamily="monospace" textAnchor="middle">DET_OUT</text>
+        <text x="40" y="142" fill="#64748b" fontSize="7" fontFamily="monospace" textAnchor="middle" opacity={hoveredNode ? 0.35 : 0.7}>IN_QUERY</text>
+        <text x="120" y="145" fill="#22d3ee" fontSize="7" fontFamily="monospace" textAnchor="middle" fontWeight="bold" opacity={hoveredNode ? 0.35 : 0.9}>SEM_ROUTER</text>
+        <text x="200" y="42" fill="#64748b" fontSize="7" fontFamily="monospace" textAnchor="middle" opacity={hoveredNode ? 0.35 : 0.7}>V_SHARD_01</text>
+        <text x="200" y="210" fill="#64748b" fontSize="7" fontFamily="monospace" textAnchor="middle" opacity={hoveredNode ? 0.35 : 0.7}>V_SHARD_03</text>
+        <text x="280" y="145" fill="#818cf8" fontSize="7" fontFamily="monospace" textAnchor="middle" opacity={hoveredNode ? 0.35 : 0.7}>SYNTHESIS</text>
+        <text x="360" y="142" fill="#22d3ee" fontSize="7" fontFamily="monospace" textAnchor="middle" opacity={hoveredNode ? 0.35 : 0.7}>DET_OUT</text>
       </svg>
     </div>
   );
@@ -216,8 +249,14 @@ export function GroundTruthVisual() {
 
 // ── 2. CENTRALIZED DIGITAL WORKSPACE: SLEEK ISOMETRIC INTERACTION GRID ───────
 export function WorkspaceVisual() {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden pointer-events-none bg-[#050B0B]/50">
+    <div 
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden bg-[#050B0B]/50 pointer-events-auto cursor-pointer"
+    >
       {/* Background Ambient glows */}
       <div className="absolute w-64 h-64 rounded-full bg-emerald-500/8 blur-[85px] -bottom-10 -left-12" />
       <div className="absolute w-72 h-72 rounded-full bg-teal-500/10 blur-[90px] -top-12 -right-12" />
@@ -225,23 +264,28 @@ export function WorkspaceVisual() {
       {/* 3D Rotated Isometric CSS Layout */}
       <div 
         style={{
-          transform: "rotateX(52deg) rotateY(0deg) rotateZ(-38deg) translateZ(0)",
+          transform: isHovered 
+            ? "rotateX(52deg) rotateY(0deg) rotateZ(-38deg) scale(1.05) translateZ(0)"
+            : "rotateX(52deg) rotateY(0deg) rotateZ(-38deg) translateZ(0)",
           transformStyle: "preserve-3d",
+          transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)"
         }}
         className="relative w-[300px] h-[300px] md:w-[340px] md:h-[340px] flex items-center justify-center z-10"
       >
         {/* Layer 1: System Base Grid (Deepest) */}
         <div 
           style={{
-            transform: "translateZ(-30px)",
+            transform: isHovered ? "translateZ(-55px)" : "translateZ(-30px)",
             transformStyle: "preserve-3d",
+            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+            border: isHovered ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(255, 255, 255, 0.05)"
           }}
-          className="absolute w-[90%] h-[90%] rounded-2xl border border-white/5 bg-black/60 backdrop-blur-sm p-4 flex flex-col justify-between"
+          className="absolute w-[90%] h-[90%] rounded-2xl bg-black/60 backdrop-blur-sm p-4 flex flex-col justify-between"
         >
           <div className="absolute inset-0 bg-grid-white/[0.015] bg-[size:15px_15px] rounded-2xl" />
           <div className="flex justify-between items-center relative z-10">
             <span className="font-mono text-[7px] text-neutral-500 uppercase tracking-widest">RailNet_Database // Node_09</span>
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/60" />
+            <div className={`h-1.5 w-1.5 rounded-full ${isHovered ? "bg-emerald-400 animate-ping" : "bg-emerald-500/60"}`} />
           </div>
           
           <div className="grid grid-cols-6 gap-1 relative z-10">
@@ -259,11 +303,13 @@ export function WorkspaceVisual() {
         {/* Layer 2: Main Operational Dashboard Grid (Middle) */}
         <div 
           style={{
-            transform: "translateZ(10px)",
+            transform: isHovered ? "translateZ(15px)" : "translateZ(10px)",
             transformStyle: "preserve-3d",
-            boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
+            boxShadow: isHovered ? "0 35px 65px -12px rgba(0,0,0,0.9)" : "0 25px 50px -12px rgba(0,0,0,0.8)",
+            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+            borderColor: isHovered ? "rgba(16, 185, 129, 0.4)" : "rgba(16, 185, 129, 0.2)",
           }}
-          className="absolute w-[85%] h-[85%] rounded-2xl border border-emerald-500/20 bg-[#090F0E]/70 backdrop-blur-md p-4 flex flex-col justify-between"
+          className="absolute w-[85%] h-[85%] rounded-2xl border bg-[#090F0E]/70 backdrop-blur-md p-4 flex flex-col justify-between"
         >
           <div className="flex items-center justify-between border-b border-white/5 pb-2">
             <div className="flex gap-1.5">
@@ -317,9 +363,11 @@ export function WorkspaceVisual() {
         {/* Layer 3: High Priority Alert Panel (Top Overlay) */}
         <motion.div 
           style={{
-            transform: "translateZ(50px)",
+            transform: isHovered ? "translateZ(85px) translateY(-5px)" : "translateZ(50px)",
             transformStyle: "preserve-3d",
-            boxShadow: "0 15px 30px rgba(0,0,0,0.9)",
+            boxShadow: isHovered ? "0 25px 45px rgba(0,0,0,0.95)" : "0 15px 30px rgba(0,0,0,0.9)",
+            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+            borderColor: isHovered ? "rgba(45, 212, 191, 0.5)" : "rgba(45, 212, 191, 0.3)",
           }}
           animate={{
             y: [0, -4, 0],
@@ -329,7 +377,7 @@ export function WorkspaceVisual() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute w-[55%] h-[35%] right-2 top-2 rounded-xl border border-teal-500/30 bg-[#0c1413]/80 backdrop-blur-md p-3 flex flex-col justify-between"
+          className="absolute w-[55%] h-[35%] right-2 top-2 rounded-xl border bg-[#0c1413]/80 backdrop-blur-md p-3 flex flex-col justify-between"
         >
           <div className="flex justify-between items-center">
             <span className="font-mono text-[7px] text-teal-300 font-bold uppercase tracking-wider">Oracle_Gateway</span>
@@ -350,8 +398,27 @@ export function WorkspaceVisual() {
 
 // ── 3. PINK-BROCCOLI: MINI UI ABSTRACTION WITH BEZIER GRAPHIC & MESH GRID ────
 export function BroccoliVisual() {
+  const [mousePos, setMousePos] = useState({ x: 140, y: 50 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    // Map container dimension to SVG viewBox of 280x100
+    setMousePos({
+      x: (px / rect.width) * 280,
+      y: (py / rect.height) * 100,
+    });
+  };
+
   return (
-    <div className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden pointer-events-none bg-[#09050A]/50">
+    <div 
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden bg-[#09050A]/50 pointer-events-auto cursor-pointer"
+    >
       <motion.div 
         animate={{
           backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
@@ -401,45 +468,59 @@ export function BroccoliVisual() {
               </filter>
             </defs>
 
+            {/* Dynamic magnetic cursor trace node and lines */}
+            {isHovered && (
+              <>
+                <line x1="85" y1="45" x2={mousePos.x} y2={mousePos.y} stroke="rgba(236,72,153,0.3)" strokeWidth="0.75" strokeDasharray="3 3" />
+                <line x1="178" y1="48" x2={mousePos.x} y2={mousePos.y} stroke="rgba(217,70,239,0.3)" strokeWidth="0.75" strokeDasharray="3 3" />
+                <circle cx={mousePos.x} cy={mousePos.y} r="6" stroke="rgba(236,72,153,0.5)" strokeWidth="0.5" className="animate-pulse" />
+                <circle cx={mousePos.x} cy={mousePos.y} r="2.5" fill="#ec4899" />
+              </>
+            )}
+
             <motion.path 
-              d="M 10 70 C 80 10, 150 90, 270 30" 
+              d={isHovered ? `M 10 70 C ${mousePos.x} ${mousePos.y}, 150 90, 270 30` : "M 10 70 C 80 10, 150 90, 270 30"} 
               stroke="url(#broccoliGrad)" 
               strokeWidth="2.5" 
               strokeLinecap="round"
               filter="url(#broccoliGlow)"
-              animate={{
-                d: [
-                  "M 10 70 C 80 10, 150 90, 270 30",
-                  "M 10 60 C 90 30, 130 70, 270 40",
-                  "M 10 70 C 80 10, 150 90, 270 30"
-                ]
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              {...(!isHovered && {
+                animate: {
+                  d: [
+                    "M 10 70 C 80 10, 150 90, 270 30",
+                    "M 10 60 C 90 30, 130 70, 270 40",
+                    "M 10 70 C 80 10, 150 90, 270 30"
+                  ]
+                },
+                transition: {
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              })}
             />
 
             <motion.path 
-              d="M 10 40 C 90 80, 180 10, 270 80" 
+              d={isHovered ? `M 10 40 C 90 80, ${mousePos.x} ${mousePos.y}, 270 80` : "M 10 40 C 90 80, 180 10, 270 80"} 
               stroke="#f97316" 
               strokeWidth="1" 
               strokeDasharray="4 4"
               opacity="0.6"
-              animate={{
-                d: [
-                  "M 10 40 C 90 80, 180 10, 270 80",
-                  "M 10 50 C 70 60, 190 30, 270 60",
-                  "M 10 40 C 90 80, 180 10, 270 80"
-                ]
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5
-              }}
+              {...(!isHovered && {
+                animate: {
+                  d: [
+                    "M 10 40 C 90 80, 180 10, 270 80",
+                    "M 10 50 C 70 60, 190 30, 270 60",
+                    "M 10 40 C 90 80, 180 10, 270 80"
+                  ]
+                },
+                transition: {
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5
+                }
+              })}
             />
 
             <circle cx="85" cy="45" r="4.5" fill="#09090f" stroke="#ec4899" strokeWidth="2.5" />

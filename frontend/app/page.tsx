@@ -252,7 +252,286 @@ function ManifestoWord({ word, index, total, progress }: { word: string; index: 
   );
 }
 
-// Inline SVG components to guarantee compilation across different package versions
+// ── COMPONENT: VAULT CARD STACK FOCAL TRANSITION (Apple/Stripe Inspired) ──────
+interface VaultCardProps {
+  children: React.ReactNode;
+  refTarget: React.RefObject<HTMLDivElement | null>;
+}
+
+function VaultCard({ children, refTarget }: VaultCardProps) {
+  const { scrollYProgress } = useScroll({
+    target: refTarget,
+    offset: ["start end", "end start"],
+  });
+
+  // Scale: dynamic zoom lens focus at center
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.88, 1.0, 0.88]);
+  // Opacity: high visibility at center focal point
+  const opacity = useTransform(scrollYProgress, [0.1, 0.42, 0.58, 0.9], [0.3, 1.0, 1.0, 0.3]);
+  // RotateX: 3D perspective scroll tilt
+  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [8, 0, -8]);
+
+  const springScale = useSpring(scale, { stiffness: 120, damping: 20 });
+  const springOpacity = useSpring(opacity, { stiffness: 120, damping: 20 });
+  const springRotateX = useSpring(rotateX, { stiffness: 120, damping: 20 });
+
+  return (
+    <motion.div
+      ref={refTarget}
+      style={{
+        scale: springScale,
+        opacity: springOpacity,
+        rotateX: springRotateX,
+        transformStyle: "preserve-3d",
+        transform: "translateZ(0)",
+        willChange: "transform, opacity",
+      }}
+      className="min-h-screen flex flex-col justify-center px-8 md:px-16 py-20"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ── COMPONENT: SCROLL REVEAL HEADER (Guglieri / Stokt Inspired 3D Tilt Enters) ──
+interface ScrollRevealHeaderProps {
+  subtitle: string;
+  title: string;
+}
+
+function ScrollRevealHeader({ subtitle, title }: ScrollRevealHeaderProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  const y = useTransform(scrollYProgress, [0, 0.35, 0.75], [50, 0, -25]);
+  const rotateX = useTransform(scrollYProgress, [0, 0.35, 0.75], [20, 0, -12]);
+  const opacity = useTransform(scrollYProgress, [0, 0.18, 0.35, 0.75], [0, 0.6, 1, 0.8]);
+
+  const springY = useSpring(y, { stiffness: 90, damping: 18 });
+  const springRotateX = useSpring(rotateX, { stiffness: 90, damping: 18 });
+  const springOpacity = useSpring(opacity, { stiffness: 90, damping: 18 });
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{
+        y: springY,
+        rotateX: springRotateX,
+        opacity: springOpacity,
+        transformStyle: "preserve-3d",
+        perspective: 1200,
+        willChange: "transform, opacity",
+      }}
+      className="flex flex-col gap-2"
+    >
+      <span className="font-mono text-[10px] md:text-xs text-neutral-500 tracking-[0.25em] uppercase">{subtitle}</span>
+      <h2 className="text-section-title premium-text-primary tracking-tight">{title}</h2>
+    </motion.div>
+  );
+}
+
+// ── COMPONENT: VAULT ISOMETRIC MOUSE PERSPECTIVE CONTAINER ────────────────────
+function VaultVisualContainer({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [8, -8]), { stiffness: 140, damping: 24 });
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), { stiffness: 140, damping: 24 });
+  const scale = useSpring(1, { stiffness: 180, damping: 22 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left - width / 2;
+    const mouseY = e.clientY - rect.top - height / 2;
+    
+    x.set(mouseX / width);
+    y.set(mouseY / height);
+  };
+
+  const handleMouseEnter = () => {
+    scale.set(1.025);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+    scale.set(1);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        scale,
+        transformStyle: "preserve-3d",
+        transform: "translateZ(0)",
+        willChange: "transform, scale",
+      }}
+      className="w-[85%] h-[60%] md:h-[65%] rounded-3xl glass-surface border border-white/10 shadow-2xl relative flex items-center justify-center select-none overflow-hidden bg-[#07070f]/60 cursor-none"
+      data-cursor-label="TILT"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ── COMPONENT: SYSTEM TELEMETRY TERMINAL WIDGET ──────────────────────────────
+interface TelemetryProps {
+  showSchematics: boolean;
+  setShowSchematics: (v: boolean) => void;
+}
+
+function SystemTelemetryWidget({ showSchematics, setShowSchematics }: TelemetryProps) {
+  const { scrollY } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+  const [velocityVal, setVelocityVal] = useState(0);
+  const [fps, setFps] = useState(120);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const velocityHistory = useRef<number[]>(new Array(50).fill(0));
+
+  useEffect(() => {
+    const unsubscribe = scrollVelocity.on("change", (latest) => {
+      setVelocityVal(Math.round(latest));
+    });
+    return () => unsubscribe();
+  }, [scrollVelocity]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFps(Math.round(118.6 + Math.random() * 1.4));
+    }, 700);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Draw canvas scroll speed waveform
+  useEffect(() => {
+    let animationFrameId: number;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Set physical display resolution based on DPR for crisp lines
+    const handleResize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    const draw = () => {
+      const latestSpeed = Math.min(Math.abs(scrollVelocity.get()), 3000);
+      velocityHistory.current.push(latestSpeed);
+      if (velocityHistory.current.length > 50) {
+        velocityHistory.current.shift();
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw subtle grid lines
+      ctx.strokeStyle = "rgba(79, 70, 229, 0.05)";
+      ctx.lineWidth = 0.5;
+      for (let i = 1; i < 4; i++) {
+        const y = (height / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw speed waveform
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(79, 70, 229, 0.8)";
+      ctx.lineWidth = 1.25;
+      const points = velocityHistory.current;
+      const step = width / (points.length - 1);
+
+      for (let i = 0; i < points.length; i++) {
+        const amp = points[i];
+        const ratio = amp / 3000;
+        const y = height - ratio * (height - 6) - 3;
+        const x = i * step;
+
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+
+      animationFrameId = requestAnimationFrame(draw);
+    };
+
+    animationFrameId = requestAnimationFrame(draw);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [scrollVelocity]);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-[90] p-4 rounded-2xl font-mono text-[9px] text-neutral-400 telemetry-panel min-w-[190px] flex flex-col gap-2.5">
+      <div className="flex justify-between items-center border-b border-white/5 pb-1.5 select-none">
+        <span className="text-[#4f46e5] font-extrabold tracking-wider">HORCRUX_KERNEL // DEVIP</span>
+        <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+      </div>
+      <div className="space-y-1 text-neutral-400 select-none">
+        <div className="flex justify-between">
+          <span>KINETIC_SPEED:</span>
+          <span className="text-neutral-200 font-bold">{Math.abs(velocityVal)} PX/S</span>
+        </div>
+        <div className="flex justify-between">
+          <span>REFRESH_RATE:</span>
+          <span className="text-neutral-200 font-bold">{fps} HZ</span>
+        </div>
+        <div className="flex justify-between">
+          <span>CORE_LOAD:</span>
+          <span className="text-green-400 font-bold">STABLE // OK</span>
+        </div>
+      </div>
+
+      {/* Telemetry scrolling waveform canvas */}
+      <canvas ref={canvasRef} className="telemetry-canvas" />
+
+      {/* Grid Toggler Controls */}
+      <div className="flex justify-between items-center mt-1 pt-1.5 border-t border-white/5">
+        <span className="text-[7px] text-neutral-500">SCHEMATIC_LINES:</span>
+        <button 
+          onClick={() => setShowSchematics(!showSchematics)}
+          className="telemetry-btn"
+          title="Toggle schematic layout blueprint grids"
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${showSchematics ? "bg-indigo-500 animate-pulse" : "bg-neutral-600"}`} />
+          {showSchematics ? "GRID_ON" : "GRID_OFF"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Inline SVG components to guarantee compilation across Next versions
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
@@ -296,6 +575,27 @@ export default function Home() {
   const glowX = useSpring(x, { stiffness: 70, damping: 24 });
   const glowY = useSpring(y, { stiffness: 70, damping: 24 });
 
+  // Global Page Scroll elements
+  const { scrollY, scrollYProgress } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothedVelocity = useSpring(scrollVelocity, { stiffness: 100, damping: 22 });
+
+  // Toggle state for CAD grid schematic lines (midlife.engineering style)
+  const [showSchematics, setShowSchematics] = useState(false);
+
+  // Dynamic Background Morphing mapped across page scroll sections
+  const pageBgColor = useTransform(
+    scrollYProgress,
+    [0, 0.22, 0.45, 0.72, 1],
+    ["#05050a", "#070712", "#09071a", "#050c12", "#05050a"]
+  );
+
+  // 3D Parallax dot-grid shift
+  const gridY = useTransform(scrollY, [0, 6000], [0, -320]);
+
+  // Velocity-reactive surface skewing (Stokt / Guglieri inspired physics)
+  const surfaceSkewY = useTransform(smoothedVelocity, [-3000, 3000], [-2.5, 2.5]);
+
   // Hero refs for Scroll-linked parallax
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroScroll } = useScroll({
@@ -320,9 +620,9 @@ export default function Home() {
   const projRef3 = useRef<HTMLDivElement>(null);
 
   // Active state viewport checking
-  const inView1 = useInView(projRef1, { amount: 0.4, once: false });
-  const inView2 = useInView(projRef2, { amount: 0.4, once: false });
-  const inView3 = useInView(projRef3, { amount: 0.4, once: false });
+  const inView1 = useInView(projRef1, { amount: 0.35, once: false });
+  const inView2 = useInView(projRef2, { amount: 0.35, once: false });
+  const inView3 = useInView(projRef3, { amount: 0.35, once: false });
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -340,10 +640,7 @@ export default function Home() {
 
   // Footer scroll velocity tracking for marquee physics
   const footerRef = useRef<HTMLDivElement>(null);
-  const { scrollY: footerScrollY } = useScroll();
-  const scrollVelocity = useVelocity(footerScrollY);
-  const smoothedVelocity = useSpring(scrollVelocity, { stiffness: 100, damping: 22 });
-
+  
   // Physics mapping: skew, scale, and horizontal drag offset
   const marqueeSkew = useTransform(smoothedVelocity, [-2500, 2500], [-8, 8]);
   const marqueeScale = useTransform(smoothedVelocity, [-2500, 2500], [0.95, 1.05]);
@@ -394,7 +691,36 @@ export default function Home() {
   };
 
   return (
-    <main className="relative w-full min-h-screen bg-[#05050a] text-neutral-200 selection:bg-white/20 overflow-x-hidden font-sans" suppressHydrationWarning>
+    <motion.main 
+      style={{ backgroundColor: pageBgColor }}
+      className="relative w-full min-h-screen text-neutral-200 selection:bg-white/20 overflow-x-hidden font-sans" 
+      suppressHydrationWarning
+    >
+      
+      {/* Parallax Dot-Grid Backdrop (Parallax Depth Parallels) */}
+      <motion.div style={{ y: gridY }} className="parallax-grid-bg" />
+
+      {/* Schematic layout grids */}
+      {showSchematics && (
+        <>
+          {/* Vertical grids */}
+          <div className="schematic-grid">
+            <div className="schematic-line-v" />
+            <div className="schematic-line-v" />
+            <div className="schematic-line-v" />
+            <div className="schematic-line-v" />
+          </div>
+          {/* Horizontal grids */}
+          <div className="schematic-grid-h">
+            <div className="schematic-line-h" />
+            <div className="schematic-line-h" />
+            <div className="schematic-line-h" />
+          </div>
+        </>
+      )}
+
+      {/* Floating System Telemetry Terminal Widget (Midlife.engineering style) */}
+      <SystemTelemetryWidget showSchematics={showSchematics} setShowSchematics={setShowSchematics} />
       
       {/* Interactive Hero Light Leak follows user mouse */}
       <motion.div
@@ -515,6 +841,7 @@ export default function Home() {
               <Magnetic range={50}>
                 <button 
                   onClick={scrollToWorks}
+                  data-cursor-label="EXPLORE"
                   className="group relative px-8 py-4 bg-white text-black font-semibold rounded-full flex items-center gap-3 transition-transform duration-300 active:scale-95 shadow-[0_0_35px_rgba(255,255,255,0.15)] text-sm md:text-base cursor-none"
                 >
                   <span>Explore Selected Works</span>
@@ -527,8 +854,8 @@ export default function Home() {
                   href="https://github.com/amaaxx" 
                   target="_blank" 
                   rel="noopener noreferrer" 
+                  data-cursor-label="GITHUB"
                   className="p-3.5 rounded-full border border-white/5 hover:border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-300 active:scale-90 text-neutral-400 hover:text-white"
-                  data-cursor="pointer"
                 >
                   <GithubIcon className="w-4.5 h-4.5" />
                 </a>
@@ -536,8 +863,8 @@ export default function Home() {
                   href="https://linkedin.com/in/amaaxx" 
                   target="_blank" 
                   rel="noopener noreferrer" 
+                  data-cursor-label="LINKEDIN"
                   className="p-3.5 rounded-full border border-white/5 hover:border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-300 active:scale-90 text-neutral-400 hover:text-white"
-                  data-cursor="pointer"
                 >
                   <LinkedinIcon className="w-4.5 h-4.5" />
                 </a>
@@ -552,17 +879,9 @@ export default function Home() {
           className="relative py-32 px-6 md:px-16 lg:px-24 z-10 max-w-5xl mx-auto flex flex-col justify-center min-h-[70vh]"
           suppressHydrationWarning
         >
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0, y: 25 },
-              show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15 } }
-            }}
-            className="flex flex-col gap-2 mb-10" 
-            suppressHydrationWarning
-          >
-            <span className="font-mono text-[10px] md:text-xs text-neutral-500 tracking-[0.2em] uppercase">PHILOSOPHY & VISION</span>
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-neutral-400 premium-text-secondary">Core Manifesto</h2>
-          </motion.div>
+          <div className="mb-10">
+            <ScrollRevealHeader subtitle="PHILOSOPHY & VISION" title="Core Manifesto" />
+          </div>
           
           <div className="flex flex-wrap leading-relaxed max-w-4xl">
             {manifestoWords.map((word, idx) => (
@@ -577,29 +896,26 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── THE TECH ARSENAL (ASYMMETRIC BENTO GRID WITH SPRING POP-IN & HOVER FLOAT) ── */}
+        {/* ── THE TECH ARSENAL (ASYMMETRIC BENTO GRID WITH SPRING POP-IN & HOVER FLOAT & KINETIC SKEW) ── */}
         <section className="relative py-20 px-6 md:px-16 lg:px-24 z-10 max-w-6xl mx-auto flex flex-col gap-12 md:gap-16" suppressHydrationWarning>
           
-          {/* Section Title */}
+          {/* Section Title with velocity skew and 3D scrolling perspective */}
           <motion.div 
-            variants={{
-              hidden: { opacity: 0, y: 25 },
-              show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15 } }
-            }}
-            className="flex flex-col gap-2" 
+            style={{ skewY: surfaceSkewY }}
+            className="will-change-transform" 
             suppressHydrationWarning
           >
-            <span className="font-mono text-[10px] md:text-xs text-neutral-500 tracking-[0.2em] uppercase">SYSTEM CORE COMPONENTS</span>
-            <h2 className="text-section-title premium-text-primary tracking-tight">The Tech Arsenal</h2>
+            <ScrollRevealHeader subtitle="SYSTEM CORE COMPONENTS" title="The Tech Arsenal" />
           </motion.div>
 
-          {/* Bento Grid with staggered whileInView choreography */}
+          {/* Bento Grid with staggered whileInView choreography and kinetic velocity skew */}
           <motion.div 
             variants={bentoContainerVariants}
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, amount: 0.15 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6"
+            style={{ skewY: surfaceSkewY, transformStyle: "preserve-3d" }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 will-change-transform"
           >
             
             {/* Card 1: Next.js 15 (Wide Card) */}
@@ -845,15 +1161,15 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── THE VAULT (SELECTED WORKS - STICKY SPLIT LAYOUT WITH HIGH-FIDELITY CROSSFADE) ── */}
+        {/* ── THE VAULT (SELECTED WORKS - STICKY SPLIT LAYOUT WITH HIGH-FIDELITY CROSSFADE & 3D FOCAL STACK) ── */}
         <section 
           id="selected-works-vault"
           className="relative flex flex-col md:flex-row items-start w-full z-10"
           suppressHydrationWarning
         >
           {/* Left Pinned Visual Column: Stays pinned exactly until right track finishes */}
-          <div className="w-full md:w-1/2 md:sticky md:top-0 h-[50vh] md:h-screen flex items-center justify-center overflow-hidden z-20">
-            <div className="w-[85%] h-[60%] md:h-[65%] rounded-3xl glass-surface border border-white/10 shadow-2xl relative flex items-center justify-center select-none overflow-hidden bg-[#07070f]/60">
+          <div className="w-full md:w-1/2 md:sticky md:top-0 h-[50vh] md:h-screen flex items-center justify-center overflow-hidden z-20" style={{ perspective: 1200 }}>
+            <VaultVisualContainer>
               
               {/* Dynamic Color Morphing Crossfade swaps featuring High-Fidelity Components */}
               <AnimatePresence mode="wait">
@@ -894,17 +1210,14 @@ export default function Home() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </VaultVisualContainer>
           </div>
 
-          {/* Right Scroll Track Column: Houses description cards */}
+          {/* Right Scroll Track Column: Houses focal-stack VaultCard components */}
           <div className="w-full md:w-1/2 flex flex-col">
             
             {/* Card 01: Ground Truth Engine */}
-            <div 
-              ref={projRef1} 
-              className="min-h-screen flex flex-col justify-center px-8 md:px-16 py-20"
-            >
+            <VaultCard refTarget={projRef1}>
               <div className="flex flex-col gap-6 max-w-lg">
                 <span className="font-mono text-xs text-neutral-500 tracking-wider">PROJECT_01 // RAG_ARCHITECTURE</span>
                 <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-none premium-text-primary">Ground Truth Engine</h3>
@@ -940,6 +1253,7 @@ export default function Home() {
                   <Magnetic>
                     <a 
                       href="/vessel/ground-truth-engine" 
+                      data-cursor-label="GTE"
                       className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none"
                     >
                       <span>Inspect Repository Architecture</span>
@@ -948,13 +1262,10 @@ export default function Home() {
                   </Magnetic>
                 </div>
               </div>
-            </div>
+            </VaultCard>
 
             {/* Card 02: Centralized Digital Workspace */}
-            <div 
-              ref={projRef2} 
-              className="min-h-screen flex flex-col justify-center px-8 md:px-16 py-20"
-            >
+            <VaultCard refTarget={projRef2}>
               <div className="flex flex-col gap-6 max-w-lg">
                 <span className="font-mono text-xs text-neutral-500 tracking-wider">PROJECT_02 // ENTERPRISE_PORTAL</span>
                 <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-none premium-text-primary">Centralized Workspace</h3>
@@ -990,6 +1301,7 @@ export default function Home() {
                   <Magnetic>
                     <a 
                       href="/vessel/blw-portal" 
+                      data-cursor-label="BLW"
                       className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none"
                     >
                       <span>Read Enterprise Case Study</span>
@@ -998,13 +1310,10 @@ export default function Home() {
                   </Magnetic>
                 </div>
               </div>
-            </div>
+            </VaultCard>
 
             {/* Card 03: pink-broccoli */}
-            <div 
-              ref={projRef3} 
-              className="min-h-screen flex flex-col justify-center px-8 md:px-16 py-20"
-            >
+            <VaultCard refTarget={projRef3}>
               <div className="flex flex-col gap-6 max-w-lg">
                 <span className="font-mono text-xs text-neutral-500 tracking-wider">PROJECT_03 // WEB_SYSTEM</span>
                 <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-none premium-text-primary">pink-broccoli</h3>
@@ -1040,6 +1349,7 @@ export default function Home() {
                   <Magnetic>
                     <a 
                       href="/vessel/Laminar" 
+                      data-cursor-label="BROCCOLI"
                       className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none"
                     >
                       <span>View Interactive UI Build</span>
@@ -1048,7 +1358,7 @@ export default function Home() {
                   </Magnetic>
                 </div>
               </div>
-            </div>
+            </VaultCard>
 
           </div>
         </section>
@@ -1072,7 +1382,8 @@ export default function Home() {
                 transform: "translateZ(0)",
                 willChange: "transform",
               }}
-              className="w-full overflow-hidden flex flex-col gap-2 border-t border-b border-white/5 py-6 md:py-8 marquee-glow"
+              data-cursor-label="TALK"
+              className="w-full overflow-hidden flex flex-col gap-2 border-t border-b border-white/5 py-6 md:py-8 marquee-glow cursor-none"
             >
               {/* ROW 1: Loops left */}
               <motion.div
@@ -1136,6 +1447,7 @@ export default function Home() {
                     href="https://github.com/amaaxx" 
                     target="_blank" 
                     rel="noopener noreferrer" 
+                    data-cursor-label="EXTERNAL"
                     className="font-mono text-xs text-neutral-500 hover:text-white transition-colors cursor-none"
                   >
                     GITHUB
@@ -1146,6 +1458,7 @@ export default function Home() {
                     href="https://linkedin.com/in/amaaxx" 
                     target="_blank" 
                     rel="noopener noreferrer" 
+                    data-cursor-label="EXTERNAL"
                     className="font-mono text-xs text-neutral-500 hover:text-white transition-colors cursor-none"
                   >
                     LINKEDIN
@@ -1156,7 +1469,7 @@ export default function Home() {
           </div>
         </footer>
       </motion.div>
-    </main>
+    </motion.main>
   );
 }
 

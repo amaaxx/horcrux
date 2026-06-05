@@ -890,44 +890,41 @@ export default function Home() {
           {/* Left Pinned Visual Column */}
           <div className="w-full md:w-1/2 md:sticky md:top-0 h-[50vh] md:h-screen flex items-center justify-center overflow-hidden z-20" style={{ perspective: 1200 }}>
             <VaultVisualContainer>
-              <AnimatePresence mode="wait">
-                {activeIndex === 0 && (
-                  <motion.div
-                    key="gte-visual"
-                    initial={{ scale: 0.94, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.92, opacity: 0 }}
-                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute inset-0 w-full h-full"
-                  >
-                    <GroundTruthVisual />
-                  </motion.div>
-                )}
-                {activeIndex === 1 && (
-                  <motion.div
-                    key="workspace-visual"
-                    initial={{ scale: 0.94, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.92, opacity: 0 }}
-                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute inset-0 w-full h-full"
-                  >
-                    <WorkspaceVisual />
-                  </motion.div>
-                )}
-                {activeIndex === 2 && (
-                  <motion.div
-                    key="broccoli-visual"
-                    initial={{ scale: 0.94, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.92, opacity: 0 }}
-                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute inset-0 w-full h-full"
-                  >
-                    <BroccoliVisual />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* Debug Scroll Tracker Overlay */}
+              <div className="absolute top-4 left-4 font-mono text-[9px] text-neutral-500/80 z-50 select-none pointer-events-none">
+                ACTIVE_INDEX // 0{activeIndex + 1}
+              </div>
+              
+              <div 
+                className="absolute inset-0 w-full h-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{ 
+                  opacity: activeIndex === 0 ? 1 : 0, 
+                  pointerEvents: activeIndex === 0 ? "auto" : "none",
+                  transform: activeIndex === 0 ? "scale(1)" : "scale(0.95)"
+                }}
+              >
+                <GroundTruthVisual />
+              </div>
+              <div 
+                className="absolute inset-0 w-full h-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{ 
+                  opacity: activeIndex === 1 ? 1 : 0, 
+                  pointerEvents: activeIndex === 1 ? "auto" : "none",
+                  transform: activeIndex === 1 ? "scale(1)" : "scale(0.95)"
+                }}
+              >
+                <WorkspaceVisual />
+              </div>
+              <div 
+                className="absolute inset-0 w-full h-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{ 
+                  opacity: activeIndex === 2 ? 1 : 0, 
+                  pointerEvents: activeIndex === 2 ? "auto" : "none",
+                  transform: activeIndex === 2 ? "scale(1)" : "scale(0.95)"
+                }}
+              >
+                <BroccoliVisual />
+              </div>
             </VaultVisualContainer>
           </div>
 

@@ -393,6 +393,32 @@ const LinkedinIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+// ── COMPONENT: SPRING CHARACTER REVEAL ───────────────────────────────────────
+function LetterReveal({ text, delayOffset = 0 }: { text: string; delayOffset: number }) {
+  return (
+    <span className="inline-block whitespace-nowrap">
+      {text.split("").map((char, idx) => (
+        <span key={idx} className="inline-block overflow-hidden pb-[0.05em] vertical-align-bottom">
+          <motion.span
+            className="inline-block origin-bottom-left"
+            initial={{ y: "105%", rotate: 6, skewY: 4, scale: 0.9 }}
+            animate={{ y: 0, rotate: 0, skewY: 0, scale: 1 }}
+            transition={{ 
+              type: "spring",
+              stiffness: 110,
+              damping: 14,
+              mass: 0.5,
+              delay: delayOffset + idx * 0.025 
+            }}
+          >
+            {char === " " ? "\u00A0" : char}
+          </motion.span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 // ── MAIN LANDING PAGE ──────────────────────────────────────────────────────────
 export default function Home() {
   // Initialize Lenis Smooth Scroll
@@ -450,16 +476,31 @@ export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
   const vaultRef = useRef<HTMLElement>(null);
 
-  const { scrollYProgress: vaultProgress } = useScroll({
-    target: vaultRef,
-    offset: ["start start", "end end"]
-  });
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!vaultRef.current) return;
+      const rect = vaultRef.current.getBoundingClientRect();
+      const totalScrollable = rect.height - window.innerHeight;
+      if (totalScrollable <= 0) return;
+      
+      const scrolled = -rect.top;
+      const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
+      
+      if (progress < 0.33) {
+        setActiveIndex(0);
+      } else if (progress < 0.66) {
+        setActiveIndex(1);
+      } else {
+        setActiveIndex(2);
+      }
+    };
 
-  useMotionValueEvent(vaultProgress, "change", (latest) => {
-    if (latest < 0.33) setActiveIndex(0);
-    else if (latest < 0.66) setActiveIndex(1);
-    else setActiveIndex(2);
-  });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Run once on mount
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const footerRef = useRef<HTMLDivElement>(null);
   const marqueeSkew = useTransform(smoothedVelocity, [-2500, 2500], [-8, 8]);
@@ -499,6 +540,19 @@ export default function Home() {
       suppressHydrationWarning
     >
       <motion.div style={{ y: gridY }} className="parallax-grid-bg" />
+
+      {/* Schematic Grid Backdrops */}
+      <div className="schematic-grid hidden md:flex">
+        <div className="schematic-line-v" />
+        <div className="schematic-line-v" />
+        <div className="schematic-line-v" />
+        <div className="schematic-line-v" />
+      </div>
+      <div className="schematic-grid-h hidden md:flex">
+        <div className="schematic-line-h" />
+        <div className="schematic-line-h" />
+        <div className="schematic-line-h" />
+      </div>
 
       {/* Interactive Hero Light Leak follows user mouse safely using CSS positioning */}
       <motion.div
@@ -555,33 +609,11 @@ export default function Home() {
 
             <h1 className="text-huge tracking-tight leading-none font-extrabold max-w-5xl flex flex-col gap-2 premium-text-primary">
               <span className="clip-mask">
-                {heroWordLine1.map((word, idx) => (
-                  <span key={idx} className="inline-block overflow-hidden mr-[0.22em] pb-[0.05em] vertical-align-bottom">
-                    <motion.span
-                      className="inline-block origin-bottom-left"
-                      initial={{ y: "105%", rotate: 2 }}
-                      animate={{ y: 0, rotate: 0 }}
-                      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: idx * 0.05 + 0.1 }}
-                    >
-                      {word}
-                    </motion.span>
-                  </span>
-                ))}
+                <LetterReveal text="Software Engineer." delayOffset={0.1} />
               </span>
 
               <span className="clip-mask">
-                {heroWordLine2.map((word, idx) => (
-                  <span key={idx} className="inline-block overflow-hidden mr-[0.22em] pb-[0.05em] vertical-align-bottom">
-                    <motion.span
-                      className="inline-block origin-bottom-left"
-                      initial={{ y: "105%", rotate: 2 }}
-                      animate={{ y: 0, rotate: 0 }}
-                      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: idx * 0.04 + 0.3 }}
-                    >
-                      {word}
-                    </motion.span>
-                  </span>
-                ))}
+                <LetterReveal text="Architecting Production-Grade Systems." delayOffset={0.3} />
               </span>
             </h1>
 
@@ -900,7 +932,8 @@ export default function Home() {
                 style={{ 
                   opacity: activeIndex === 0 ? 1 : 0, 
                   pointerEvents: activeIndex === 0 ? "auto" : "none",
-                  transform: activeIndex === 0 ? "scale(1)" : "scale(0.95)"
+                  transform: activeIndex === 0 ? "scale(1) translateZ(0)" : "scale(0.95) translateZ(-20px)",
+                  transformStyle: "preserve-3d"
                 }}
               >
                 <GroundTruthVisual />
@@ -910,7 +943,8 @@ export default function Home() {
                 style={{ 
                   opacity: activeIndex === 1 ? 1 : 0, 
                   pointerEvents: activeIndex === 1 ? "auto" : "none",
-                  transform: activeIndex === 1 ? "scale(1)" : "scale(0.95)"
+                  transform: activeIndex === 1 ? "scale(1) translateZ(0)" : "scale(0.95) translateZ(-20px)",
+                  transformStyle: "preserve-3d"
                 }}
               >
                 <WorkspaceVisual />
@@ -920,7 +954,8 @@ export default function Home() {
                 style={{ 
                   opacity: activeIndex === 2 ? 1 : 0, 
                   pointerEvents: activeIndex === 2 ? "auto" : "none",
-                  transform: activeIndex === 2 ? "scale(1)" : "scale(0.95)"
+                  transform: activeIndex === 2 ? "scale(1) translateZ(0)" : "scale(0.95) translateZ(-20px)",
+                  transformStyle: "preserve-3d"
                 }}
               >
                 <BroccoliVisual />

@@ -278,7 +278,7 @@ export function WorkspaceVisual() {
             transformStyle: "preserve-3d",
           }}
           animate={{
-            z: isHovered ? -55 : -30,
+            transform: isHovered ? "translateZ(-55px)" : "translateZ(-30px)",
             borderColor: isHovered ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.05)"
           }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -308,7 +308,7 @@ export function WorkspaceVisual() {
             transformStyle: "preserve-3d",
           }}
           animate={{
-            z: isHovered ? 15 : 10,
+            transform: isHovered ? "translateZ(15px)" : "translateZ(10px)",
             boxShadow: isHovered ? "0 35px 65px -12px rgba(0,0,0,0.9)" : "0 25px 50px -12px rgba(0,0,0,0.8)",
             borderColor: isHovered ? "rgba(16, 185, 129, 0.4)" : "rgba(16, 185, 129, 0.2)",
           }}
@@ -366,33 +366,41 @@ export function WorkspaceVisual() {
 
         {/* Layer 3: High Priority Alert Panel (Top Overlay) */}
         <motion.div 
-          style={{
-            transformStyle: "preserve-3d",
-            borderColor: isHovered ? "rgba(45, 212, 191, 0.5)" : "rgba(45, 212, 191, 0.3)",
-          }}
           animate={{
-            z: isHovered ? 85 : 50,
-            y: isHovered ? [-5, -9, -5] : [0, -4, 0],
-            boxShadow: isHovered ? "0 25px 45px rgba(0,0,0,0.95)" : "0 15px 30px rgba(0,0,0,0.9)",
+            y: [0, -4, 0],
           }}
           transition={{
-            z: { type: "spring", stiffness: 150, damping: 20 },
-            y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-            boxShadow: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
           }}
-          className="absolute w-[55%] h-[35%] right-2 top-2 rounded-xl border bg-[#0c1413]/80 backdrop-blur-md p-3 flex flex-col justify-between"
+          className="absolute w-[55%] h-[35%] right-2 top-2 z-25"
+          style={{ transformStyle: "preserve-3d" }}
         >
-          <div className="flex justify-between items-center">
-            <span className="font-mono text-[7px] text-teal-300 font-bold uppercase tracking-wider">Oracle_Gateway</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-ping" />
-          </div>
-          <p className="font-mono text-[8px] text-neutral-400 leading-normal">
-            DATA_TUNNEL: ACTIVE<br/>
-            FLOW_RATE: 1.2 GB/s
-          </p>
-          <div className="h-1 w-full bg-teal-500/20 rounded overflow-hidden">
-            <div className="h-full bg-teal-400 w-3/4 animate-pulse" />
-          </div>
+          <motion.div 
+            style={{
+              transformStyle: "preserve-3d",
+            }}
+            animate={{
+              transform: isHovered ? "translateZ(85px)" : "translateZ(50px)",
+              boxShadow: isHovered ? "0 25px 45px rgba(0,0,0,0.95)" : "0 15px 30px rgba(0,0,0,0.9)",
+              borderColor: isHovered ? "rgba(45, 212, 191, 0.5)" : "rgba(45, 212, 191, 0.3)",
+            }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full h-full rounded-xl border bg-[#0c1413]/80 backdrop-blur-md p-3 flex flex-col justify-between"
+          >
+            <div className="flex justify-between items-center">
+              <span className="font-mono text-[7px] text-teal-300 font-bold uppercase tracking-wider">Oracle_Gateway</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-ping" />
+            </div>
+            <p className="font-mono text-[8px] text-neutral-400 leading-normal">
+              DATA_TUNNEL: ACTIVE<br/>
+              FLOW_RATE: 1.2 GB/s
+            </p>
+            <div className="h-1 w-full bg-teal-500/20 rounded overflow-hidden">
+              <div className="h-full bg-teal-400 w-3/4 animate-pulse" />
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>
@@ -483,19 +491,12 @@ export function BroccoliVisual() {
 
             <motion.path 
               d="M 10 70 C 80 10, 150 90, 270 30"
-              animate={isHovered 
-                ? { d: `M 10 70 C ${mousePos.x} ${mousePos.y}, 150 90, 270 30` } 
-                : { d: [
-                    "M 10 70 C 80 10, 150 90, 270 30",
-                    "M 10 60 C 90 30, 130 70, 270 40",
-                    "M 10 70 C 80 10, 150 90, 270 30"
-                  ] 
-                }
-              }
-              transition={isHovered 
-                ? { type: "spring", stiffness: 150, damping: 15 } 
-                : { duration: 6, repeat: Infinity, ease: "easeInOut" }
-              }
+              animate={{ 
+                d: isHovered 
+                  ? `M 10 70 C ${mousePos.x} ${mousePos.y}, 150 90, 270 30` 
+                  : "M 10 70 C 80 10, 150 90, 270 30"
+              }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               stroke="url(#broccoliGrad)" 
               strokeWidth="2.5" 
               strokeLinecap="round"
@@ -504,19 +505,12 @@ export function BroccoliVisual() {
 
             <motion.path 
               d="M 10 40 C 90 80, 180 10, 270 80"
-              animate={isHovered
-                ? { d: `M 10 40 C 90 80, ${mousePos.x} ${mousePos.y}, 270 80` }
-                : { d: [
-                    "M 10 40 C 90 80, 180 10, 270 80",
-                    "M 10 50 C 70 60, 190 30, 270 60",
-                    "M 10 40 C 90 80, 180 10, 270 80"
-                  ]
-                }
-              }
-              transition={isHovered
-                ? { type: "spring", stiffness: 150, damping: 15 }
-                : { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
-              }
+              animate={{ 
+                d: isHovered
+                  ? `M 10 40 C 90 80, ${mousePos.x} ${mousePos.y}, 270 80`
+                  : "M 10 40 C 90 80, 180 10, 270 80"
+              }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
               stroke="#f97316" 
               strokeWidth="1" 
               strokeDasharray="4 4"

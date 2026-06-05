@@ -1,31 +1,34 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { 
-  motion, 
+import {
+  motion,
   AnimatePresence,
-  useScroll, 
-  useTransform, 
-  useSpring, 
-  useMotionValue, 
+  useScroll,
+  useTransform,
+  useSpring,
+  useMotionValue,
   useVelocity,
-  useInView
+  useMotionTemplate,
+  useMotionValueEvent,
+  Variants,
+  MotionValue
 } from "framer-motion";
-import { 
-  ArrowUpRight, 
-  ArrowRight, 
-  Cpu, 
-  Database, 
-  Activity, 
-  Server, 
-  Layers, 
-  Zap 
+import {
+  ArrowUpRight,
+  ArrowRight,
+  Cpu,
+  Database,
+  Activity,
+  Server,
+  Layers,
+  Zap
 } from "lucide-react";
 import Lenis from "lenis";
-import { 
-  GroundTruthVisual, 
-  WorkspaceVisual, 
-  BroccoliVisual 
+import {
+  GroundTruthVisual,
+  WorkspaceVisual,
+  BroccoliVisual
 } from "@/components/ProjectVisuals";
 
 // ── CUSTOM HOOK: TRACK GLOBAL MOUSE POSITION (GPU ONLY) ───────────────────────
@@ -50,7 +53,7 @@ function useMousePosition() {
 
 // ── COMPONENT: MAGNETIC CONTAINER (REFLECTIVE OPTIMIZED) ──────────────────────
 interface MagneticProps {
-  children: React.ReactElement<{ "data-cursor"?: string; className?: string }>;
+  children: React.ReactElement<any>;
   range?: number;
 }
 
@@ -78,7 +81,7 @@ function Magnetic({ children, range = 45 }: MagneticProps) {
     const { cx, cy } = cachedBounds.current;
     const distanceX = e.clientX - cx;
     const distanceY = e.clientY - cy;
-    
+
     const distance = Math.hypot(distanceX, distanceY);
     if (distance < range) {
       x.set(distanceX * 0.38);
@@ -125,7 +128,7 @@ function TiltCard({ children, className = "", glowColor = "rgba(79, 70, 229, 0.1
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  
+
   const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [6, -6]), { stiffness: 180, damping: 20 });
   const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-6, 6]), { stiffness: 180, damping: 20 });
 
@@ -159,7 +162,7 @@ function TiltCard({ children, className = "", glowColor = "rgba(79, 70, 229, 0.1
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cachedRect.current) return;
     const { left, top, width, height } = cachedRect.current;
-    
+
     const pageX = e.pageX;
     const pageY = e.pageY;
     const rx = pageX - left;
@@ -183,11 +186,8 @@ function TiltCard({ children, className = "", glowColor = "rgba(79, 70, 229, 0.1
     cachedRect.current = null;
   };
 
-  // Convert spotlight positions into liquid gradient sweeps on GPU
-  const spotlightGradient = useTransform(
-    [spotlightX, spotlightY],
-    ([sx, sy]) => `radial-gradient(280px circle at ${sx}px ${sy}px, ${glowColor}, rgba(255,255,255,0.01) 60%, transparent 100%)`
-  );
+  // Safe TS String parsing for GPU gradient sweeps
+  const spotlightGradient = useMotionTemplate`radial-gradient(280px circle at ${spotlightX}px ${spotlightY}px, ${glowColor}, rgba(255,255,255,0.01) 60%, transparent 100%)`;
 
   return (
     <motion.div
@@ -199,7 +199,7 @@ function TiltCard({ children, className = "", glowColor = "rgba(79, 70, 229, 0.1
         rotateX: isMobile ? 0 : rotateX,
         rotateY: isMobile ? 0 : rotateY,
         transformStyle: "preserve-3d",
-        transform: "translateZ(0)",
+        z: 0,
         willChange: "transform",
       }}
       className={`glass-surface rounded-3xl p-6 md:p-8 relative overflow-hidden transition-colors duration-500 hover:border-white/12 ${className}`}
@@ -213,10 +213,10 @@ function TiltCard({ children, className = "", glowColor = "rgba(79, 70, 229, 0.1
           willChange: "opacity",
         }}
       />
-      
+
       {/* Dynamic persistent floating content layer desynchronized using index */}
-      <motion.div 
-        style={{ transform: "translateZ(20px)" }} 
+      <motion.div
+        style={{ z: 20 }}
         className="h-full flex flex-col justify-between relative z-10 will-change-transform"
         animate={{ y: [0, -5, 0] }}
         transition={{
@@ -234,17 +234,14 @@ function TiltCard({ children, className = "", glowColor = "rgba(79, 70, 229, 0.1
 }
 
 // ── COMPONENT: MANIFESTO WORD HIGHLIGHTER ─────────────────────────────────────
-function ManifestoWord({ word, index, total, progress }: { word: string; index: number; total: number; progress: any }) {
+function ManifestoWord({ word, index, total, progress }: { word: string; index: number; total: number; progress: MotionValue<number> }) {
   const start = 0.15 + (index / total) * 0.55;
   const end = start + 0.04;
   const opacity = useTransform(progress, [start, end], [0.18, 1]);
 
   return (
     <motion.span
-      style={{
-        opacity,
-        willChange: "opacity",
-      }}
+      style={{ opacity, willChange: "opacity" }}
       className="inline-block mr-[0.24em] font-sans font-semibold text-2xl md:text-5xl lg:text-6xl tracking-tight text-neutral-200 hover:text-white transition-colors duration-300"
     >
       {word}
@@ -253,14 +250,10 @@ function ManifestoWord({ word, index, total, progress }: { word: string; index: 
 }
 
 // ── COMPONENT: VAULT CARD STACK FOCAL TRANSITION (Apple/Stripe Inspired) ──────
-interface VaultCardProps {
-  children: React.ReactNode;
-  refTarget: React.RefObject<HTMLDivElement | null>;
-}
-
-function VaultCard({ children, refTarget }: VaultCardProps) {
+function VaultCard({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    target: refTarget,
+    target: ref,
     offset: ["start end", "end start"],
   });
 
@@ -277,13 +270,13 @@ function VaultCard({ children, refTarget }: VaultCardProps) {
 
   return (
     <motion.div
-      ref={refTarget}
+      ref={ref}
       style={{
         scale: springScale,
         opacity: springOpacity,
         rotateX: springRotateX,
         transformStyle: "preserve-3d",
-        transform: "translateZ(0)",
+        z: 0,
         willChange: "transform, opacity",
       }}
       className="min-h-screen flex flex-col justify-center px-8 md:px-16 py-20"
@@ -350,15 +343,12 @@ function VaultVisualContainer({ children }: { children: React.ReactNode }) {
     const height = rect.height;
     const mouseX = e.clientX - rect.left - width / 2;
     const mouseY = e.clientY - rect.top - height / 2;
-    
+
     x.set(mouseX / width);
     y.set(mouseY / height);
   };
 
-  const handleMouseEnter = () => {
-    scale.set(1.025);
-  };
-
+  const handleMouseEnter = () => scale.set(1.025);
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
@@ -376,7 +366,7 @@ function VaultVisualContainer({ children }: { children: React.ReactNode }) {
         rotateY,
         scale,
         transformStyle: "preserve-3d",
-        transform: "translateZ(0)",
+        z: 0,
         willChange: "transform, scale",
       }}
       className="w-[85%] h-[60%] md:h-[65%] rounded-3xl glass-surface border border-white/10 shadow-2xl relative flex items-center justify-center select-none overflow-hidden bg-[#07070f]/60 cursor-none"
@@ -387,9 +377,7 @@ function VaultVisualContainer({ children }: { children: React.ReactNode }) {
   );
 }
 
-
-
-// Inline SVG components to guarantee compilation across Next versions
+// Inline SVG components
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
@@ -411,7 +399,7 @@ export default function Home() {
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.1,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       gestureOrientation: "vertical",
       smoothWheel: true,
     });
@@ -420,95 +408,69 @@ export default function Home() {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
-
     requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
+    return () => lenis.destroy();
   }, []);
 
-  // Track global mouse position for backdrop light glow
   const { x, y } = useMousePosition();
   const glowX = useSpring(x, { stiffness: 70, damping: 24 });
   const glowY = useSpring(y, { stiffness: 70, damping: 24 });
 
-  // Global Page Scroll elements
   const { scrollY, scrollYProgress } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
   const smoothedVelocity = useSpring(scrollVelocity, { stiffness: 100, damping: 22 });
 
-
-
-  // Dynamic Background Morphing mapped across page scroll sections
   const pageBgColor = useTransform(
     scrollYProgress,
     [0, 0.22, 0.45, 0.72, 1],
     ["#05050a", "#070712", "#09071a", "#050c12", "#05050a"]
   );
 
-  // 3D Parallax dot-grid shift
   const gridY = useTransform(scrollY, [0, 6000], [0, -320]);
-
-  // Velocity-reactive surface skewing (Stokt / Guglieri inspired physics)
   const surfaceSkewY = useTransform(smoothedVelocity, [-3000, 3000], [-2.5, 2.5]);
 
-  // Hero refs for Scroll-linked parallax
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroScroll } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
 
-  const heroY = useTransform(heroScroll, [0, 1], [0, 160]); 
+  const heroY = useTransform(heroScroll, [0, 1], [0, 160]);
   const heroScale = useTransform(heroScroll, [0, 1], [1, 0.92]);
   const heroOpacity = useTransform(heroScroll, [0, 0.95], [1, 0]);
 
-  // Manifesto Scroll Tracking
   const manifestoRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: manifestoScroll } = useScroll({
     target: manifestoRef,
     offset: ["start end", "end start"],
   });
 
-  // Project Scroll-tracking refs to trigger split sticky visual swaps
-  const projRef1 = useRef<HTMLDivElement>(null);
-  const projRef2 = useRef<HTMLDivElement>(null);
-  const projRef3 = useRef<HTMLDivElement>(null);
-
-  // Active state viewport checking
-  const inView1 = useInView(projRef1, { amount: 0.35, once: false });
-  const inView2 = useInView(projRef2, { amount: 0.35, once: false });
-  const inView3 = useInView(projRef3, { amount: 0.35, once: false });
-
+  // ── FIX: FOOLPROOF VAULT SCROLL TRACKER ──
+  // Mathematically links activeIndex directly to the Vault's scroll progression, immune to 3D bounding box glitches.
   const [activeIndex, setActiveIndex] = useState(0);
+  const vaultRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (inView1) setActiveIndex(0);
-  }, [inView1]);
+  const { scrollYProgress: vaultProgress } = useScroll({
+    target: vaultRef,
+    offset: ["start start", "end end"]
+  });
 
-  useEffect(() => {
-    if (inView2) setActiveIndex(1);
-  }, [inView2]);
+  useMotionValueEvent(vaultProgress, "change", (latest) => {
+    if (latest < 0.33) setActiveIndex(0);
+    else if (latest < 0.66) setActiveIndex(1);
+    else setActiveIndex(2);
+  });
 
-  useEffect(() => {
-    if (inView3) setActiveIndex(2);
-  }, [inView3]);
-
-  // Footer scroll velocity tracking for marquee physics
   const footerRef = useRef<HTMLDivElement>(null);
-  
-  // Physics mapping: skew, scale, and horizontal drag offset
   const marqueeSkew = useTransform(smoothedVelocity, [-2500, 2500], [-8, 8]);
   const marqueeScale = useTransform(smoothedVelocity, [-2500, 2500], [0.95, 1.05]);
   const marqueeExtraX = useTransform(smoothedVelocity, [-2500, 2500], [-60, 60]);
 
-  // Velocity-reactive marquee text-shadow glow intensity
-  const marqueeGlow = useTransform(smoothedVelocity, (val) => {
+  const marqueeGlowRadius = useTransform(smoothedVelocity, (val) => {
     const absVal = Math.min(Math.abs(val), 2500);
-    const intensity = (absVal / 2500) * 30 + 3; // Glow radius [3px, 33px]
-    return `0 0 ${intensity}px rgba(79, 70, 229, 0.5)`;
+    return (absVal / 2500) * 30 + 3;
   });
+  const marqueeGlow = useMotionTemplate`0 0 ${marqueeGlowRadius}px rgba(79, 70, 229, 0.5)`;
 
   const heroWordLine1 = "Software Engineer.".split(" ");
   const heroWordLine2 = "Architecting Production-Grade Systems.".split(" ");
@@ -517,91 +479,60 @@ export default function Home() {
 
   const scrollToWorks = () => {
     const worksSection = document.getElementById("selected-works-vault");
-    if (worksSection) {
-      worksSection.scrollIntoView({ behavior: "smooth" });
-    }
+    if (worksSection) worksSection.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Bento grid container entry choreography variants
-  const bentoContainerVariants = {
+  const bentoContainerVariants: Variants = {
     hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.12,
-      }
-    }
+    show: { opacity: 1, transition: { staggerChildren: 0.12 } }
   };
 
-  const bentoCardVariants = {
+  const bentoCardVariants: Variants = {
     hidden: { opacity: 0, y: 35, scale: 0.96 },
-    show: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 20
-      }
-    }
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 20 } }
   };
 
   return (
-    <motion.main 
+    <motion.main
       style={{ backgroundColor: pageBgColor }}
-      className="relative w-full min-h-screen text-neutral-200 selection:bg-white/20 overflow-x-hidden font-sans" 
+      className="relative w-full min-h-screen text-neutral-200 selection:bg-white/20 overflow-x-hidden font-sans"
       suppressHydrationWarning
     >
-      
-      {/* Parallax Dot-Grid Backdrop (Parallax Depth Parallels) */}
       <motion.div style={{ y: gridY }} className="parallax-grid-bg" />
 
-
-      
-      {/* Interactive Hero Light Leak follows user mouse */}
+      {/* Interactive Hero Light Leak follows user mouse safely using CSS positioning */}
       <motion.div
-        className="fixed w-[500px] h-[500px] rounded-full pointer-events-none z-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.08)_0%,rgba(51,65,85,0.04)_55%,transparent_75%)] hidden md:block"
+        className="fixed top-0 left-0 w-[500px] h-[500px] -ml-[250px] -mt-[250px] rounded-full pointer-events-none z-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.08)_0%,rgba(51,65,85,0.04)_55%,transparent_75%)] hidden md:block"
         style={{
           x: glowX,
           y: glowY,
-          translateX: "-50%",
-          translateY: "-50%",
           transformStyle: "preserve-3d",
-          transform: "translateZ(0)",
+          z: 0,
           willChange: "transform",
         }}
       />
 
-      {/* ── STAGGERED PAGE LOAD ENTRANCE WRAPPER ────────────────────────────── */}
       <motion.div
         initial="hidden"
         animate="show"
         variants={{
           hidden: { opacity: 0 },
-          show: {
-            opacity: 1,
-            transition: {
-              staggerChildren: 0.15,
-              delayChildren: 0.05,
-            }
-          }
+          show: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.05 } }
         }}
       >
-
         {/* ── HERO SECTION ──────────────────────────────────────────────────────── */}
-        <section 
+        <section
           ref={heroRef}
           className="relative w-full min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 z-10 select-none overflow-hidden"
           suppressHydrationWarning
         >
-          <motion.div 
-            style={{ 
-              y: heroY, 
-              scale: heroScale, 
+          <motion.div
+            style={{
+              y: heroY,
+              scale: heroScale,
               opacity: heroOpacity,
               transformStyle: "preserve-3d",
-              transform: "translateZ(0)",
+              z: 0,
               willChange: "transform, opacity",
             }}
             variants={{
@@ -610,10 +541,9 @@ export default function Home() {
             }}
             className="max-w-6xl w-full flex flex-col gap-8 md:gap-12"
           >
-            {/* Subtle subhead */}
             <div className="flex items-center gap-3">
               <span className="h-[1px] w-12 bg-neutral-700" />
-              <motion.span 
+              <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
@@ -623,7 +553,6 @@ export default function Home() {
               </motion.span>
             </div>
 
-            {/* Kinetic Mask Reveal with Premium Text Titles */}
             <h1 className="text-huge tracking-tight leading-none font-extrabold max-w-5xl flex flex-col gap-2 premium-text-primary">
               <span className="clip-mask">
                 {heroWordLine1.map((word, idx) => (
@@ -632,18 +561,14 @@ export default function Home() {
                       className="inline-block origin-bottom-left"
                       initial={{ y: "105%", rotate: 2 }}
                       animate={{ y: 0, rotate: 0 }}
-                      transition={{
-                        duration: 0.9,
-                        ease: [0.16, 1, 0.3, 1],
-                        delay: idx * 0.05 + 0.1,
-                      }}
+                      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: idx * 0.05 + 0.1 }}
                     >
                       {word}
                     </motion.span>
                   </span>
                 ))}
               </span>
-              
+
               <span className="clip-mask">
                 {heroWordLine2.map((word, idx) => (
                   <span key={idx} className="inline-block overflow-hidden mr-[0.22em] pb-[0.05em] vertical-align-bottom">
@@ -651,11 +576,7 @@ export default function Home() {
                       className="inline-block origin-bottom-left"
                       initial={{ y: "105%", rotate: 2 }}
                       animate={{ y: 0, rotate: 0 }}
-                      transition={{
-                        duration: 0.9,
-                        ease: [0.16, 1, 0.3, 1],
-                        delay: idx * 0.04 + 0.3,
-                      }}
+                      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: idx * 0.04 + 0.3 }}
                     >
                       {word}
                     </motion.span>
@@ -664,7 +585,7 @@ export default function Home() {
               </span>
             </h1>
 
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut", delay: 0.7 }}
@@ -673,10 +594,9 @@ export default function Home() {
               Developing low-latency pipelines, scalable web microservices, and high-performance user interfaces with meticulous engineering practices.
             </motion.p>
 
-            {/* Magnetic CTA Action */}
             <div className="mt-4 flex flex-wrap gap-4 items-center">
               <Magnetic range={50}>
-                <button 
+                <button
                   onClick={scrollToWorks}
                   data-cursor-label="EXPLORE"
                   className="group relative px-8 py-4 bg-white text-black font-semibold rounded-full flex items-center gap-3 transition-transform duration-300 active:scale-95 shadow-[0_0_35px_rgba(255,255,255,0.15)] text-sm md:text-base cursor-none"
@@ -687,19 +607,19 @@ export default function Home() {
               </Magnetic>
 
               <div className="flex gap-4">
-                <a 
-                  href="https://github.com/amaaxx" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href="https://github.com/amaaxx"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   data-cursor-label="GITHUB"
                   className="p-3.5 rounded-full border border-white/5 hover:border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-300 active:scale-90 text-neutral-400 hover:text-white"
                 >
                   <GithubIcon className="w-4.5 h-4.5" />
                 </a>
-                <a 
-                  href="https://linkedin.com/in/amaaxx" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href="https://linkedin.com/in/amaaxx"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   data-cursor-label="LINKEDIN"
                   className="p-3.5 rounded-full border border-white/5 hover:border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-300 active:scale-90 text-neutral-400 hover:text-white"
                 >
@@ -710,8 +630,8 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── THE MANIFESTO & ETHOS (SCROLL-LINKED LIGHTING) ─────────────────── */}
-        <section 
+        {/* ── THE MANIFESTO & ETHOS ─────────────────── */}
+        <section
           ref={manifestoRef}
           className="relative py-32 px-6 md:px-16 lg:px-24 z-10 max-w-5xl mx-auto flex flex-col justify-center min-h-[70vh]"
           suppressHydrationWarning
@@ -719,34 +639,27 @@ export default function Home() {
           <div className="mb-10">
             <ScrollRevealHeader subtitle="PHILOSOPHY & VISION" title="Core Manifesto" />
           </div>
-          
+
           <div className="flex flex-wrap leading-relaxed max-w-4xl">
             {manifestoWords.map((word, idx) => (
-              <ManifestoWord 
-                key={idx} 
-                word={word} 
-                index={idx} 
-                total={manifestoWords.length} 
-                progress={manifestoScroll} 
+              <ManifestoWord
+                key={idx}
+                word={word}
+                index={idx}
+                total={manifestoWords.length}
+                progress={manifestoScroll}
               />
             ))}
           </div>
         </section>
 
-        {/* ── THE TECH ARSENAL (ASYMMETRIC BENTO GRID WITH SPRING POP-IN & HOVER FLOAT & KINETIC SKEW) ── */}
+        {/* ── THE TECH ARSENAL ── */}
         <section className="relative py-20 px-6 md:px-16 lg:px-24 z-10 max-w-6xl mx-auto flex flex-col gap-12 md:gap-16" suppressHydrationWarning>
-          
-          {/* Section Title with velocity skew and 3D scrolling perspective */}
-          <motion.div 
-            style={{ skewY: surfaceSkewY }}
-            className="will-change-transform" 
-            suppressHydrationWarning
-          >
+          <motion.div style={{ skewY: surfaceSkewY }} className="will-change-transform" suppressHydrationWarning>
             <ScrollRevealHeader subtitle="SYSTEM CORE COMPONENTS" title="The Tech Arsenal" />
           </motion.div>
 
-          {/* Bento Grid with staggered whileInView choreography and kinetic velocity skew */}
-          <motion.div 
+          <motion.div
             variants={bentoContainerVariants}
             initial="hidden"
             whileInView="show"
@@ -754,15 +667,12 @@ export default function Home() {
             style={{ skewY: surfaceSkewY, transformStyle: "preserve-3d" }}
             className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 will-change-transform"
           >
-            
-            {/* Card 1: Next.js 15 (Wide Card) */}
             <motion.div variants={bentoCardVariants} className="md:col-span-2">
               <TiltCard className="min-h-[240px]" glowColor="rgba(79, 70, 229, 0.1)" index={0}>
                 <div className="flex justify-between items-start w-full">
                   <span className="font-mono text-[10px] text-neutral-500 tracking-wider">CORE_FRAMEWORK // SYSTEM_01</span>
                   <Cpu className="w-5 h-5 text-neutral-600" />
                 </div>
-                
                 <div className="mt-8 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
                   <div className="flex-1">
                     <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-200 mb-2">Next.js 15</h3>
@@ -775,8 +685,6 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  
-                  {/* Next.js Mini Visual */}
                   <div className="w-full md:w-40 h-28 shrink-0 rounded-2xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
                     <svg className="w-24 h-20" viewBox="0 0 100 80" fill="none">
                       <circle cx="50" cy="40" r="10" stroke="#4f46e5" strokeWidth="1.5" />
@@ -785,24 +693,22 @@ export default function Home() {
                       <path d="M 40 40 L 15 40" stroke="#334155" strokeWidth="1.5" />
                       <path d="M 60 40 L 85 40" stroke="#334155" strokeWidth="1.5" />
                       <path d="M 50 50 L 50 68" stroke="#334155" strokeWidth="1.5" />
-                      <circle r="2" fill="#22d3ee"><animateMotion path="M 50 30 L 50 12" dur="1s" repeatCount="indefinite"/></circle>
-                      <circle r="2" fill="#22d3ee"><animateMotion path="M 50 50 L 50 68" dur="1.2s" repeatCount="indefinite"/></circle>
-                      <circle r="2" fill="#22d3ee"><animateMotion path="M 40 40 L 15 40" dur="0.9s" repeatCount="indefinite"/></circle>
-                      <circle r="2" fill="#22d3ee"><animateMotion path="M 60 40 L 85 40" dur="1.1s" repeatCount="indefinite"/></circle>
+                      <circle r="2" fill="#22d3ee"><animateMotion path="M 50 30 L 50 12" dur="1s" repeatCount="indefinite" /></circle>
+                      <circle r="2" fill="#22d3ee"><animateMotion path="M 50 50 L 50 68" dur="1.2s" repeatCount="indefinite" /></circle>
+                      <circle r="2" fill="#22d3ee"><animateMotion path="M 40 40 L 15 40" dur="0.9s" repeatCount="indefinite" /></circle>
+                      <circle r="2" fill="#22d3ee"><animateMotion path="M 60 40 L 85 40" dur="1.1s" repeatCount="indefinite" /></circle>
                     </svg>
                   </div>
                 </div>
               </TiltCard>
             </motion.div>
 
-            {/* Card 2: Python & FastAPI */}
             <motion.div variants={bentoCardVariants}>
               <TiltCard className="min-h-[240px]" glowColor="rgba(51, 65, 85, 0.12)" index={1}>
                 <div className="flex justify-between items-start w-full">
                   <span className="font-mono text-[10px] text-neutral-500 tracking-wider">BACKEND_ENGINE // SYSTEM_02</span>
                   <Server className="w-5 h-5 text-neutral-600" />
                 </div>
-                
                 <div className="mt-8 flex flex-col justify-between h-full gap-4">
                   <div>
                     <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">Python & FastAPI</h3>
@@ -815,8 +721,6 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  
-                  {/* Python & FastAPI Mini Visual */}
                   <div className="w-full h-20 rounded-xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
                     <svg className="w-20 h-16" viewBox="0 0 80 60" fill="none">
                       <rect x="25" y="15" width="30" height="30" rx="6" stroke="#334155" strokeWidth="1.5" />
@@ -824,26 +728,20 @@ export default function Home() {
                       <circle cx="40" cy="30" r="2.5" fill="#4f46e5" />
                       <path d="M 10 20 C 25 5, 55 5, 70 20" stroke="#334155" strokeWidth="1" strokeDasharray="2 2" />
                       <path d="M 70 40 C 55 55, 25 55, 10 40" stroke="#334155" strokeWidth="1" strokeDasharray="2 2" />
-                      <circle r="1.5" fill="#22d3ee">
-                        <animateMotion path="M 10 20 C 25 5, 55 5, 70 20" dur="1.6s" repeatCount="indefinite" />
-                      </circle>
-                      <circle r="1.5" fill="#c084fc">
-                        <animateMotion path="M 70 40 C 55 55, 25 55, 10 40" dur="1.6s" repeatCount="indefinite" />
-                      </circle>
+                      <circle r="1.5" fill="#22d3ee"><animateMotion path="M 10 20 C 25 5, 55 5, 70 20" dur="1.6s" repeatCount="indefinite" /></circle>
+                      <circle r="1.5" fill="#c084fc"><animateMotion path="M 70 40 C 55 55, 25 55, 10 40" dur="1.6s" repeatCount="indefinite" /></circle>
                     </svg>
                   </div>
                 </div>
               </TiltCard>
             </motion.div>
 
-            {/* Card 3: React */}
             <motion.div variants={bentoCardVariants}>
               <TiltCard className="min-h-[220px]" glowColor="rgba(79, 70, 229, 0.08)" index={2}>
                 <div className="flex justify-between items-start w-full">
                   <span className="font-mono text-[10px] text-neutral-500 tracking-wider">USER_INTERFACE // SYSTEM_03</span>
                   <Activity className="w-5 h-5 text-neutral-600" />
                 </div>
-                
                 <div className="mt-8 flex flex-col justify-between h-full gap-4">
                   <div>
                     <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">React</h3>
@@ -856,8 +754,6 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  
-                  {/* React Mini Visual */}
                   <div className="w-full h-20 rounded-xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
                     <svg className="w-20 h-16" viewBox="0 0 80 60" fill="none">
                       <circle cx="40" cy="12" r="4.5" stroke="#334155" strokeWidth="1.5" />
@@ -876,14 +772,12 @@ export default function Home() {
               </TiltCard>
             </motion.div>
 
-            {/* Card 4: LangChain & AI agents */}
             <motion.div variants={bentoCardVariants}>
               <TiltCard className="min-h-[220px]" glowColor="rgba(51, 65, 85, 0.08)" index={3}>
                 <div className="flex justify-between items-start w-full">
                   <span className="font-mono text-[10px] text-neutral-500 tracking-wider">AI_INTEGRATION // SYSTEM_04</span>
                   <Layers className="w-5 h-5 text-neutral-600" />
                 </div>
-                
                 <div className="mt-8 flex flex-col justify-between h-full gap-4">
                   <div>
                     <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">LangChain</h3>
@@ -896,8 +790,6 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  
-                  {/* LangChain Mini Visual */}
                   <div className="w-full h-20 rounded-xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
                     <svg className="w-20 h-16" viewBox="0 0 80 60" fill="none">
                       <circle cx="40" cy="15" r="5" stroke="#4f46e5" strokeWidth="1.5" />
@@ -915,14 +807,12 @@ export default function Home() {
               </TiltCard>
             </motion.div>
 
-            {/* Card 5: C++ / Low Level */}
             <motion.div variants={bentoCardVariants}>
               <TiltCard className="min-h-[220px]" glowColor="rgba(255, 255, 255, 0.04)" index={4}>
                 <div className="flex justify-between items-start w-full">
                   <span className="font-mono text-[10px] text-neutral-500 tracking-wider">SYSTEMS_LEVEL // SYSTEM_05</span>
                   <Zap className="w-5 h-5 text-neutral-600" />
                 </div>
-                
                 <div className="mt-8 flex flex-col justify-between h-full gap-4">
                   <div>
                     <h3 className="text-2xl font-bold tracking-tight text-neutral-200 mb-2">C++ & DSA</h3>
@@ -935,8 +825,6 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  
-                  {/* C++ Mini Visual */}
                   <div className="w-full h-20 rounded-xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
                     <svg className="w-20 h-16" viewBox="0 0 80 60" fill="none">
                       <circle cx="40" cy="15" r="4.5" stroke="#334155" strokeWidth="1.5" />
@@ -956,14 +844,12 @@ export default function Home() {
               </TiltCard>
             </motion.div>
 
-            {/* Card 6: PostgreSQL (Wide on desktop) */}
             <motion.div variants={bentoCardVariants} className="md:col-span-3">
               <TiltCard className="min-h-[200px]" glowColor="rgba(79, 70, 229, 0.08)" index={5}>
                 <div className="flex justify-between items-start w-full">
                   <span className="font-mono text-[10px] text-neutral-500 tracking-wider">DATASTORAGE_ENGINE // SYSTEM_06</span>
                   <Database className="w-5 h-5 text-neutral-600" />
                 </div>
-                
                 <div className="mt-8 flex flex-col md:flex-row justify-between md:items-end gap-6">
                   <div className="flex-1">
                     <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-200 mb-2">PostgreSQL</h3>
@@ -976,8 +862,6 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  
-                  {/* PostgreSQL Mini Visual */}
                   <div className="w-full md:w-44 h-24 shrink-0 rounded-2xl border border-white/5 bg-[#09090e]/40 relative overflow-hidden flex items-center justify-center">
                     <svg className="w-32 h-16" viewBox="0 0 160 80" fill="none">
                       <rect x="15" y="15" width="40" height="8" rx="2" stroke="#334155" strokeWidth="1" />
@@ -985,9 +869,7 @@ export default function Home() {
                       <rect x="15" y="39" width="40" height="8" rx="2" stroke="#334155" strokeWidth="1" />
                       <path d="M 120 31 L 65 31" stroke="#334155" strokeWidth="1.2" strokeDasharray="2 2" />
                       <circle cx="120" cy="31" r="3.5" fill="#4f46e5" />
-                      <circle r="1.5" fill="#22d3ee">
-                        <animateMotion path="M 120 31 L 65 31" dur="1.2s" repeatCount="indefinite" />
-                      </circle>
+                      <circle r="1.5" fill="#22d3ee"><animateMotion path="M 120 31 L 65 31" dur="1.2s" repeatCount="indefinite" /></circle>
                       <circle cx="55" cy="29" r="6" stroke="#22d3ee" strokeWidth="0.5" className="animate-ping" style={{ transformOrigin: "55px 29px" }} />
                     </svg>
                   </div>
@@ -998,17 +880,16 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── THE VAULT (SELECTED WORKS - STICKY SPLIT LAYOUT WITH HIGH-FIDELITY CROSSFADE & 3D FOCAL STACK) ── */}
-        <section 
+        {/* ── THE VAULT (SELECTED WORKS - STICKY SPLIT LAYOUT) ── */}
+        <section
           id="selected-works-vault"
+          ref={vaultRef as React.RefObject<HTMLElement>}
           className="relative flex flex-col md:flex-row items-start w-full z-10"
           suppressHydrationWarning
         >
-          {/* Left Pinned Visual Column: Stays pinned exactly until right track finishes */}
+          {/* Left Pinned Visual Column */}
           <div className="w-full md:w-1/2 md:sticky md:top-0 h-[50vh] md:h-screen flex items-center justify-center overflow-hidden z-20" style={{ perspective: 1200 }}>
             <VaultVisualContainer>
-              
-              {/* Dynamic Color Morphing Crossfade swaps featuring High-Fidelity Components */}
               <AnimatePresence mode="wait">
                 {activeIndex === 0 && (
                   <motion.div
@@ -1050,22 +931,16 @@ export default function Home() {
             </VaultVisualContainer>
           </div>
 
-          {/* Right Scroll Track Column: Houses focal-stack VaultCard components */}
+          {/* Right Scroll Track Column */}
           <div className="w-full md:w-1/2 flex flex-col">
-            
-            {/* Card 01: Ground Truth Engine */}
-            <VaultCard refTarget={projRef1}>
+            <VaultCard>
               <div className="flex flex-col gap-6 max-w-lg">
                 <span className="font-mono text-xs text-neutral-500 tracking-wider">PROJECT_01 // RAG_ARCHITECTURE</span>
                 <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-none premium-text-primary">Ground Truth Engine</h3>
-                
                 <div className="p-4 rounded-2xl border border-white/5 bg-[#09090e]/60 backdrop-blur-sm shadow-md">
                   <span className="font-mono text-[9px] text-[#4f46e5] font-bold block mb-1">ARCHITECTURE BRIEF:</span>
-                  <p className="text-neutral-400 text-sm leading-relaxed font-light">
-                    An advanced Retrieval-Augmented Generation (RAG) platform engineered to remove hallucination risks. Employs a deterministic, structured 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.
-                  </p>
+                  <p className="text-neutral-400 text-sm leading-relaxed font-light">An advanced Retrieval-Augmented Generation (RAG) platform engineered to remove hallucination risks. Employs a deterministic, structured 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.</p>
                 </div>
-
                 <div className="space-y-3">
                   <span className="font-mono text-[9px] text-neutral-500 uppercase tracking-widest block">Core Specifications:</span>
                   <ul className="space-y-1.5 text-xs md:text-sm text-neutral-400 font-light list-disc list-inside">
@@ -1074,7 +949,6 @@ export default function Home() {
                     <li>pgvector integration yielding sub-180ms document indexing.</li>
                   </ul>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4 border-t border-b border-white/5 py-4 my-2">
                   <div>
                     <span className="font-mono text-[9px] text-neutral-500 block">LATENCY RESPONSE</span>
@@ -1085,14 +959,9 @@ export default function Home() {
                     <span className="text-lg font-bold font-mono text-indigo-400">99.8% Hallucination-Free</span>
                   </div>
                 </div>
-
                 <div className="pt-2">
                   <Magnetic>
-                    <a 
-                      href="/vessel/ground-truth-engine" 
-                      data-cursor-label="GTE"
-                      className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none"
-                    >
+                    <a href="/vessel/ground-truth-engine" data-cursor-label="GTE" className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none">
                       <span>Inspect Repository Architecture</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </a>
@@ -1101,19 +970,14 @@ export default function Home() {
               </div>
             </VaultCard>
 
-            {/* Card 02: Centralized Digital Workspace */}
-            <VaultCard refTarget={projRef2}>
+            <VaultCard>
               <div className="flex flex-col gap-6 max-w-lg">
                 <span className="font-mono text-xs text-neutral-500 tracking-wider">PROJECT_02 // ENTERPRISE_PORTAL</span>
                 <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-none premium-text-primary">Centralized Workspace</h3>
-                
                 <div className="p-4 rounded-2xl border border-white/5 bg-[#09090e]/60 backdrop-blur-sm shadow-md">
                   <span className="font-mono text-[9px] text-emerald-500 font-bold block mb-1">ENTERPRISE BRIEF:</span>
-                  <p className="text-neutral-400 text-sm leading-relaxed font-light">
-                    A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Deployed internally to consolidate databases, proxy legacy Oracle systems, and manage staff operations.
-                  </p>
+                  <p className="text-neutral-400 text-sm leading-relaxed font-light">A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Deployed internally to consolidate databases, proxy legacy Oracle systems, and manage staff operations.</p>
                 </div>
-
                 <div className="space-y-3">
                   <span className="font-mono text-[9px] text-neutral-500 uppercase tracking-widest block">Core Specifications:</span>
                   <ul className="space-y-1.5 text-xs md:text-sm text-neutral-400 font-light list-disc list-inside">
@@ -1122,7 +986,6 @@ export default function Home() {
                     <li>API caching reducing database query latency to 45ms.</li>
                   </ul>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4 border-t border-b border-white/5 py-4 my-2">
                   <div>
                     <span className="font-mono text-[9px] text-neutral-500 block">DEPLOYED FOOTPRINT</span>
@@ -1133,14 +996,9 @@ export default function Home() {
                     <span className="text-lg font-bold font-mono text-emerald-400">45ms Avg Latency</span>
                   </div>
                 </div>
-
                 <div className="pt-2">
                   <Magnetic>
-                    <a 
-                      href="/vessel/blw-portal" 
-                      data-cursor-label="BLW"
-                      className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none"
-                    >
+                    <a href="/vessel/blw-portal" data-cursor-label="BLW" className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none">
                       <span>Read Enterprise Case Study</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </a>
@@ -1149,19 +1007,14 @@ export default function Home() {
               </div>
             </VaultCard>
 
-            {/* Card 03: pink-broccoli */}
-            <VaultCard refTarget={projRef3}>
+            <VaultCard>
               <div className="flex flex-col gap-6 max-w-lg">
                 <span className="font-mono text-xs text-neutral-500 tracking-wider">PROJECT_03 // WEB_SYSTEM</span>
                 <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-none premium-text-primary">pink-broccoli</h3>
-                
                 <div className="p-4 rounded-2xl border border-white/5 bg-[#09090e]/60 backdrop-blur-sm shadow-md">
                   <span className="font-mono text-[9px] text-pink-500 font-bold block mb-1">FRONTEND BRIEF:</span>
-                  <p className="text-neutral-400 text-sm leading-relaxed font-light">
-                    A high-velocity, design-forward web application. Compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero garbage collection delays.
-                  </p>
+                  <p className="text-neutral-400 text-sm leading-relaxed font-light">A high-velocity, design-forward web application. Compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero garbage collection delays.</p>
                 </div>
-
                 <div className="space-y-3">
                   <span className="font-mono text-[9px] text-neutral-500 uppercase tracking-widest block">Core Specifications:</span>
                   <ul className="space-y-1.5 text-xs md:text-sm text-neutral-400 font-light list-disc list-inside">
@@ -1170,7 +1023,6 @@ export default function Home() {
                     <li>Extremely low memory footprint and high frontend velocity.</li>
                   </ul>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4 border-t border-b border-white/5 py-4 my-2">
                   <div>
                     <span className="font-mono text-[9px] text-neutral-500 block">LCP LOAD SPEED</span>
@@ -1181,14 +1033,9 @@ export default function Home() {
                     <span className="text-lg font-bold font-mono text-pink-400">&lt; 42 Kilobytes</span>
                   </div>
                 </div>
-
                 <div className="pt-2">
                   <Magnetic>
-                    <a 
-                      href="/vessel/Laminar" 
-                      data-cursor-label="BROCCOLI"
-                      className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none"
-                    >
+                    <a href="/vessel/Laminar" data-cursor-label="BROCCOLI" className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-neutral-400 hover:text-white border-b border-neutral-700 hover:border-white pb-1 transition-colors cursor-none">
                       <span>View Interactive UI Build</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </a>
@@ -1201,105 +1048,54 @@ export default function Home() {
         </section>
 
         {/* ── FOOTER SECTION ────────────────────────────────────────────────────── */}
-        <footer 
+        <footer
           ref={footerRef}
           className="relative w-full z-10 bg-[#09090e] pt-32 pb-16 px-6 md:px-16 lg:px-24 flex flex-col justify-end min-h-[70vh] border-t border-white/5 select-none"
           suppressHydrationWarning
         >
           <div className="max-w-6xl w-full mx-auto flex flex-col gap-12 md:gap-16" suppressHydrationWarning>
-            
-            {/* Loop Marquee scaling, skewing, and shifting dynamically based on scroll velocity */}
-            <motion.div 
-              style={{ 
-                scale: marqueeScale, 
+            <motion.div
+              style={{
+                scale: marqueeScale,
                 skewY: marqueeSkew,
                 x: marqueeExtraX,
                 textShadow: marqueeGlow,
                 transformStyle: "preserve-3d",
-                transform: "translateZ(0)",
+                z: 0,
                 willChange: "transform",
               }}
               data-cursor-label="TALK"
               className="w-full overflow-hidden flex flex-col gap-2 border-t border-b border-white/5 py-6 md:py-8 marquee-glow cursor-none"
             >
-              {/* ROW 1: Loops left */}
-              <motion.div
-                variants={marqueeVariantsLeft}
-                animate="animate"
-                className="flex text-marquee leading-none uppercase font-black font-sans tracking-tighter w-[200%] gap-12 select-none"
-              >
+              <motion.div variants={marqueeVariantsLeft} animate="animate" className="flex text-marquee leading-none uppercase font-black font-sans tracking-tighter w-[200%] gap-12 select-none">
                 <div className="flex justify-around min-w-full shrink-0 gap-12">
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
+                  <span>LET&apos;S TALK</span><span>•</span><span>LET&apos;S TALK</span><span>•</span><span>LET&apos;S TALK</span><span>•</span>
                 </div>
                 <div className="flex justify-around min-w-full shrink-0 gap-12">
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
+                  <span>LET&apos;S TALK</span><span>•</span><span>LET&apos;S TALK</span><span>•</span><span>LET&apos;S TALK</span><span>•</span>
                 </div>
               </motion.div>
-
-              {/* ROW 2: Loops right */}
-              <motion.div
-                variants={marqueeVariantsRight}
-                animate="animate"
-                className="flex text-marquee leading-none uppercase font-black font-sans tracking-tighter w-[200%] gap-12 select-none opacity-50"
-              >
+              <motion.div variants={marqueeVariantsRight} animate="animate" className="flex text-marquee leading-none uppercase font-black font-sans tracking-tighter w-[200%] gap-12 select-none opacity-50">
                 <div className="flex justify-around min-w-full shrink-0 gap-12">
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
+                  <span>LET&apos;S TALK</span><span>•</span><span>LET&apos;S TALK</span><span>•</span><span>LET&apos;S TALK</span><span>•</span>
                 </div>
                 <div className="flex justify-around min-w-full shrink-0 gap-12">
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
-                  <span>LET&apos;S TALK</span>
-                  <span>•</span>
+                  <span>LET&apos;S TALK</span><span>•</span><span>LET&apos;S TALK</span><span>•</span><span>LET&apos;S TALK</span><span>•</span>
                 </div>
               </motion.div>
             </motion.div>
 
-            {/* Bottom links and details */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-8 pt-8 border-t border-white/5">
               <div className="flex flex-col gap-1 text-center md:text-left font-mono text-[10px] text-neutral-500">
                 <span>DESIGNED & ENGINEERED BY AMAAN</span>
                 <span>© 2026 HORCRUX ENGINE • ALL RIGHTS RESERVED</span>
               </div>
-              
               <div className="flex gap-6 items-center">
                 <Magnetic>
-                  <a 
-                    href="https://github.com/amaaxx" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    data-cursor-label="EXTERNAL"
-                    className="font-mono text-xs text-neutral-500 hover:text-white transition-colors cursor-none"
-                  >
-                    GITHUB
-                  </a>
+                  <a href="https://github.com/amaaxx" target="_blank" rel="noopener noreferrer" data-cursor-label="EXTERNAL" className="font-mono text-xs text-neutral-500 hover:text-white transition-colors cursor-none">GITHUB</a>
                 </Magnetic>
                 <Magnetic>
-                  <a 
-                    href="https://linkedin.com/in/amaaxx" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    data-cursor-label="EXTERNAL"
-                    className="font-mono text-xs text-neutral-500 hover:text-white transition-colors cursor-none"
-                  >
-                    LINKEDIN
-                  </a>
+                  <a href="https://linkedin.com/in/amaaxx" target="_blank" rel="noopener noreferrer" data-cursor-label="EXTERNAL" className="font-mono text-xs text-neutral-500 hover:text-white transition-colors cursor-none">LINKEDIN</a>
                 </Magnetic>
               </div>
             </div>
@@ -1311,30 +1107,10 @@ export default function Home() {
 }
 
 // ── MARQUEE ANIMATION VARIANTS ────────────────────────────────────────────────
-const marqueeVariantsLeft = {
-  animate: {
-    x: ["0%", "-50%"],
-    transition: {
-      x: {
-        repeat: Infinity,
-        repeatType: "loop" as const,
-        duration: 18,
-        ease: "linear" as const,
-      },
-    },
-  },
+const marqueeVariantsLeft: Variants = {
+  animate: { x: ["0%", "-50%"], transition: { x: { repeat: Infinity, repeatType: "loop", duration: 18, ease: "linear" } } },
 };
 
-const marqueeVariantsRight = {
-  animate: {
-    x: ["-50%", "0%"],
-    transition: {
-      x: {
-        repeat: Infinity,
-        repeatType: "loop" as const,
-        duration: 18,
-        ease: "linear" as const,
-      },
-    },
-  },
+const marqueeVariantsRight: Variants = {
+  animate: { x: ["-50%", "0%"], transition: { x: { repeat: Infinity, repeatType: "loop", duration: 18, ease: "linear" } } },
 };

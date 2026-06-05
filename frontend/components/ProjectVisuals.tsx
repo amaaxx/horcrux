@@ -273,14 +273,16 @@ export function WorkspaceVisual() {
         className="relative w-[300px] h-[300px] md:w-[340px] md:h-[340px] flex items-center justify-center z-10"
       >
         {/* Layer 1: System Base Grid (Deepest) */}
-        <div 
+        <motion.div 
           style={{
-            transform: isHovered ? "translateZ(-55px)" : "translateZ(-30px)",
             transformStyle: "preserve-3d",
-            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
-            border: isHovered ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(255, 255, 255, 0.05)"
           }}
-          className="absolute w-[90%] h-[90%] rounded-2xl bg-black/60 backdrop-blur-sm p-4 flex flex-col justify-between"
+          animate={{
+            z: isHovered ? -55 : -30,
+            borderColor: isHovered ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.05)"
+          }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute w-[90%] h-[90%] rounded-2xl bg-black/60 backdrop-blur-sm p-4 flex flex-col justify-between border"
         >
           <div className="absolute inset-0 bg-grid-white/[0.015] bg-[size:15px_15px] rounded-2xl" />
           <div className="flex justify-between items-center relative z-10">
@@ -298,17 +300,19 @@ export function WorkspaceVisual() {
               />
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Layer 2: Main Operational Dashboard Grid (Middle) */}
-        <div 
+        <motion.div 
           style={{
-            transform: isHovered ? "translateZ(15px)" : "translateZ(10px)",
             transformStyle: "preserve-3d",
+          }}
+          animate={{
+            z: isHovered ? 15 : 10,
             boxShadow: isHovered ? "0 35px 65px -12px rgba(0,0,0,0.9)" : "0 25px 50px -12px rgba(0,0,0,0.8)",
-            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
             borderColor: isHovered ? "rgba(16, 185, 129, 0.4)" : "rgba(16, 185, 129, 0.2)",
           }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="absolute w-[85%] h-[85%] rounded-2xl border bg-[#090F0E]/70 backdrop-blur-md p-4 flex flex-col justify-between"
         >
           <div className="flex items-center justify-between border-b border-white/5 pb-2">
@@ -358,24 +362,23 @@ export function WorkspaceVisual() {
             <span>PING: 42ms</span>
             <span className="text-emerald-500 bg-emerald-500/10 px-1 py-0.5 rounded font-bold">LTS_STABLE</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Layer 3: High Priority Alert Panel (Top Overlay) */}
         <motion.div 
           style={{
-            transform: isHovered ? "translateZ(85px) translateY(-5px)" : "translateZ(50px)",
             transformStyle: "preserve-3d",
-            boxShadow: isHovered ? "0 25px 45px rgba(0,0,0,0.95)" : "0 15px 30px rgba(0,0,0,0.9)",
-            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
             borderColor: isHovered ? "rgba(45, 212, 191, 0.5)" : "rgba(45, 212, 191, 0.3)",
           }}
           animate={{
-            y: [0, -4, 0],
+            z: isHovered ? 85 : 50,
+            y: isHovered ? [-5, -9, -5] : [0, -4, 0],
+            boxShadow: isHovered ? "0 25px 45px rgba(0,0,0,0.95)" : "0 15px 30px rgba(0,0,0,0.9)",
           }}
           transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
+            z: { type: "spring", stiffness: 150, damping: 20 },
+            y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+            boxShadow: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
           }}
           className="absolute w-[55%] h-[35%] right-2 top-2 rounded-xl border bg-[#0c1413]/80 backdrop-blur-md p-3 flex flex-col justify-between"
         >
@@ -407,8 +410,8 @@ export function BroccoliVisual() {
     const py = e.clientY - rect.top;
     // Map container dimension to SVG viewBox of 280x100
     setMousePos({
-      x: (px / rect.width) * 280,
-      y: (py / rect.height) * 100,
+      x: (px / (rect.width || 1)) * 280,
+      y: (py / (rect.height || 1)) * 100,
     });
   };
 
@@ -479,48 +482,45 @@ export function BroccoliVisual() {
             )}
 
             <motion.path 
-              d={isHovered ? `M 10 70 C ${mousePos.x} ${mousePos.y}, 150 90, 270 30` : "M 10 70 C 80 10, 150 90, 270 30"} 
+              d="M 10 70 C 80 10, 150 90, 270 30"
+              animate={isHovered 
+                ? { d: `M 10 70 C ${mousePos.x} ${mousePos.y}, 150 90, 270 30` } 
+                : { d: [
+                    "M 10 70 C 80 10, 150 90, 270 30",
+                    "M 10 60 C 90 30, 130 70, 270 40",
+                    "M 10 70 C 80 10, 150 90, 270 30"
+                  ] 
+                }
+              }
+              transition={isHovered 
+                ? { type: "spring", stiffness: 150, damping: 15 } 
+                : { duration: 6, repeat: Infinity, ease: "easeInOut" }
+              }
               stroke="url(#broccoliGrad)" 
               strokeWidth="2.5" 
               strokeLinecap="round"
               filter="url(#broccoliGlow)"
-              {...(!isHovered && {
-                animate: {
-                  d: [
-                    "M 10 70 C 80 10, 150 90, 270 30",
-                    "M 10 60 C 90 30, 130 70, 270 40",
-                    "M 10 70 C 80 10, 150 90, 270 30"
-                  ]
-                },
-                transition: {
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }
-              })}
             />
 
             <motion.path 
-              d={isHovered ? `M 10 40 C 90 80, ${mousePos.x} ${mousePos.y}, 270 80` : "M 10 40 C 90 80, 180 10, 270 80"} 
-              stroke="#f97316" 
-              strokeWidth="1" 
-              strokeDasharray="4 4"
-              opacity="0.6"
-              {...(!isHovered && {
-                animate: {
-                  d: [
+              d="M 10 40 C 90 80, 180 10, 270 80"
+              animate={isHovered
+                ? { d: `M 10 40 C 90 80, ${mousePos.x} ${mousePos.y}, 270 80` }
+                : { d: [
                     "M 10 40 C 90 80, 180 10, 270 80",
                     "M 10 50 C 70 60, 190 30, 270 60",
                     "M 10 40 C 90 80, 180 10, 270 80"
                   ]
-                },
-                transition: {
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.5
                 }
-              })}
+              }
+              transition={isHovered
+                ? { type: "spring", stiffness: 150, damping: 15 }
+                : { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+              }
+              stroke="#f97316" 
+              strokeWidth="1" 
+              strokeDasharray="4 4"
+              opacity="0.6"
             />
 
             <circle cx="85" cy="45" r="4.5" fill="#09090f" stroke="#ec4899" strokeWidth="2.5" />

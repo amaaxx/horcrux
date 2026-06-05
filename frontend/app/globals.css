@@ -1,73 +1,60 @@
 @import "tailwindcss";
 
-@theme {
-  --color-background: #05050a;
-  --color-surface: #09090e;
-  --color-border: rgba(255, 255, 255, 0.05);
-  --color-accent: #4f46e5;
+/* ── TOKENS ──────────────────────────────────────────────────────────────────── */
+:root {
+  --bg:           #080808;
+  --bg-surface:   #0e0e0e;
+  --border:       rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --text-primary: #f0ede8;
+  --text-muted:   #5a5a5a;
+  --text-faint:   #2e2e2e;
+  --serif:        var(--font-serif), Georgia, serif;
 }
 
+/* ── BASE ────────────────────────────────────────────────────────────────────── */
 html, body {
   width: 100%;
   min-height: 100vh;
-  background-color: #05050a;
-  color: #e5e5e5; /* text-neutral-200 equivalent */
+  background-color: var(--bg);
+  color: var(--text-primary);
   overflow-x: hidden;
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Hide scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: #05050a;
-}
+/* ── SCROLLBAR ───────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(79, 70, 229, 0.3);
+  background: rgba(255, 255, 255, 0.22);
 }
 
-/* Custom Selection */
+/* ── SELECTION ───────────────────────────────────────────────────────────────── */
 ::selection {
-  background-color: rgba(79, 70, 229, 0.25);
+  background-color: rgba(240, 237, 232, 0.18);
   color: #ffffff;
 }
 
-/* Lenis smooth scroll specific requirements */
-html.lenis, html.lenis body {
-  height: auto;
-}
+/* ── LENIS SMOOTH SCROLL ─────────────────────────────────────────────────────── */
+html.lenis, html.lenis body { height: auto; }
+.lenis-smooth { scroll-behavior: auto !important; }
+.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis-stopped { overflow: hidden; }
+.lenis-scrolling iframe { pointer-events: none; }
 
-.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis-scrolling iframe {
-  pointer-events: none;
-}
-
-/* Hide default cursor on fine-pointer devices */
+/* ── HIDE DEFAULT CURSOR ─────────────────────────────────────────────────────── */
 @media (hover: hover) and (pointer: fine) {
   body, a, button, [role="button"], select, textarea, [data-cursor="pointer"] {
     cursor: none !important;
   }
 }
 
-/* ── Fluid Ambient Aurora Gradients (Composited on GPU, Fixed Background) ───────────── */
+/* ── AMBIENT BACKGROUND HAZE (single, neutral, very subtle) ──────────────────── */
 .aurora-container {
   position: fixed;
   inset: 0;
@@ -76,7 +63,6 @@ html.lenis, html.lenis body {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  background: linear-gradient(to bottom, #05050a, #09090e);
   will-change: transform;
   transform: translateZ(0);
 }
@@ -84,160 +70,88 @@ html.lenis, html.lenis body {
 .aurora-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(140px);
-  opacity: 0.24;
   will-change: transform;
   transform: translateZ(0) translate3d(0, 0, 0);
 }
 
+/* Single centered haze — no color, just a ghost of depth */
 .aurora-1 {
+  width: 80vw;
+  height: 80vw;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.018) 0%, transparent 68%);
+  filter: blur(120px);
+  top: -10%;
+  left: 10%;
+  animation: aurora-breathe 28s infinite alternate ease-in-out;
+}
+
+/* A very faint warmth at the bottom — mirrors thibaut.cool's dark-green vignette approach */
+.aurora-2 {
   width: 60vw;
   height: 60vw;
-  background: radial-gradient(circle, rgba(79, 70, 229, 0.16) 0%, rgba(51, 65, 85, 0.08) 100%);
-  top: -15%;
-  left: -10%;
-  animation: aurora-move-1 25s infinite alternate ease-in-out;
+  background: radial-gradient(circle, rgba(255, 248, 230, 0.012) 0%, transparent 65%);
+  filter: blur(140px);
+  bottom: -5%;
+  right: 5%;
+  animation: aurora-breathe 36s infinite alternate-reverse ease-in-out;
 }
 
-.aurora-2 {
-  width: 70vw;
-  height: 70vw;
-  background: radial-gradient(circle, rgba(51, 65, 85, 0.14) 0%, rgba(79, 70, 229, 0.06) 100%);
-  bottom: -20%;
-  right: -10%;
-  animation: aurora-move-2 30s infinite alternate ease-in-out;
+@keyframes aurora-breathe {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(3vw, 4vh, 0) scale(1.06); }
+  100% { transform: translate3d(-2vw, -3vh, 0) scale(0.97); }
 }
 
-.aurora-3 {
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, rgba(79, 70, 229, 0.08) 100%);
-  top: 35%;
-  left: 20%;
-  animation: aurora-move-3 28s infinite alternate ease-in-out;
-}
-
-@keyframes aurora-move-1 {
-  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
-  50% { transform: translate3d(6vw, 5vh, 0) scale(1.1) rotate(180deg); }
-  100% { transform: translate3d(-3vw, -3vh, 0) scale(0.95) rotate(360deg); }
-}
-
-@keyframes aurora-move-2 {
-  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
-  50% { transform: translate3d(-8vw, -6vh, 0) scale(0.97) rotate(-120deg); }
-  100% { transform: translate3d(4vw, 3vh, 0) scale(1.03) rotate(-240deg); }
-}
-
-@keyframes aurora-move-3 {
-  0% { transform: translate3d(0, 0, 0) scale(0.97) rotate(0deg); }
-  50% { transform: translate3d(4vw, -5vh, 0) scale(1.07) rotate(90deg); }
-  100% { transform: translate3d(-6vw, 6vh, 0) scale(1) rotate(180deg); }
-}
-
-/* Hardened Static Noise Texture Layer (promoted to GPU) */
+/* ── NOISE GRAIN OVERLAY ─────────────────────────────────────────────────────── */
 .noise-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.01;
+  opacity: 0.022;
   z-index: 99;
   will-change: transform;
   transform: translateZ(0);
 }
 
-/* Premium Reflected Glassmorphism Standard */
+/* ── GLASS SURFACE (cards, panels) ──────────────────────────────────────────── */
 .glass-surface {
-  background: rgba(9, 9, 14, 0.6);
+  background: rgba(14, 14, 14, 0.72);
   backdrop-filter: blur(24px) saturate(120%);
   -webkit-backdrop-filter: blur(24px) saturate(120%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 0 rgba(0, 0, 0, 0.5),
-    0 16px 48px 0 rgba(0, 0, 0, 0.7);
-  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+    0 24px 64px 0 rgba(0, 0, 0, 0.6);
+  transition:
+    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow   0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.clip-mask {
-  overflow: hidden;
-  display: block;
+.glass-surface:hover {
+  border-color: var(--border-hover);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),
+    0 24px 64px 0 rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-/* Sophisticated Radial Highlight Text Treatment */
-.premium-text-primary {
-  color: #e5e5e5; /* text-neutral-200 */
-  background: linear-gradient(135deg, #f5f5f7 0%, #a3a3a3 50%, #f5f5f7 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  transition: background-position 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.premium-text-primary:hover {
-  background-position: right center;
-}
-
-/* Secondary header styling */
-.premium-text-secondary {
-  color: #737373; /* text-neutral-500 equivalent */
-  transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.premium-text-secondary:hover {
-  color: #a3a3a3; /* text-neutral-400 */
-}
-
-/* Cinematic Typography Clamp Scaling */
-.text-huge {
-  font-size: clamp(2.5rem, 7.5vw, 8.5rem);
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-  font-weight: 850;
-}
-
-.text-section-title {
-  font-size: clamp(2.2rem, 5.5vw, 5.5rem);
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  font-weight: 850;
-}
-
-.text-marquee {
-  font-size: clamp(4.5rem, 14vw, 15rem);
-  line-height: 0.85;
-  letter-spacing: -0.05em;
-  font-weight: 950;
-}
-
-/* 3D Parallax Dot-Grid Backdrop Layer */
+/* ── PARALLAX DOT GRID ───────────────────────────────────────────────────────── */
 .parallax-grid-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1.2px, transparent 1.2px);
-  background-size: 32px 32px;
+  /* Barely-visible dot matrix — structural, not decorative */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
   pointer-events: none;
   z-index: 1;
   will-change: transform;
   transform: translateZ(0);
 }
 
-/* Glassmorphic Telemetry Terminal Widget */
-.telemetry-panel {
-  background: rgba(9, 9, 14, 0.72);
-  backdrop-filter: blur(20px) saturate(110%);
-  -webkit-backdrop-filter: blur(20px) saturate(110%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-    0 16px 48px 0 rgba(0, 0, 0, 0.7);
-}
-
-/* Schematic Lines (Cad / midlife.engineering style) */
+/* ── HAIRLINE SCHEMATIC GRID LINES ───────────────────────────────────────────── */
 .schematic-grid {
   position: fixed;
   inset: 0;
@@ -253,10 +167,17 @@ html.lenis, html.lenis body {
 .schematic-line-v {
   width: 1px;
   height: 100%;
-  background: linear-gradient(to bottom, transparent, rgba(79, 70, 229, 0.06) 20%, rgba(79, 70, 229, 0.06) 80%, transparent);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.04) 20%,
+    rgba(255, 255, 255, 0.04) 80%,
+    transparent
+  );
   position: relative;
 }
 
+/* Single white ghost runner — no color */
 .schematic-line-v::after {
   content: '';
   position: absolute;
@@ -264,29 +185,18 @@ html.lenis, html.lenis body {
   left: 0;
   width: 1px;
   height: 60px;
-  background: linear-gradient(to bottom, transparent, #4f46e5, transparent);
-  animation: flowDown 12s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent);
+  animation: flowDown 14s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
 }
 
-.schematic-line-v:nth-child(2)::after {
-  animation-delay: 3s;
-  animation-duration: 15s;
-}
-
-.schematic-line-v:nth-child(3)::after {
-  animation-delay: 6s;
-  animation-duration: 10s;
-}
-
-.schematic-line-v:nth-child(4)::after {
-  animation-delay: 1s;
-  animation-duration: 14s;
-}
+.schematic-line-v:nth-child(2)::after { animation-delay: 4s; animation-duration: 18s; }
+.schematic-line-v:nth-child(3)::after { animation-delay: 8s; animation-duration: 12s; }
+.schematic-line-v:nth-child(4)::after { animation-delay: 2s; animation-duration: 16s; }
 
 @keyframes flowDown {
-  0% { top: -10%; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
+  0%   { top: -10%; opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
   100% { top: 110%; opacity: 0; }
 }
 
@@ -305,46 +215,232 @@ html.lenis, html.lenis body {
 .schematic-line-h {
   width: 100%;
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(79, 70, 229, 0.06) 20%, rgba(79, 70, 229, 0.06) 80%, transparent);
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.03) 20%,
+    rgba(255, 255, 255, 0.03) 80%,
+    transparent
+  );
 }
 
-/* Telemetry Mini Waveform Graphic Canvas */
-.telemetry-canvas {
+/* ── TYPOGRAPHY SCALE ────────────────────────────────────────────────────────── */
+.text-huge {
+  font-size: clamp(2.8rem, 7.5vw, 8.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  font-weight: 900;
+}
+
+.text-section-title {
+  font-size: clamp(2.2rem, 5.5vw, 5.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+
+.text-marquee {
+  font-size: clamp(5rem, 14vw, 15rem);
+  line-height: 0.83;
+  letter-spacing: -0.055em;
+  font-weight: 950;
+}
+
+/* ── SERIF DISPLAY (Playfair) ────────────────────────────────────────────────── */
+.serif-display {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* ── HAIRLINE DIVIDER ────────────────────────────────────────────────────────── */
+.hairline-divider {
   width: 100%;
-  height: 36px;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  margin-top: 4px;
-  image-rendering: pixelated;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
-/* HUD System Buttons */
-.telemetry-btn {
+/* ── CLIP MASK (for letter reveal) ──────────────────────────────────────────── */
+.clip-mask {
+  overflow: hidden;
+  display: block;
+}
+
+/* ── TEXT COLOR UTILITIES ────────────────────────────────────────────────────── */
+.text-primary    { color: var(--text-primary); }
+.text-muted      { color: var(--text-muted); }
+.text-faint      { color: var(--text-faint); }
+
+/* A single, restrained warm-white shimmer for hero text only */
+.heading-shimmer {
+  background: linear-gradient(125deg, #f0ede8 0%, #c8c4be 35%, #ffffff 55%, #b8b4ae 80%, #f0ede8 100%);
+  background-size: 280% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmerText 10s linear infinite;
+}
+
+@keyframes shimmerText {
+  0%   { background-position: 0% center; }
+  100% { background-position: 280% center; }
+}
+
+/* ── ACCENT LINE (hairline, no color) ───────────────────────────────────────── */
+.accent-line {
+  display: inline-block;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ── PILL TAGS (uniform, monochrome) ─────────────────────────────────────────── */
+.tag {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #6b6b6b;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 100px;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+
+.tag:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── STATUS BADGE (available for work) ──────────────────────────────────────── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 100px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 5px 9px;
-  border-radius: 6px;
   font-family: var(--font-geist-mono), monospace;
-  font-size: 8px;
-  font-weight: 700;
-  color: #a3a3a3;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: auto;
-  cursor: pointer;
-  letter-spacing: 0.05em;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  animation: pulseDot 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(1.3); }
+}
+
+/* ── HERO PRIMARY BUTTON ─────────────────────────────────────────────────────── */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: rgba(240, 237, 232, 0.92);
+  color: #0a0a0a;
+  border: 1px solid transparent;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #ffffff;
+  box-shadow: 0 0 32px rgba(240, 237, 232, 0.12);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* Shimmer sweep on hover */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+.btn-primary:hover::after {
+  transform: translateX(100%);
+}
+
+/* ── SECONDARY ICON BUTTON ───────────────────────────────────────────────────── */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── ANIMATED UNDERLINE ──────────────────────────────────────────────────────── */
+.animated-underline {
+  position: relative;
+}
+
+.animated-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: rgba(240, 237, 232, 0.5);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animated-underline:hover::after {
+  width: 100%;
+}
+
+/* ── STAT VALUE (no glow, just weight contrast) ──────────────────────────────── */
+.stat-value {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── TELEMETRY PANEL ─────────────────────────────────────────────────────────── */
+.telemetry-panel {
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* ── SECTION MARKER ──────────────────────────────────────────────────────────── */
+.section-marker {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
 }
 
-.telemetry-btn:hover {
-  background: rgba(79, 70, 229, 0.18);
-  border-color: rgba(79, 70, 229, 0.4);
-  color: #ffffff;
-  box-shadow: 0 0 12px rgba(79, 70, 229, 0.2);
+.section-marker-line {
+  display: inline-block;
+  height: 1px;
+  width: 24px;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.telemetry-btn:active {
-  transform: scale(0.96);
-}
+/* ── HERO GLOW PULSE (very subtle, no color) ────────────────────────────────── */
+@keyframes heroGlowPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 0.7; transform: scale(1.03); }
+}

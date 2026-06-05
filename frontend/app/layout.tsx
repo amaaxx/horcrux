@@ -1,6 +1,6 @@
 import CustomCursor from "@/components/CustomCursor";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,33 +13,43 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfairDisplay = Playfair_Display({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
   title: "Horcrux // Amaan",
-  description: "Digital artifacts and complex systems. A high-performance portfolio engine designed by Amaan.",
+  description: "Software Engineer. Architecting production-grade systems, low-latency pipelines, and high-performance interfaces.",
   icons: {
     icon: "/favicon.ico",
   },
 };
 
-export default function RootLayout({ children,
+export default function RootLayout({
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
+      className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased overflow-x-hidden`}
       suppressHydrationWarning
     >
-      <body className="bg-[#05050a] text-neutral-200 selection:bg-accent/25 selection:text-white" suppressHydrationWarning>
-        
-        {/* Global Noise Overlay & fixed background auroras promoted to GPU layer */}
+      <body
+        className="bg-[#080808] text-[#f0ede8] selection:bg-white/10 selection:text-white"
+        suppressHydrationWarning
+      >
+        {/* Grain */}
         <div className="noise-overlay" />
-        
+
+        {/* Single ambient haze — neutral, barely-there */}
         <div className="aurora-container">
           <div className="aurora-blob aurora-1" />
           <div className="aurora-blob aurora-2" />
-          <div className="aurora-blob aurora-3" />
         </div>
 
         <CustomCursor />

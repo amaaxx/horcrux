@@ -198,8 +198,10 @@ export default function Hero3DCanvas() {
     };
 
     const container = containerRef.current;
-    container.addEventListener("mousemove", handleMouseMove, { passive: true });
-    container.addEventListener("mouseleave", handleMouseLeave, { passive: true });
+    if (container) {
+      container.addEventListener("mousemove", handleMouseMove, { passive: true });
+      container.addEventListener("mouseleave", handleMouseLeave, { passive: true });
+    }
 
     return () => {
       cancelAnimationFrame(animationId);

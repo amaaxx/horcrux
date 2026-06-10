@@ -392,6 +392,11 @@ const marqueeR: Variants = {
 
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────────
 export default function Home() {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Smooth scroll
   useEffect(() => {
     const lenis = new Lenis({
@@ -434,6 +439,7 @@ export default function Home() {
   // Manifesto
   const manifestoRef = useRef<HTMLElement>(null);
   const { scrollYProgress: manifestoScroll } = useScroll({ target: manifestoRef, offset: ["start end", "end start"] });
+  const manifestoOpacity = useTransform(manifestoScroll, [0, 0.4, 0.9], [0, 1, 0]);
 
   // Vault ref
   const vaultRef = useRef<HTMLElement>(null);
@@ -507,6 +513,10 @@ export default function Home() {
       transition: { type: "spring", stiffness: 240, damping: 24 }
     }
   };
+
+  if (!isMounted) {
+    return <div className="min-h-screen bg-[#080808]" />;
+  }
 
   return (
     <motion.main
@@ -716,7 +726,7 @@ export default function Home() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background: `radial-gradient(ellipse 60% 40% at 50% 60%, rgba(255,255,255,0.008) 0%, transparent 70%)`,
-            opacity: useTransform(manifestoScroll, [0, 0.4, 0.9], [0, 1, 0]),
+            opacity: manifestoOpacity,
           }}
         />
 

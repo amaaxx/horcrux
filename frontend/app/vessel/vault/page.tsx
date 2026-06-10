@@ -164,7 +164,7 @@ export default function Vault() {
                         </div>
                         <div className="p-4 bg-neutral-900/50 border border-neutral-800 rounded-xl">
                           <p className="text-sm text-neutral-400 leading-relaxed italic">
-                            "{msg.message}"
+                            &ldquo;{msg.message}&rdquo;
                           </p>
                         </div>
                       </div>

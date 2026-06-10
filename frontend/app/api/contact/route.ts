@@ -8,10 +8,11 @@ export async function GET() {
     });
 
     return NextResponse.json(data);
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to retrieve logs";
     console.error("Fetch API Error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to retrieve logs" },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -41,10 +42,11 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to transmit payload";
     console.error("Contact API Error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to transmit payload" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

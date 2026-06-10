@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   motion,
   useScroll,
@@ -9,6 +10,7 @@ import {
   useMotionValue,
   useVelocity,
   useMotionTemplate,
+  useInView,
   Variants,
   MotionValue
 } from "framer-motion";
@@ -42,7 +44,7 @@ function useMousePosition() {
 }
 
 // ── COMPONENT: MAGNETIC ───────────────────────────────────────────────────────
-interface MagneticProps { children: React.ReactElement<any>; range?: number; }
+interface MagneticProps { children: React.ReactElement<{ "data-cursor"?: string }>; range?: number; }
 
 function Magnetic({ children, range = 45 }: MagneticProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -73,14 +75,40 @@ function Magnetic({ children, range = 45 }: MagneticProps) {
   );
 }
 
+// ── COMPONENT: SCROLL PROGRESS BAR ────────────────────────────────────────────
+function ScrollProgressBar() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 25, restDelta: 0.001 });
+  return (
+    <div className="scroll-progress-bar">
+      <motion.div className="scroll-progress-fill" style={{ scaleX, transformOrigin: "0%" }} />
+    </div>
+  );
+}
+
+// ── COMPONENT: SECTION HUD ────────────────────────────────────────────────────
+function SectionHud({ activeSection }: { activeSection: number }) {
+  const sections = ["HERO", "MANIFESTO", "ARSENAL", "WORKS", "CONNECT"];
+  return (
+    <div className="section-hud hidden md:flex">
+      {sections.map((_, i) => (
+        <div
+          key={i}
+          className={`hud-dot ${activeSection === i ? "active" : ""}`}
+          title={sections[i]}
+        />
+      ))}
+    </div>
+  );
+}
+
 // ── COMPONENT: 3D TILT CARD ───────────────────────────────────────────────────
 interface TiltCardProps {
   children: React.ReactNode;
   className?: string;
-  index?: number;
 }
 
-function TiltCard({ children, className = "", index = 0 }: TiltCardProps) {
+function TiltCard({ children, className = "" }: TiltCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(true);
   const x = useMotionValue(0);
@@ -115,7 +143,6 @@ function TiltCard({ children, className = "", index = 0 }: TiltCardProps) {
   };
   const onLeave = () => { x.set(0); y.set(0); spotOpacity.set(0); cachedRect.current = null; };
 
-  // Subtle warm-white spotlight — no color
   const spotlight = useMotionTemplate`radial-gradient(280px circle at ${spotX}px ${spotY}px, rgba(255,255,255,0.04), rgba(255,255,255,0.005) 60%, transparent 100%)`;
 
   return (
@@ -130,7 +157,7 @@ function TiltCard({ children, className = "", index = 0 }: TiltCardProps) {
         transformStyle: "preserve-3d",
         willChange: "transform",
       }}
-      className={`glass-surface rounded-2xl p-6 md:p-8 relative overflow-hidden ${className}`}
+      className={`glass-surface bento-scan-card rounded-2xl p-6 md:p-8 relative overflow-hidden ${className}`}
     >
       <motion.div
         className="absolute inset-0 pointer-events-none z-0"
@@ -151,9 +178,12 @@ function ManifestoWord({ word, index, total, progress }: {
   const end = start + 0.04;
   const opacity = useTransform(progress, [start, end], [0.1, 1]);
   const color = useTransform(progress, [start, end], ["#2e2e2e", "#f0ede8"]);
+  const blur = useTransform(progress, [start, end], [4, 0]);
+  const y = useTransform(progress, [start, end], [8, 0]);
+  const blurFilter = useMotionTemplate`blur(${blur}px)`;
   return (
     <motion.span
-      style={{ opacity, color, willChange: "opacity, color" }}
+      style={{ opacity, color, filter: blurFilter, y, willChange: "opacity, color, transform, filter" }}
       className="inline-block mr-[0.22em] font-sans font-semibold text-2xl md:text-5xl lg:text-6xl tracking-tight"
     >
       {word}
@@ -167,7 +197,9 @@ function VaultCard({ children }: { children: React.ReactNode }) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.88, 1.0, 0.88]);
   const opacity = useTransform(scrollYProgress, [0.1, 0.42, 0.58, 0.9], [0.15, 1.0, 1.0, 0.15]);
-  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [8, 0, -8]);
+  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [10, 0, -10]);
+  const y = useTransform(scrollYProgress, [0, 0.5, 1], [40, 0, -40]);
+
   return (
     <motion.div
       ref={ref}
@@ -175,6 +207,7 @@ function VaultCard({ children }: { children: React.ReactNode }) {
         scale: useSpring(scale, { stiffness: 120, damping: 20 }),
         opacity: useSpring(opacity, { stiffness: 120, damping: 20 }),
         rotateX: useSpring(rotateX, { stiffness: 120, damping: 20 }),
+        y: useSpring(y, { stiffness: 120, damping: 20 }),
         transformStyle: "preserve-3d",
         willChange: "transform, opacity",
       }}
@@ -185,13 +218,15 @@ function VaultCard({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ── COMPONENT: SCROLL REVEAL HEADER ──────────────────────────────────────────
+// ── COMPONENT: SCROLL REVEAL HEADER (clip-path + parallax) ───────────────────
 function ScrollRevealHeader({ subtitle, title }: { subtitle: string; title: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-10% 0px -10% 0px" });
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 0.35, 0.75], [50, 0, -25]);
-  const rotateX = useTransform(scrollYProgress, [0, 0.35, 0.75], [18, 0, -10]);
+  const y = useTransform(scrollYProgress, [0, 0.35, 0.75], [60, 0, -30]);
+  const rotateX = useTransform(scrollYProgress, [0, 0.35, 0.75], [20, 0, -12]);
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.35, 0.75], [0, 0.6, 1, 0.8]);
+
   return (
     <motion.div
       ref={ref}
@@ -205,11 +240,25 @@ function ScrollRevealHeader({ subtitle, title }: { subtitle: string; title: stri
       }}
       className="flex flex-col gap-3"
     >
-      <div className="flex items-center gap-3">
+      <motion.div
+        className="flex items-center gap-3 overflow-hidden"
+        initial={{ x: -40, opacity: 0 }}
+        animate={isInView ? { x: 0, opacity: 1 } : {}}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
         <span className="accent-line w-6" />
         <span className="font-mono text-[10px] text-[#3a3a3a] tracking-[0.25em] uppercase">{subtitle}</span>
+      </motion.div>
+      <div className="overflow-hidden">
+        <motion.h2
+          className="text-section-title tracking-tight text-[#f0ede8]"
+          initial={{ y: "100%", opacity: 0 }}
+          animate={isInView ? { y: "0%", opacity: 1 } : {}}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        >
+          {title}
+        </motion.h2>
       </div>
-      <h2 className="text-section-title tracking-tight text-[#f0ede8]">{title}</h2>
     </motion.div>
   );
 }
@@ -247,7 +296,7 @@ function VaultVisualContainer({ children }: { children: React.ReactNode }) {
         background: "rgba(10, 10, 10, 0.75)",
         borderColor: "rgba(255, 255, 255, 0.07)",
         backdropFilter: "blur(20px)",
-      } as any}
+      } as unknown as React.CSSProperties}
       className="w-[85%] h-[60%] md:h-[65%] rounded-2xl border shadow-2xl relative flex items-center justify-center select-none overflow-hidden cursor-none"
       data-cursor-label="TILT"
     >
@@ -273,6 +322,73 @@ function LetterReveal({ text, delayOffset }: { text: string; delayOffset: number
         </span>
       ))}
     </span>
+  );
+}
+
+// ── COMPONENT: SECTION SPLIT ENTRY ────────────────────────────────────────────
+// Slides in from left or right on scroll intersection
+function SplitEntry({ children, from = "left", delay = 0, className = "" }: {
+  children: React.ReactNode;
+  from?: "left" | "right" | "bottom";
+  delay?: number;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-8% 0px -8% 0px" });
+
+  const initial = from === "left" ? { x: -60, opacity: 0, filter: "blur(8px)" }
+    : from === "right" ? { x: 60, opacity: 0, filter: "blur(8px)" }
+    : { y: 50, opacity: 0, filter: "blur(6px)" };
+
+  const animate = isInView
+    ? { x: 0, y: 0, opacity: 1, filter: "blur(0px)" }
+    : initial;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={initial}
+      animate={animate}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ── COMPONENT: STAGGERED COUNTER ──────────────────────────────────────────────
+function AnimatedCounter({ value, label, delay }: { value: string; label: string; delay: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-5% 0px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      className="flex flex-col gap-0.5"
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
+    >
+      <span className="text-xl md:text-2xl font-bold font-mono stat-value">{value}</span>
+      <span className="font-mono text-[9px] text-[#3a3a3a] uppercase tracking-widest">{label}</span>
+    </motion.div>
+  );
+}
+
+// ── COMPONENT: WIPE DIVIDER ───────────────────────────────────────────────────
+function WipeDivider({ className = "" }: { className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-5% 0px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      className={`hairline-divider ${className}`}
+      style={{ transformOrigin: "left center", scaleX: 0 }}
+      animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
+      transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+    />
   );
 }
 
@@ -318,7 +434,7 @@ export default function Home() {
   const glowX = useSpring(mx, { stiffness: 70, damping: 24 });
   const glowY = useSpring(my, { stiffness: 70, damping: 24 });
 
-  const { scrollY, scrollYProgress } = useScroll();
+  const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
   const smoothVel = useSpring(scrollVelocity, { stiffness: 100, damping: 22 });
 
@@ -328,15 +444,20 @@ export default function Home() {
   const marqueeSkew = useTransform(smoothVel, [-2500, 2500], [-6, 6]);
   const marqueeExtraX = useTransform(smoothVel, [-2500, 2500], [-40, 40]);
 
-  // Hero parallax
-  const heroRef = useRef<HTMLDivElement>(null);
+  // Hero parallax — multiple depth planes
+  const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(heroScroll, [0, 1], [0, 160]);
-  const heroScale = useTransform(heroScroll, [0, 1], [1, 0.92]);
-  const heroOpacity = useTransform(heroScroll, [0, 0.9], [1, 0]);
+  const heroScale = useTransform(heroScroll, [0, 1], [1, 0.88]);
+  const heroOpacity = useTransform(heroScroll, [0, 0.85], [1, 0]);
+  const heroBlur = useTransform(heroScroll, [0, 1], [0, 12]);
+  const heroBlurFilter = useMotionTemplate`blur(${heroBlur}px)`;
+  // Background parallax planes at different rates (depth illusion)
+  const heroBgY = useTransform(heroScroll, [0, 1], [0, 80]);
+  const heroFgY = useTransform(heroScroll, [0, 1], [0, 240]);
 
   // Manifesto
-  const manifestoRef = useRef<HTMLDivElement>(null);
+  const manifestoRef = useRef<HTMLElement>(null);
   const { scrollYProgress: manifestoScroll } = useScroll({ target: manifestoRef, offset: ["start end", "end start"] });
 
   // Vault active index
@@ -354,6 +475,26 @@ export default function Home() {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  // Section HUD tracking
+  const [activeSection, setActiveSection] = useState(0);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([null, null, null, null, null]);
+  useEffect(() => {
+    const fn = () => {
+      const scrollPos = window.scrollY + window.innerHeight / 2;
+      let found = 0;
+      sectionRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const top = el.offsetTop;
+        const bottom = top + el.offsetHeight;
+        if (scrollPos >= top && scrollPos < bottom) found = i;
+      });
+      setActiveSection(found);
+    };
+    window.addEventListener("scroll", fn, { passive: true });
+    fn();
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
   const scrollToWorks = () => {
     document.getElementById("selected-works-vault")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -361,15 +502,30 @@ export default function Home() {
   const manifestoText = "We engineer systems that endure. Coding is more than writing logic—it is about sculpting digital architecture that flows with absolute speed and physical precision. Every frame matters. Every compile counts. We build with hardware-accelerated layouts, tactile responsive animations, and cinematic aesthetics to deliver an experience that feels alive.";
   const manifestoWords = manifestoText.split(" ");
 
-  // Bento variants
-  const bentoContainer: Variants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.09 } } };
-  const bentoCard: Variants = { hidden: { opacity: 0, y: 36, scale: 0.96 }, show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 260, damping: 22 } } };
+  // Bento variants — upgraded with rotateZ micro-tilt and blur
+  const bentoContainer: Variants = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } }
+  };
+  const bentoCard: Variants = {
+    hidden: { opacity: 0, y: 48, scale: 0.93, rotateZ: -1.5, filter: "blur(6px)" },
+    show: {
+      opacity: 1, y: 0, scale: 1, rotateZ: 0, filter: "blur(0px)",
+      transition: { type: "spring", stiffness: 240, damping: 24 }
+    }
+  };
 
   return (
     <motion.main
       className="relative w-full min-h-screen text-[#f0ede8] overflow-x-hidden font-sans"
       suppressHydrationWarning
     >
+      {/* Scroll progress bar */}
+      <ScrollProgressBar />
+
+      {/* Section HUD */}
+      <SectionHud activeSection={activeSection} />
+
       {/* Parallax dot grid */}
       <motion.div style={{ y: gridY }} className="parallax-grid-bg" />
 
@@ -381,7 +537,7 @@ export default function Home() {
         {[0, 1, 2].map(i => <div key={i} className="schematic-line-h" />)}
       </div>
 
-      {/* Subtle mouse follow — no color, just a very faint warm ghost */}
+      {/* Subtle mouse follow */}
       <motion.div
         className="fixed top-0 left-0 pointer-events-none z-0 hidden md:block"
         style={{
@@ -396,22 +552,38 @@ export default function Home() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
-        ref={heroRef}
+        ref={(el) => { heroRef.current = el!; sectionRefs.current[0] = el; }}
         className="relative w-full min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 z-10 select-none overflow-hidden"
         suppressHydrationWarning
       >
+        {/* Depth background layer — slowest parallax */}
         <motion.div
-          style={{ y: heroY, scale: heroScale, opacity: heroOpacity, willChange: "transform, opacity" }}
+          className="hero-depth-bg"
+          style={{ y: heroBgY, willChange: "transform" }}
+        />
+
+        {/* Vignette */}
+        <div className="hero-vignette" />
+
+        {/* Main hero content — medium parallax */}
+        <motion.div
+          style={{
+            y: heroY,
+            scale: heroScale,
+            opacity: heroOpacity,
+            filter: heroBlurFilter,
+            willChange: "transform, opacity, filter"
+          }}
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 18 }}
-          className="max-w-6xl w-full flex flex-col gap-8 md:gap-12"
+          className="max-w-6xl w-full flex flex-col gap-8 md:gap-12 relative z-10"
         >
           {/* Status */}
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
             className="flex items-center gap-4"
           >
             <div className="status-badge">
@@ -424,13 +596,11 @@ export default function Home() {
             </span>
           </motion.div>
 
-          {/* Headline — sans + serif editorial contrast */}
+          {/* Headline */}
           <h1 className="tracking-tight leading-none flex flex-col gap-1">
-            {/* Sans: weight, scale, engineering */}
             <span className="clip-mask text-huge font-extrabold text-[#f0ede8]">
               <LetterReveal text="Software Engineer." delayOffset={0.1} />
             </span>
-            {/* Serif: italic, editorial, premium */}
             <span className="clip-mask serif-display" style={{ fontSize: "clamp(2rem, 5.5vw, 7rem)", lineHeight: 1.0 }}>
               <LetterReveal text="Architecting systems that endure." delayOffset={0.3} />
             </span>
@@ -438,8 +608,8 @@ export default function Home() {
 
           {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.8 }}
             className="text-[#5a5a5a] text-sm md:text-base font-light tracking-wide max-w-xl leading-relaxed"
           >
@@ -484,10 +654,10 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* Stats — no neon, just typographic contrast */}
+          {/* Stats — staggered counter reveal */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
             className="flex flex-wrap gap-8 pt-4 border-t border-white/[0.05]"
           >
@@ -497,35 +667,91 @@ export default function Home() {
               { label: "Uptime Target", value: "99.9%" },
               { label: "Users Served", value: "15K+" },
             ].map((s, i) => (
-              <div key={i} className="flex flex-col gap-0.5">
-                <span className="text-xl md:text-2xl font-bold font-mono stat-value">{s.value}</span>
-                <span className="font-mono text-[9px] text-[#3a3a3a] uppercase tracking-widest">{s.label}</span>
-              </div>
+              <AnimatedCounter key={i} value={s.value} label={s.label} delay={1.2 + i * 0.08} />
             ))}
           </motion.div>
+        </motion.div>
+
+        {/* Foreground layer — fastest parallax (creates depth illusion) */}
+        <motion.div
+          className="absolute bottom-12 right-8 md:right-16 pointer-events-none hidden md:block"
+          style={{ y: heroFgY, opacity: heroOpacity, willChange: "transform, opacity" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+        >
+          <div className="font-mono text-[8px] text-[#1e1e1e] tracking-[0.3em] uppercase flex flex-col gap-1 text-right">
+            <span>HORCRUX // ENGINE</span>
+            <span>v2.0.1 // STABLE</span>
+            <motion.span
+              className="text-[#2e2e2e]"
+              animate={{ opacity: [0.3, 0.8, 0.3] }}
+              transition={{ duration: 2.5, repeat: Infinity }}
+            >
+              ● SYSTEM NOMINAL
+            </motion.span>
+          </div>
+        </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.8, duration: 0.8 }}
+          style={{ opacity: heroOpacity }}
+        >
+          <span className="font-mono text-[8px] text-[#2e2e2e] tracking-[0.25em] uppercase">SCROLL</span>
+          <motion.div
+            className="w-[1px] h-8 bg-gradient-to-b from-white/20 to-transparent"
+            animate={{ scaleY: [1, 0.4, 1], opacity: [0.6, 0.2, 0.6] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
         </motion.div>
       </section>
 
       {/* ── HAIRLINE DIVIDER ────────────────────────────────────────────── */}
-      <div className="hairline-divider relative z-10 mx-6 md:mx-16 lg:mx-24" />
+      <WipeDivider className="relative z-10 mx-6 md:mx-16 lg:mx-24" />
 
       {/* ── MANIFESTO ───────────────────────────────────────────────────── */}
       <section
-        ref={manifestoRef}
+        ref={(el) => { manifestoRef.current = el!; sectionRefs.current[1] = el; }}
         className="relative py-32 px-6 md:px-16 lg:px-24 z-10 max-w-5xl mx-auto flex flex-col justify-center min-h-[70vh]"
       >
+        {/* Ambient depth glow behind manifesto */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse 60% 40% at 50% 60%, rgba(255,255,255,0.008) 0%, transparent 70%)`,
+            opacity: useTransform(manifestoScroll, [0, 0.4, 0.9], [0, 1, 0]),
+          }}
+        />
+
         <div className="mb-12">
           <ScrollRevealHeader subtitle="PHILOSOPHY & VISION" title="Core Manifesto" />
         </div>
+
+        {/* Manifesto words with blur+color+y scroll reveal */}
         <div className="flex flex-wrap leading-relaxed max-w-4xl">
           {manifestoWords.map((word, idx) => (
             <ManifestoWord key={idx} word={word} index={idx} total={manifestoWords.length} progress={manifestoScroll} />
           ))}
         </div>
+
+        {/* Side decorative lines — slide in from edges */}
+        <SplitEntry from="left" delay={0.3} className="mt-12">
+          <div className="flex items-center gap-4">
+            <div className="h-[1px] w-12 bg-white/10" />
+            <span className="font-mono text-[9px] text-[#2e2e2e] tracking-[0.2em]">ENGINEERING PHILOSOPHY // 2026</span>
+          </div>
+        </SplitEntry>
       </section>
 
       {/* ── TECH ARSENAL ────────────────────────────────────────────────── */}
-      <section className="relative py-20 px-6 md:px-16 lg:px-24 z-10 max-w-6xl mx-auto flex flex-col gap-12 md:gap-16">
+      <section
+        ref={(el) => { sectionRefs.current[2] = el; }}
+        className="relative py-20 px-6 md:px-16 lg:px-24 z-10 max-w-6xl mx-auto flex flex-col gap-12 md:gap-16"
+      >
         <motion.div style={{ skewY: surfaceSkewY }}>
           <ScrollRevealHeader subtitle="SYSTEM CORE COMPONENTS" title="The Tech Arsenal" />
         </motion.div>
@@ -534,13 +760,13 @@ export default function Home() {
           variants={bentoContainer}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.12 }}
+          viewport={{ once: true, amount: 0.08 }}
           style={{ skewY: surfaceSkewY, transformStyle: "preserve-3d" }}
           className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4"
         >
           {/* CARD — Next.js (wide) */}
           <motion.div variants={bentoCard} className="md:col-span-2">
-            <TiltCard className="min-h-[240px]" index={0}>
+            <TiltCard className="min-h-[240px]">
               <div className="flex justify-between items-start w-full">
                 <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">CORE_FRAMEWORK // 01</span>
                 <Cpu className="w-4 h-4 text-[#3a3a3a]" />
@@ -577,7 +803,7 @@ export default function Home() {
 
           {/* CARD — FastAPI */}
           <motion.div variants={bentoCard}>
-            <TiltCard className="min-h-[240px]" index={1}>
+            <TiltCard className="min-h-[240px]">
               <div className="flex justify-between items-start w-full">
                 <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">BACKEND // 02</span>
                 <Server className="w-4 h-4 text-[#3a3a3a]" />
@@ -598,7 +824,7 @@ export default function Home() {
 
           {/* CARD — React */}
           <motion.div variants={bentoCard}>
-            <TiltCard className="min-h-[220px]" index={2}>
+            <TiltCard className="min-h-[220px]">
               <div className="flex justify-between items-start w-full">
                 <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">UI_LAYER // 03</span>
                 <Activity className="w-4 h-4 text-[#3a3a3a]" />
@@ -619,7 +845,7 @@ export default function Home() {
 
           {/* CARD — LangChain */}
           <motion.div variants={bentoCard}>
-            <TiltCard className="min-h-[220px]" index={3}>
+            <TiltCard className="min-h-[220px]">
               <div className="flex justify-between items-start w-full">
                 <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">AI // 04</span>
                 <BrainCircuit className="w-4 h-4 text-[#3a3a3a]" />
@@ -640,7 +866,7 @@ export default function Home() {
 
           {/* CARD — C++ */}
           <motion.div variants={bentoCard}>
-            <TiltCard className="min-h-[220px]" index={4}>
+            <TiltCard className="min-h-[220px]">
               <div className="flex justify-between items-start w-full">
                 <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">SYSTEMS // 05</span>
                 <Zap className="w-4 h-4 text-[#3a3a3a]" />
@@ -661,7 +887,7 @@ export default function Home() {
 
           {/* CARD — PostgreSQL (full width) */}
           <motion.div variants={bentoCard} className="md:col-span-3">
-            <TiltCard className="min-h-[180px]" index={5}>
+            <TiltCard className="min-h-[180px]">
               <div className="flex justify-between items-start w-full">
                 <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">DATASTORAGE // 06</span>
                 <Database className="w-4 h-4 text-[#3a3a3a]" />
@@ -685,19 +911,25 @@ export default function Home() {
       </section>
 
       {/* ── HAIRLINE DIVIDER ────────────────────────────────────────────── */}
-      <div className="hairline-divider relative z-10 mx-6 md:mx-16 lg:mx-24" />
+      <WipeDivider className="relative z-10 mx-6 md:mx-16 lg:mx-24" />
 
       {/* ── VAULT — SELECTED WORKS ───────────────────────────────────────── */}
       <section
         id="selected-works-vault"
-        ref={vaultRef as React.RefObject<HTMLElement>}
+        ref={(el) => { vaultRef.current = el!; sectionRefs.current[3] = el; }}
         className="relative flex flex-col md:flex-row items-start w-full z-10"
       >
         {/* Label */}
-        <div className="absolute top-8 left-6 md:left-16 z-30 section-marker">
+        <motion.div
+          className="absolute top-8 left-6 md:left-16 z-30 section-marker"
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
           <span className="section-marker-line" />
           <span className="font-mono text-[9px] text-[#3a3a3a] tracking-[0.25em] uppercase">SELECTED_WORKS</span>
-        </div>
+        </motion.div>
 
         {/* Left: sticky visual */}
         <div className="w-full md:w-1/2 md:sticky md:top-0 h-[50vh] md:h-screen flex items-center justify-center overflow-hidden z-20">
@@ -708,20 +940,32 @@ export default function Home() {
             </div>
             {/* Active indicator line */}
             <div className="absolute top-0 left-0 right-0 h-[1px] z-50 bg-white/10" />
+            {/* Project counter HUD */}
+            <motion.div
+              className="absolute bottom-4 right-4 font-mono text-[8px] text-white/15 z-50 pointer-events-none select-none"
+              animate={{ opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              {String(activeIndex + 1).padStart(2, "0")} / 03
+            </motion.div>
 
             {[GroundTruthVisual, WorkspaceVisual, BroccoliVisual].map((Visual, i) => (
-              <div
+              <motion.div
                 key={i}
-                className="absolute inset-0 w-full h-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-                style={{
+                className="absolute inset-0 w-full h-full"
+                animate={{
                   opacity: activeIndex === i ? 1 : 0,
+                  scale: activeIndex === i ? 1 : 0.96,
+                  filter: activeIndex === i ? "blur(0px)" : "blur(4px)",
+                }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                style={{
                   pointerEvents: activeIndex === i ? "auto" : "none",
-                  transform: activeIndex === i ? "scale(1) translateZ(0)" : "scale(0.96) translateZ(-16px)",
                   transformStyle: "preserve-3d",
                 }}
               >
                 <Visual />
-              </div>
+              </motion.div>
             ))}
           </VaultVisualContainer>
         </div>
@@ -732,38 +976,54 @@ export default function Home() {
           {/* PROJECT 01 */}
           <VaultCard>
             <div className="flex flex-col gap-6 max-w-lg">
-              <div className="section-marker">
-                <span className="section-marker-line" />
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_01 // RAG_ARCHITECTURE</span>
-              </div>
-              {/* Serif headline — the editorial money shot */}
-              <h3 className="tracking-tight leading-tight" style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}>
-                <span className="font-extrabold text-[#f0ede8] block">Ground Truth</span>
-                <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Engine</span>
-              </h3>
-              <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Architecture Brief</span>
-                <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">An advanced Retrieval-Augmented Generation platform engineered to remove hallucination risks. Employs a deterministic 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.</p>
-              </div>
-              <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                <li>5-layer parsing, routing, ranking, and database layout.</li>
-                <li>Deterministic semantic classification using cosine vector calculations.</li>
-                <li>pgvector integration yielding sub-180ms document indexing.</li>
-              </ul>
-              <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                <div>
-                  <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Latency Response</span>
-                  <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 180ms</span>
+              <SplitEntry from="left">
+                <div className="section-marker">
+                  <span className="section-marker-line" />
+                  <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_01 // RAG_ARCHITECTURE</span>
                 </div>
-                <div>
-                  <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Accuracy Target</span>
-                  <span className="text-lg font-bold font-mono text-[#f0ede8]">99.8% Hallucination-Free</span>
-                </div>
+              </SplitEntry>
+              <div className="overflow-hidden">
+                <motion.h3
+                  className="tracking-tight leading-tight"
+                  style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
+                  initial={{ y: "100%" }}
+                  whileInView={{ y: "0%" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <span className="font-extrabold text-[#f0ede8] block">Ground Truth</span>
+                  <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Engine</span>
+                </motion.h3>
               </div>
+              <SplitEntry from="bottom" delay={0.1}>
+                <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                  <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Architecture Brief</span>
+                  <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">An advanced Retrieval-Augmented Generation platform engineered to remove hallucination risks. Employs a deterministic 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.</p>
+                </div>
+              </SplitEntry>
+              <SplitEntry from="bottom" delay={0.2}>
+                <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
+                  <li>5-layer parsing, routing, ranking, and database layout.</li>
+                  <li>Deterministic semantic classification using cosine vector calculations.</li>
+                  <li>pgvector integration yielding sub-180ms document indexing.</li>
+                </ul>
+              </SplitEntry>
+              <SplitEntry from="bottom" delay={0.3}>
+                <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
+                  <div>
+                    <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Latency Response</span>
+                    <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 180ms</span>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Accuracy Target</span>
+                    <span className="text-lg font-bold font-mono text-[#f0ede8]">99.8% Hallucination-Free</span>
+                  </div>
+                </div>
+              </SplitEntry>
               <Magnetic>
-                <a href="/vessel/ground-truth-engine" data-cursor-label="GTE" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
+                <Link href="/vessel/ground-truth-engine" data-cursor-label="GTE" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
                   Inspect Repository Architecture <ArrowUpRight className="w-3 h-3" />
-                </a>
+                </Link>
               </Magnetic>
             </div>
           </VaultCard>
@@ -771,37 +1031,54 @@ export default function Home() {
           {/* PROJECT 02 */}
           <VaultCard>
             <div className="flex flex-col gap-6 max-w-lg">
-              <div className="section-marker">
-                <span className="section-marker-line" />
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_02 // ENTERPRISE_PORTAL</span>
-              </div>
-              <h3 className="tracking-tight leading-tight" style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}>
-                <span className="font-extrabold text-[#f0ede8] block">Centralized</span>
-                <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Workspace</span>
-              </h3>
-              <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Enterprise Brief</span>
-                <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Consolidates databases, proxies legacy Oracle systems, and manages staff operations.</p>
-              </div>
-              <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                <li>Servicing 15,000+ active enterprise directory profiles with RBAC.</li>
-                <li>Real-time legacy sync middleware proxying Oracle tables securely.</li>
-                <li>API caching reducing database query latency to 45ms.</li>
-              </ul>
-              <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                <div>
-                  <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Deployed Footprint</span>
-                  <span className="text-lg font-bold font-mono text-[#f0ede8]">15K+ Active Users</span>
+              <SplitEntry from="left">
+                <div className="section-marker">
+                  <span className="section-marker-line" />
+                  <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_02 // ENTERPRISE_PORTAL</span>
                 </div>
-                <div>
-                  <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Proxy Speed</span>
-                  <span className="text-lg font-bold font-mono text-[#f0ede8]">45ms Avg Latency</span>
-                </div>
+              </SplitEntry>
+              <div className="overflow-hidden">
+                <motion.h3
+                  className="tracking-tight leading-tight"
+                  style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
+                  initial={{ y: "100%" }}
+                  whileInView={{ y: "0%" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <span className="font-extrabold text-[#f0ede8] block">Centralized</span>
+                  <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Workspace</span>
+                </motion.h3>
               </div>
+              <SplitEntry from="bottom" delay={0.1}>
+                <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                  <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Enterprise Brief</span>
+                  <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Consolidates databases, proxies legacy Oracle systems, and manages staff operations.</p>
+                </div>
+              </SplitEntry>
+              <SplitEntry from="bottom" delay={0.2}>
+                <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
+                  <li>Servicing 15,000+ active enterprise directory profiles with RBAC.</li>
+                  <li>Real-time legacy sync middleware proxying Oracle tables securely.</li>
+                  <li>API caching reducing database query latency to 45ms.</li>
+                </ul>
+              </SplitEntry>
+              <SplitEntry from="bottom" delay={0.3}>
+                <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
+                  <div>
+                    <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Deployed Footprint</span>
+                    <span className="text-lg font-bold font-mono text-[#f0ede8]">15K+ Active Users</span>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Proxy Speed</span>
+                    <span className="text-lg font-bold font-mono text-[#f0ede8]">45ms Avg Latency</span>
+                  </div>
+                </div>
+              </SplitEntry>
               <Magnetic>
-                <a href="/vessel/blw-portal" data-cursor-label="BLW" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
+                <Link href="/vessel/blw-portal" data-cursor-label="BLW" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
                   Read Enterprise Case Study <ArrowUpRight className="w-3 h-3" />
-                </a>
+                </Link>
               </Magnetic>
             </div>
           </VaultCard>
@@ -809,37 +1086,54 @@ export default function Home() {
           {/* PROJECT 03 */}
           <VaultCard>
             <div className="flex flex-col gap-6 max-w-lg">
-              <div className="section-marker">
-                <span className="section-marker-line" />
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_03 // WEB_SYSTEM</span>
-              </div>
-              <h3 className="tracking-tight leading-tight" style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}>
-                <span className="font-extrabold text-[#f0ede8] block">pink-broccoli</span>
-                <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Laminar build.</span>
-              </h3>
-              <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Frontend Brief</span>
-                <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-velocity, design-forward web application compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero GC delays.</p>
-              </div>
-              <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                <li>Lighthouse Performance score hitting 100/100 across platforms.</li>
-                <li>Virtualized list rendering with zero layout thrashing.</li>
-                <li>Extremely low memory footprint and high frontend velocity.</li>
-              </ul>
-              <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                <div>
-                  <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">LCP Load Speed</span>
-                  <span className="text-lg font-bold font-mono text-[#f0ede8]">0.52 Seconds</span>
+              <SplitEntry from="left">
+                <div className="section-marker">
+                  <span className="section-marker-line" />
+                  <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_03 // WEB_SYSTEM</span>
                 </div>
-                <div>
-                  <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Gzipped Bundle</span>
-                  <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 42 Kilobytes</span>
-                </div>
+              </SplitEntry>
+              <div className="overflow-hidden">
+                <motion.h3
+                  className="tracking-tight leading-tight"
+                  style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
+                  initial={{ y: "100%" }}
+                  whileInView={{ y: "0%" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <span className="font-extrabold text-[#f0ede8] block">pink-broccoli</span>
+                  <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Laminar build.</span>
+                </motion.h3>
               </div>
+              <SplitEntry from="bottom" delay={0.1}>
+                <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                  <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Frontend Brief</span>
+                  <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-velocity, design-forward web application compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero GC delays.</p>
+                </div>
+              </SplitEntry>
+              <SplitEntry from="bottom" delay={0.2}>
+                <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
+                  <li>Lighthouse Performance score hitting 100/100 across platforms.</li>
+                  <li>Virtualized list rendering with zero layout thrashing.</li>
+                  <li>Extremely low memory footprint and high frontend velocity.</li>
+                </ul>
+              </SplitEntry>
+              <SplitEntry from="bottom" delay={0.3}>
+                <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
+                  <div>
+                    <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">LCP Load Speed</span>
+                    <span className="text-lg font-bold font-mono text-[#f0ede8]">0.52 Seconds</span>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Gzipped Bundle</span>
+                    <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 42 Kilobytes</span>
+                  </div>
+                </div>
+              </SplitEntry>
               <Magnetic>
-                <a href="/vessel/Laminar" data-cursor-label="BROCCOLI" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
+                <Link href="/vessel/Laminar" data-cursor-label="BROCCOLI" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
                   View Interactive UI Build <ArrowUpRight className="w-3 h-3" />
-                </a>
+                </Link>
               </Magnetic>
             </div>
           </VaultCard>
@@ -847,40 +1141,86 @@ export default function Home() {
       </section>
 
       {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer
-        className="relative w-full z-10 pt-32 pb-16 px-6 md:px-16 lg:px-24 flex flex-col justify-end min-h-[70vh] border-t border-white/[0.05] select-none overflow-hidden"
-        style={{ background: "linear-gradient(to bottom, transparent, rgba(8,8,8,0.98))" }}
-      >
-        <div className="max-w-6xl w-full mx-auto flex flex-col gap-12 md:gap-16 relative z-10">
-          {/* Marquee — plain text, no rainbow */}
-          <motion.div
-            style={{ scale: marqueeScale, skewY: marqueeSkew, x: marqueeExtraX, willChange: "transform" }}
-            data-cursor-label="TALK"
-            className="w-full overflow-hidden flex flex-col gap-1 border-t border-b border-white/[0.05] py-6 md:py-8 cursor-none"
-          >
-            <motion.div variants={marqueeL} animate="animate" className="flex text-marquee leading-none uppercase font-black tracking-tighter w-[200%] gap-12 select-none">
-              {[0, 1].map(i => (
-                <div key={i} className="flex justify-around min-w-full shrink-0 gap-12 text-[#f0ede8]">
-                  <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
-                  <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
-                  <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
-                </div>
-              ))}
-            </motion.div>
-            {/* Second line — italic serif, editorial */}
-            <motion.div variants={marqueeR} animate="animate" className="flex leading-none w-[200%] gap-12 select-none" style={{ fontSize: "clamp(1.5rem, 4vw, 4rem)" }}>
-              {[0, 1].map(i => (
-                <div key={i} className="flex justify-around min-w-full shrink-0 gap-12 serif-display text-white/12">
-                  <span>Build something real.</span><span>•</span>
-                  <span>Build something real.</span><span>•</span>
-                  <span>Build something real.</span><span>•</span>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
+      <FooterSection sectionRef={(el: HTMLElement | null) => { sectionRefs.current[4] = el; }} marqueeScale={marqueeScale} marqueeSkew={marqueeSkew} marqueeExtraX={marqueeExtraX} />
+    </motion.main>
+  );
+}
 
-          {/* Contact row */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+// ── COMPONENT: FOOTER SECTION (cinematic clip-path reveal) ────────────────────
+function FooterSection({
+  sectionRef,
+  marqueeScale,
+  marqueeSkew,
+  marqueeExtraX,
+}: {
+  sectionRef: (el: HTMLElement | null) => void;
+  marqueeScale: MotionValue<number>;
+  marqueeSkew: MotionValue<number>;
+  marqueeExtraX: MotionValue<number>;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-5% 0px" });
+
+  return (
+    <motion.footer
+      ref={(el) => { (ref as React.MutableRefObject<HTMLElement | null>).current = el; sectionRef(el); }}
+      className="relative w-full z-10 pt-32 pb-16 px-6 md:px-16 lg:px-24 flex flex-col justify-end min-h-[70vh] border-t border-white/[0.05] select-none overflow-hidden"
+      style={{ background: "linear-gradient(to bottom, transparent, rgba(8,8,8,0.98))" }}
+      initial={{ opacity: 0, y: 60, filter: "blur(8px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, margin: "-10% 0px" }}
+      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* Dramatic radial glow at footer entry */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,255,255,0.015) 0%, transparent 70%)",
+        }}
+        animate={isInView ? { opacity: [0, 1, 0.5] } : { opacity: 0 }}
+        transition={{ duration: 2, ease: "easeOut" }}
+      />
+
+      <div className="max-w-6xl w-full mx-auto flex flex-col gap-12 md:gap-16 relative z-10">
+        {/* Marquee — velocity-warped */}
+        <motion.div
+          style={{ scale: marqueeScale, skewY: marqueeSkew, x: marqueeExtraX, willChange: "transform" }}
+          data-cursor-label="TALK"
+          className="w-full overflow-hidden flex flex-col gap-1 border-t border-b border-white/[0.05] py-6 md:py-8 cursor-none"
+        >
+          <motion.div variants={marqueeL as Variants} animate="animate" className="flex text-marquee leading-none uppercase font-black tracking-tighter w-[200%] gap-12 select-none">
+            {[0, 1].map(i => (
+              <div key={i} className="flex justify-around min-w-full shrink-0 gap-12 text-[#f0ede8]">
+                <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
+                <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
+                <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
+              </div>
+            ))}
+          </motion.div>
+          {/* Second line — italic serif */}
+          <motion.div variants={marqueeR as Variants} animate="animate" className="flex leading-none w-[200%] gap-12 select-none" style={{ fontSize: "clamp(1.5rem, 4vw, 4rem)" }}>
+            {[0, 1].map(i => (
+              <div key={i} className="flex justify-around min-w-full shrink-0 gap-12 serif-display text-white/12">
+                <span>Build something real.</span><span>•</span>
+                <span>Build something real.</span><span>•</span>
+                <span>Build something real.</span><span>•</span>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Contact row — staggered entry */}
+        <motion.div
+          className="flex flex-col md:flex-row items-center justify-between gap-8"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          variants={{
+            hidden: { opacity: 0 },
+            show: { opacity: 1, transition: { staggerChildren: 0.12 } }
+          }}
+        >
+          <motion.div variants={{ hidden: { opacity: 0, x: -30 }, show: { opacity: 1, x: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}>
             <Magnetic range={40}>
               <a
                 href="mailto:amaan@example.com"
@@ -892,40 +1232,49 @@ export default function Home() {
                 <ArrowUpRight className="w-3.5 h-3.5 text-white/20 group-hover:text-white/50 transition-colors" />
               </a>
             </Magnetic>
-            <div className="flex gap-6 items-center">
-              {["GITHUB", "LINKEDIN"].map((l, i) => (
-                <React.Fragment key={l}>
-                  {i > 0 && <span className="w-[1px] h-3 bg-white/10" />}
-                  <Magnetic>
-                    <a
-                      href={l === "GITHUB" ? "https://github.com/amaaxx" : "https://linkedin.com/in/amaaxx"}
-                      target="_blank" rel="noopener noreferrer"
-                      data-cursor-label="EXTERNAL"
-                      className="font-mono text-[10px] text-[#3a3a3a] hover:text-[#f0ede8] transition-colors cursor-none"
-                    >
-                      {l}
-                    </a>
-                  </Magnetic>
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
+          </motion.div>
+          <motion.div
+            className="flex gap-6 items-center"
+            variants={{ hidden: { opacity: 0, x: 30 }, show: { opacity: 1, x: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
+          >
+            {["GITHUB", "LINKEDIN"].map((l, i) => (
+              <React.Fragment key={l}>
+                {i > 0 && <span className="w-[1px] h-3 bg-white/10" />}
+                <Magnetic>
+                  <a
+                    href={l === "GITHUB" ? "https://github.com/amaaxx" : "https://linkedin.com/in/amaaxx"}
+                    target="_blank" rel="noopener noreferrer"
+                    data-cursor-label="EXTERNAL"
+                    className="font-mono text-[10px] text-[#3a3a3a] hover:text-[#f0ede8] transition-colors cursor-none"
+                  >
+                    {l}
+                  </a>
+                </Magnetic>
+              </React.Fragment>
+            ))}
+          </motion.div>
+        </motion.div>
 
-          {/* Bottom bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/[0.04]">
-            <div className="font-mono text-[9px] text-[#2e2e2e] text-center md:text-left leading-relaxed">
-              <div>DESIGNED & ENGINEERED BY AMAAN</div>
-              <div>© 2026 HORCRUX ENGINE • ALL RIGHTS RESERVED</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[8px] text-[#2e2e2e]">BUILT WITH</span>
-              {["NEXT.JS", "FRAMER MOTION", "LENIS"].map(tech => (
-                <span key={tech} className="px-2 py-0.5 rounded font-mono text-[7px] bg-white/[0.03] border border-white/[0.05] text-[#2e2e2e]">{tech}</span>
-              ))}
-            </div>
+        {/* Bottom bar */}
+        <motion.div
+          className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/[0.04]"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+        >
+          <div className="font-mono text-[9px] text-[#2e2e2e] text-center md:text-left leading-relaxed">
+            <div>DESIGNED & ENGINEERED BY AMAAN</div>
+            <div>© 2026 HORCRUX ENGINE • ALL RIGHTS RESERVED</div>
           </div>
-        </div>
-      </footer>
-    </motion.main>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[8px] text-[#2e2e2e]">BUILT WITH</span>
+            {["NEXT.JS", "FRAMER MOTION", "LENIS"].map(tech => (
+              <span key={tech} className="px-2 py-0.5 rounded font-mono text-[7px] bg-white/[0.03] border border-white/[0.05] text-[#2e2e2e]">{tech}</span>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </motion.footer>
   );
 }

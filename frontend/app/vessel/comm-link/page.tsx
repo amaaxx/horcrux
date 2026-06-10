@@ -48,9 +48,10 @@ export default function CommLink() {
       }
 
       setStatus("secure");
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Critical failure during data uplink. Please try again.";
       console.error("Transmission error:", error);
-      alert(`System Error: ${error.message || "Critical failure during data uplink. Please try again."}`);
+      alert(`System Error: ${errorMessage}`);
       setStatus("ready");
     }
   };

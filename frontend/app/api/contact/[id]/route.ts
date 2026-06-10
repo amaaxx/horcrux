@@ -13,10 +13,11 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to purge record";
     console.error("Delete API Error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to purge record" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

@@ -10,6 +10,8 @@
   --text-muted:   #5a5a5a;
   --text-faint:   #2e2e2e;
   --serif:        var(--font-serif), Georgia, serif;
+  /* Scroll progress custom property (updated via JS) */
+  --scroll-progress: 0;
 }
 
 /* ── BASE ────────────────────────────────────────────────────────────────────── */
@@ -54,7 +56,65 @@ html.lenis, html.lenis body { height: auto; }
   }
 }
 
-/* ── AMBIENT BACKGROUND HAZE (single, neutral, very subtle) ──────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── SCROLL PROGRESS BAR (fixed top) ────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 200;
+  background: rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scroll-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── SECTION HUD COUNTER ─────────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.section-hud {
+  position: fixed;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.hud-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.hud-dot.active {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  transform: scale(1.8);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── AMBIENT BACKGROUND HAZE ─────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
 .aurora-container {
   position: fixed;
   inset: 0;
@@ -74,7 +134,6 @@ html.lenis, html.lenis body { height: auto; }
   transform: translateZ(0) translate3d(0, 0, 0);
 }
 
-/* Single centered haze — no color, just a ghost of depth */
 .aurora-1 {
   width: 80vw;
   height: 80vw;
@@ -85,7 +144,6 @@ html.lenis, html.lenis body { height: auto; }
   animation: aurora-breathe 28s infinite alternate ease-in-out;
 }
 
-/* A very faint warmth at the bottom — mirrors thibaut.cool's dark-green vignette approach */
 .aurora-2 {
   width: 60vw;
   height: 60vw;
@@ -142,7 +200,6 @@ html.lenis, html.lenis body { height: auto; }
   inset: 0;
   width: 100%;
   height: 100%;
-  /* Barely-visible dot matrix — structural, not decorative */
   background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
@@ -177,7 +234,6 @@ html.lenis, html.lenis body { height: auto; }
   position: relative;
 }
 
-/* Single white ghost runner — no color */
 .schematic-line-v::after {
   content: '';
   position: absolute;
@@ -222,6 +278,77 @@ html.lenis, html.lenis body { height: auto; }
     rgba(255, 255, 255, 0.03) 80%,
     transparent
   );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── CLIP REVEAL ANIMATION ───────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+
+/* Clip-path wipe from bottom — used for section headers and key elements */
+@keyframes clipRevealUp {
+  from {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    clip-path: inset(0% 0 0 0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes clipRevealLeft {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+@keyframes clipRevealRight {
+  from { clip-path: inset(0 0 0 100%); }
+  to   { clip-path: inset(0 0 0 0%); }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── DEPTH FOG OVERLAY (cinematic section transition) ────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.depth-fog {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 200px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.depth-fog-top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+}
+
+.depth-fog-bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── SECTION REVEAL — scroll-linked entry classes ────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+
+/* For elements that slide+fade in on scroll */
+.reveal-ready {
+  opacity: 0;
+  transform: translateY(40px);
+  filter: blur(4px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-ready.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
 }
 
 /* ── TYPOGRAPHY SCALE ────────────────────────────────────────────────────────── */
@@ -443,4 +570,156 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes heroGlowPulse {
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50%       { opacity: 0.7; transform: scale(1.03); }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── ADVANCED SCROLL ANIMATION KEYFRAMES ─────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+
+/* Line wipe from left — for accent lines and dividers */
+@keyframes lineWipe {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+
+/* Scan line that sweeps across a card */
+@keyframes scanLine {
+  0%   { top: -2px; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: calc(100% + 2px); opacity: 0; }
+}
+
+/* Ticker-tape number counter visual pulse */
+@keyframes counterFlash {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* Glitch micro-animation for hero text on load */
+@keyframes glitchX {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-2px); }
+  40%       { transform: translateX(2px); }
+  60%       { transform: translateX(-1px); }
+  80%       { transform: translateX(1px); }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── FOOTER REVEAL CLIP ──────────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.footer-clip-reveal {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.footer-clip-reveal.revealed {
+  clip-path: inset(0% 0 0 0);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── BENTO CARD SCAN LINE ────────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.bento-scan-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-scan-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent);
+  top: -1px;
+  animation: scanLine 6s ease-in-out infinite;
+  animation-play-state: paused;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.bento-scan-card:hover::before {
+  animation-play-state: running;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── PARALLAX DEPTH PLANES ───────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.depth-plane {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── MANIFESTO SPLIT TRACK ───────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.manifesto-track {
+  overflow: hidden;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── HORIZONTAL DIVIDER WIPE ─────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.wipe-divider {
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.wipe-divider::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.06);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.wipe-divider.revealed::after {
+  animation: lineWipe 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── VAULT CARD ENHANCED ─────────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.vault-entry-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── COUNTER TICKER ──────────────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.counter-digit {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  animation: counterFlash 3s ease-in-out infinite;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── HERO DEPTH LAYER STACK ──────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.hero-depth-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(255,255,255,0.012) 0%, transparent 70%);
+  z-index: 0;
+}
+
+/* Vignette on hero edges */
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 100% at 50% 50%, transparent 50%, rgba(8,8,8,0.7) 100%);
+  z-index: 2;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Hero3DCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ export default function Hero3DCanvas() {
     let time = 0;
     const camDist = 320;
     const pitch = 0.85; // Tilt down
-    let yaw = -0.55;    // Tilt slightly side
+    const yaw = -0.55;    // Tilt slightly side
 
     // Main animation loop
     const animate = () => {

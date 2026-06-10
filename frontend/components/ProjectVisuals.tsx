@@ -6,6 +6,36 @@ import { motion } from "framer-motion";
 // ── 1. GROUND TRUTH ENGINE: DETAILED VECTOR DB / SEMANTIC NODE GRAPH ──────────
 export function GroundTruthVisual() {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [logs, setLogs] = useState<string[]>([
+    "SYSTEM: NOMINAL // STANDBY"
+  ]);
+  const [isSimulating, setIsSimulating] = useState(false);
+
+  const triggerSimulation = () => {
+    if (isSimulating) return;
+    setIsSimulating(true);
+    setLogs([]);
+    const steps = [
+      { text: "UPLINK: Establishing secure query vector channel...", node: "IN_QUERY", delay: 0 },
+      { text: "INGEST: Query parsed: 'fetch high-frequency telemetry logs'", node: "IN_QUERY", delay: 800 },
+      { text: "SEMANTIC: Routing embeddings via Cosine Similarity Router...", node: "SEM_ROUTER", delay: 1800 },
+      { text: "SEARCH: Querying 3 vector shards in parallel...", node: "V_SHARD_01", delay: 2800 },
+      { text: "RANKING: Aggregating shard results (180ms response)...", node: "SYNTHESIS", delay: 3800 },
+      { text: "SYNTHESIS: Context compiled. Hallucination guard verified.", node: "SYNTHESIS", delay: 4600 },
+      { text: "COMPLETED: Vector response dispatched successfully. 200 OK", node: "DET_OUT", delay: 5400 }
+    ];
+
+    steps.forEach((step) => {
+      setTimeout(() => {
+        setLogs((prev) => [...prev, step.text]);
+        setHoveredNode(step.node);
+        if (step.node === "DET_OUT") {
+          setIsSimulating(false);
+          setTimeout(() => setHoveredNode(null), 1000);
+        }
+      }, step.delay);
+    });
+  };
 
   const isLineActive = (fromNode: string, toNode: string) => {
     if (!hoveredNode) return true; // Default state: all active
@@ -36,7 +66,7 @@ export function GroundTruthVisual() {
       
       {/* High-Fidelity Network Graph SVG */}
       <svg 
-        className="w-[90%] h-[90%] max-w-[420px] max-h-[300px] z-10 pointer-events-auto" 
+        className="w-[90%] h-[90%] max-w-[420px] max-h-[300px] z-10 pointer-events-auto mb-10" 
         viewBox="0 0 400 240" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
@@ -243,6 +273,25 @@ export function GroundTruthVisual() {
         <text x="280" y="145" fill="rgba(255,255,255,0.5)" fontSize="7" fontFamily="monospace" textAnchor="middle" opacity={hoveredNode ? 0.35 : 0.6}>SYNTHESIS</text>
         <text x="360" y="142" fill="rgba(255,255,255,0.5)" fontSize="7" fontFamily="monospace" textAnchor="middle" opacity={hoveredNode ? 0.35 : 0.6}>DET_OUT</text>
       </svg>
+
+      {/* Simulation Terminal HUD */}
+      <div className="absolute bottom-2 left-2 right-2 p-2 rounded-lg bg-black/80 border border-white/5 font-mono text-[7px] text-white/50 z-20 flex flex-col gap-0.5 max-h-[50px] overflow-y-auto select-none pointer-events-auto">
+        <div className="flex justify-between items-center border-b border-white/5 pb-1 mb-1">
+          <span className="text-white/30 font-bold uppercase tracking-wider">SYSTEM_TELEMETRY</span>
+          <button 
+            onClick={triggerSimulation}
+            disabled={isSimulating}
+            className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 hover:bg-white/15 text-white/80 active:scale-95 transition-all disabled:opacity-50 text-[6px] font-bold cursor-pointer"
+          >
+            {isSimulating ? "RUNNING" : "SIMULATE"}
+          </button>
+        </div>
+        {logs.map((log, idx) => (
+          <div key={idx} className={idx === logs.length - 1 ? "text-white/90" : ""}>
+            {log}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -250,6 +299,35 @@ export function GroundTruthVisual() {
 // ── 2. CENTRALIZED DIGITAL WORKSPACE: SLEEK ISOMETRIC INTERACTION GRID ───────
 export function WorkspaceVisual() {
   const [isHovered, setIsHovered] = useState(false);
+  const [logs, setLogs] = useState<string[]>([
+    "GATEWAY: STABLE // CACHE HIT RATE 94%"
+  ]);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [cpuUsage, setCpuUsage] = useState(14);
+  const [syncRate, setSyncRate] = useState(98.2);
+
+  const triggerSync = () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    setLogs([]);
+    const steps = [
+      { text: "UPLINK: Checking integrity of sync tunnel...", cpu: 34, sync: 98.2, delay: 0 },
+      { text: "PROXING: Refreshing cached Oracle tables...", cpu: 78, sync: 85.0, delay: 700 },
+      { text: "DATABASE: Syncing Redis RBAC session buffer...", cpu: 92, sync: 91.5, delay: 1400 },
+      { text: "NOMINAL: 15,482 user directory entries aligned.", cpu: 22, sync: 99.9, delay: 2100 }
+    ];
+
+    steps.forEach((step) => {
+      setTimeout(() => {
+        setLogs((prev) => [...prev, step.text]);
+        setCpuUsage(step.cpu);
+        setSyncRate(step.sync);
+        if (step.delay === 2100) {
+          setIsSyncing(false);
+        }
+      }, step.delay);
+    });
+  };
 
   return (
     <div 
@@ -265,12 +343,12 @@ export function WorkspaceVisual() {
       <div 
         style={{
           transform: isHovered 
-            ? "rotateX(52deg) rotateY(0deg) rotateZ(-38deg) scale(1.05) translateZ(0)"
+            ? "rotateX(52deg) rotateY(0deg) rotateZ(-38deg) scale(1.02) translateZ(0)"
             : "rotateX(52deg) rotateY(0deg) rotateZ(-38deg) translateZ(0)",
           transformStyle: "preserve-3d",
           transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)"
         }}
-        className="relative w-[300px] h-[300px] md:w-[340px] md:h-[340px] flex items-center justify-center z-10"
+        className="relative w-[300px] h-[300px] md:w-[340px] md:h-[340px] flex items-center justify-center z-10 mb-8"
       >
         {/* Layer 1: System Base Grid (Deepest) */}
         <motion.div 
@@ -286,7 +364,7 @@ export function WorkspaceVisual() {
         >
           <div className="absolute inset-0 bg-grid-white/[0.015] bg-[size:15px_15px] rounded-2xl" />
           <div className="flex justify-between items-center relative z-10">
-            <span className="font-mono text-[7px] text-neutral-500 uppercase tracking-widest">RailNet_Database // Node_09</span>
+            <span className="font-mono text-[7px] text-neutral-500 uppercase tracking-widest">RailNet_Database {" // "} Node_09</span>
             <div className={`h-1.5 w-1.5 rounded-full ${isHovered ? "bg-white animate-ping" : "bg-white/40"}`} />
           </div>
           
@@ -329,13 +407,11 @@ export function WorkspaceVisual() {
             <div className="space-y-1">
               <div className="flex justify-between text-[7px] font-mono text-neutral-400">
                 <span>INTRANET_SYNC</span>
-                <span className="text-white/60 font-bold">98.2%</span>
+                <span className="text-white/60 font-bold">{syncRate.toFixed(1)}%</span>
               </div>
               <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: "98.2%" }}
-                  transition={{ duration: 1.5, delay: 0.5 }}
+                <div 
+                  style={{ width: `${syncRate}%`, transition: "width 0.4s ease" }}
                   className="h-full bg-white/50" 
                 />
               </div>
@@ -344,36 +420,32 @@ export function WorkspaceVisual() {
             {/* System metric bar 2 */}
             <div className="space-y-1">
               <div className="flex justify-between text-[7px] font-mono text-neutral-400">
-                <span>DIRECTORY_RBAC</span>
-                <span className="text-white/50 font-bold">15,482 USERS</span>
+                <span>CPU_LOAD</span>
+                <span className="text-white/50 font-bold">{cpuUsage}%</span>
               </div>
               <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: "85%" }}
-                  transition={{ duration: 1.5, delay: 0.7 }}
+                <div 
+                  style={{ width: `${cpuUsage}%`, transition: "width 0.4s ease" }}
                   className="h-full bg-white/30" 
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex justify-between items-center text-[7px] font-mono text-neutral-500 border-t border-white/5 pt-2">
+          <div className="flex justify-between items-center text-[7px] font-mono text-neutral-500 border-t border-white/5 pt-2 relative z-10 pointer-events-auto">
             <span>PING: 42ms</span>
-            <span className="text-neutral-300 bg-white/5 px-1 py-0.5 rounded font-bold">LTS_STABLE</span>
+            <button 
+              onClick={triggerSync}
+              disabled={isSyncing}
+              className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 hover:bg-white/15 text-white/80 active:scale-95 transition-all text-[6px] font-bold cursor-pointer"
+            >
+              {isSyncing ? "SYNCING..." : "RE-SYNC"}
+            </button>
           </div>
         </motion.div>
 
         {/* Layer 3: High Priority Alert Panel (Top Overlay) */}
         <motion.div 
-          animate={{
-            y: [0, -4, 0],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
           className="absolute w-[55%] h-[35%] right-2 top-2 z-25"
           style={{ transformStyle: "preserve-3d" }}
         >
@@ -393,15 +465,24 @@ export function WorkspaceVisual() {
               <span className="font-mono text-[7px] text-neutral-300 font-bold uppercase tracking-wider">Oracle_Gateway</span>
               <span className="h-1.5 w-1.5 rounded-full bg-white/60 animate-ping" />
             </div>
-            <p className="font-mono text-[8px] text-neutral-400 leading-normal">
-              DATA_TUNNEL: ACTIVE<br/>
-              FLOW_RATE: 1.2 GB/s
+            <p className="font-mono text-[6px] text-neutral-400 leading-normal">
+              TUNNEL: ACTIVE<br/>
+              SPEED: {(cpuUsage * 12.4).toFixed(0)} KB/s
             </p>
             <div className="h-1 w-full bg-white/10 rounded overflow-hidden">
               <div className="h-full bg-white/45 w-3/4 animate-pulse" />
             </div>
           </motion.div>
         </motion.div>
+      </div>
+
+      {/* Terminal logs display */}
+      <div className="absolute bottom-2 left-2 right-2 p-1.5 rounded-lg bg-black/80 border border-white/5 font-mono text-[6px] text-white/40 z-20 flex flex-col gap-0.5 max-h-[42px] overflow-y-auto select-none pointer-events-none">
+        {logs.map((log, idx) => (
+          <div key={idx} className={idx === logs.length - 1 ? "text-white/80" : ""}>
+            &gt; {log}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -411,6 +492,50 @@ export function WorkspaceVisual() {
 export function BroccoliVisual() {
   const [mousePos, setMousePos] = useState({ x: 140, y: 50 });
   const [isHovered, setIsHovered] = useState(false);
+  const [logs, setLogs] = useState<string[]>([
+    "ENGINE: READY // FPS: 120 STABLE"
+  ]);
+  const [isTesting, setIsTesting] = useState(false);
+  const [isPurging, setIsPurging] = useState(false);
+  const [fps, setFps] = useState(120);
+  const [heap, setHeap] = useState(18.4);
+
+  const runStressTest = () => {
+    if (isTesting || isPurging) return;
+    setIsTesting(true);
+    setLogs([]);
+    const steps = [
+      { text: "LOAD: Mounting virtualized list data (5k records)...", fps: 104, heap: 22.8, delay: 0 },
+      { text: "RENDER: Processing layout trees... 0 cls shifts.", fps: 112, heap: 28.5, delay: 800 },
+      { text: "STABLE: 120 FPS target maintained under stress.", fps: 120, heap: 31.2, delay: 1600 }
+    ];
+
+    steps.forEach((step) => {
+      setTimeout(() => {
+        setLogs((prev) => [...prev, step.text]);
+        setFps(step.fps);
+        setHeap(step.heap);
+        if (step.delay === 1600) {
+          setIsTesting(false);
+        }
+      }, step.delay);
+    });
+  };
+
+  const runGcPurge = () => {
+    if (isTesting || isPurging) return;
+    setIsPurging(true);
+    setLogs(["SYS: Triggering garbage collection..."]);
+    setTimeout(() => {
+      setLogs((prev) => [...prev, "GC: Heap sweep finished. Freed 14.8MB memory."]);
+      setHeap(16.4);
+      setFps(120);
+    }, 600);
+    setTimeout(() => {
+      setLogs((prev) => [...prev, "SYS: Restored nominal standby status."]);
+      setIsPurging(false);
+    }, 1200);
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -453,7 +578,7 @@ export function BroccoliVisual() {
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="relative w-[85%] h-[80%] max-w-[340px] max-h-[220px] rounded-2xl border border-white/10 bg-[#09090f]/80 backdrop-blur-md shadow-2xl p-4 flex flex-col justify-between z-10"
+        className="relative w-[85%] h-[80%] max-w-[340px] max-h-[220px] rounded-2xl border border-white/10 bg-[#09090f]/80 backdrop-blur-md shadow-2xl p-4 flex flex-col justify-between z-10 mb-8"
       >
         <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
           <div className="flex gap-1.5">
@@ -521,11 +646,35 @@ export function BroccoliVisual() {
           </svg>
         </div>
 
-        <div className="flex justify-between items-center text-[7px] font-mono text-neutral-500">
-          <span>FPS: 120 / GPU</span>
-          <span className="text-neutral-400 font-bold uppercase tracking-wider">UI_VELOCITY_VERIFIED</span>
+        <div className="flex justify-between items-center text-[7px] font-mono text-neutral-500 border-t border-white/5 pt-2 relative z-10 pointer-events-auto">
+          <div className="flex gap-2">
+            <button 
+              onClick={runStressTest}
+              disabled={isTesting || isPurging}
+              className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 hover:bg-white/15 text-white/80 active:scale-95 transition-all text-[6px] font-bold cursor-pointer"
+            >
+              {isTesting ? "STRESS..." : "STRESS TEST"}
+            </button>
+            <button 
+              onClick={runGcPurge}
+              disabled={isTesting || isPurging}
+              className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 hover:bg-white/15 text-white/80 active:scale-95 transition-all text-[6px] font-bold cursor-pointer"
+            >
+              {isPurging ? "PURGING..." : "GC PURGE"}
+            </button>
+          </div>
+          <span className="text-neutral-400 font-bold uppercase tracking-wider">FPS: {fps} {" // "} MEM: {heap.toFixed(1)}MB</span>
         </div>
       </motion.div>
+
+      {/* Terminal logs display */}
+      <div className="absolute bottom-2 left-2 right-2 p-1.5 rounded-lg bg-black/80 border border-white/5 font-mono text-[6px] text-white/40 z-20 flex flex-col gap-0.5 max-h-[42px] overflow-y-auto select-none pointer-events-none">
+        {logs.map((log, idx) => (
+          <div key={idx} className={idx === logs.length - 1 ? "text-white/40" : ""}>
+            &gt; {log}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

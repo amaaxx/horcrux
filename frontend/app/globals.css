@@ -20,7 +20,7 @@ html, body {
   min-height: 100vh;
   background-color: var(--bg);
   color: var(--text-primary);
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -722,4 +722,63 @@ html.lenis, html.lenis body { height: auto; }
   background:
     radial-gradient(ellipse 120% 100% at 50% 50%, transparent 50%, rgba(8,8,8,0.7) 100%);
   z-index: 2;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────── */
+/* ── HORIZONTAL SCROLL DECK STYLES ───────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────────── */
+.horizontal-scroll-container {
+  position: relative;
+  height: 300vh;
+  width: 100%;
+}
+
+.horizontal-scroll-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.horizontal-scroll-track {
+  display: flex;
+  flex-direction: row;
+  width: 300vw;
+  height: 100%;
+  will-change: transform;
+}
+
+.horizontal-scroll-card {
+  width: 100vw;
+  height: 100vh;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 2rem 4rem;
+}
+
+@media (max-width: 768px) {
+  .horizontal-scroll-container {
+    height: auto;
+  }
+  .horizontal-scroll-sticky {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+  .horizontal-scroll-track {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+  }
+  .horizontal-scroll-card {
+    width: 100%;
+    height: auto;
+    padding: 4rem 1.5rem;
+  }
 }

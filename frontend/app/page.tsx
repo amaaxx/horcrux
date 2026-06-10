@@ -191,32 +191,7 @@ function ManifestoWord({ word, index, total, progress }: {
   );
 }
 
-// ── COMPONENT: VAULT CARD (scroll-linked entry) ───────────────────────────────
-function VaultCard({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.88, 1.0, 0.88]);
-  const opacity = useTransform(scrollYProgress, [0.1, 0.42, 0.58, 0.9], [0.15, 1.0, 1.0, 0.15]);
-  const rotateX = useTransform(scrollYProgress, [0, 0.5, 1], [10, 0, -10]);
-  const y = useTransform(scrollYProgress, [0, 0.5, 1], [40, 0, -40]);
 
-  return (
-    <motion.div
-      ref={ref}
-      style={{
-        scale: useSpring(scale, { stiffness: 120, damping: 20 }),
-        opacity: useSpring(opacity, { stiffness: 120, damping: 20 }),
-        rotateX: useSpring(rotateX, { stiffness: 120, damping: 20 }),
-        y: useSpring(y, { stiffness: 120, damping: 20 }),
-        transformStyle: "preserve-3d",
-        willChange: "transform, opacity",
-      }}
-      className="min-h-screen flex flex-col justify-center px-8 md:px-16 py-20"
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 // ── COMPONENT: SCROLL REVEAL HEADER (clip-path + parallax) ───────────────────
 function ScrollRevealHeader({ subtitle, title }: { subtitle: string; title: string }) {
@@ -463,6 +438,36 @@ export default function Home() {
   // Vault ref
   const vaultRef = useRef<HTMLElement>(null);
 
+  const [isMobile, setIsMobile] = useState(true);
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const worksSectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: worksScrollProgress } = useScroll({
+    target: worksSectionRef,
+    offset: ["start start", "end end"]
+  });
+
+  const worksXTranslation = useTransform(worksScrollProgress, [0, 1], ["0%", "-66.66%"]);
+  const worksSpringX = useSpring(worksXTranslation, { stiffness: 100, damping: 22, mass: 0.5 });
+
+  const currentCardIndex = useTransform(worksScrollProgress, [0, 0.33, 0.66, 1], [1, 1, 2, 3]);
+  const [activeCardIndex, setActiveCardIndex] = useState(1);
+  useEffect(() => {
+    return currentCardIndex.on("change", (latest) => {
+      setActiveCardIndex(Math.min(3, Math.max(1, Math.round(latest))));
+    });
+  }, [currentCardIndex]);
+
+  // Parallax offsets for project visuals
+  const card1Parallax = useTransform(worksScrollProgress, [0, 0.33], [0, 60]);
+  const card2Parallax = useTransform(worksScrollProgress, [0.15, 0.5, 0.8], [-60, 0, 60]);
+  const card3Parallax = useTransform(worksScrollProgress, [0.66, 1], [-60, 0]);
+
   // Section HUD tracking
   const [activeSection, setActiveSection] = useState(0);
   const sectionRefs = useRef<(HTMLElement | null)[]>([null, null, null, null, null]);
@@ -505,7 +510,7 @@ export default function Home() {
 
   return (
     <motion.main
-      className="relative w-full min-h-screen text-[#f0ede8] overflow-x-hidden font-sans"
+      className="relative w-full min-h-screen text-[#f0ede8] overflow-x-clip font-sans"
       suppressHydrationWarning
     >
       {/* Scroll progress bar */}
@@ -905,7 +910,7 @@ export default function Home() {
       <section
         id="selected-works-vault"
         ref={(el) => { vaultRef.current = el!; sectionRefs.current[3] = el; }}
-        className="relative flex flex-col items-center w-full z-10"
+        className="relative w-full z-10"
       >
         {/* Label */}
         <motion.div
@@ -919,202 +924,242 @@ export default function Home() {
           <span className="font-mono text-[9px] text-[#3a3a3a] tracking-[0.25em] uppercase">SELECTED_WORKS</span>
         </motion.div>
 
-        <div className="w-full flex flex-col">
-          {/* PROJECT 01 */}
-          <VaultCard>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl mx-auto">
-              <div className="w-full md:w-1/2 flex items-center justify-center">
-                <VaultVisualContainer>
-                  <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
-                    PROJECT // 01
-                  </div>
-                  <GroundTruthVisual />
-                </VaultVisualContainer>
-              </div>
-              <div className="w-full md:w-1/2 flex flex-col gap-6 max-w-lg">
-                <SplitEntry from="left">
-                  <div className="section-marker">
-                    <span className="section-marker-line" />
-                    <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_01 // RAG_ARCHITECTURE</span>
-                  </div>
-                </SplitEntry>
-                <div className="overflow-hidden">
-                  <motion.h3
-                    className="tracking-tight leading-tight"
-                    style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
-                    initial={{ y: "100%" }}
-                    whileInView={{ y: "0%" }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        <div className={isMobile ? "w-full flex flex-col" : "horizontal-scroll-container"} ref={isMobile ? undefined : worksSectionRef}>
+          <div className={isMobile ? "w-full flex flex-col" : "horizontal-scroll-sticky"}>
+            <motion.div
+              className={isMobile ? "w-full flex flex-col" : "horizontal-scroll-track"}
+              style={isMobile ? {} : { x: worksSpringX }}
+            >
+              {/* PROJECT 01 */}
+              <div className={isMobile ? "w-full flex flex-col px-6 py-20 border-b border-white/[0.05]" : "horizontal-scroll-card"}>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl mx-auto relative h-full">
+                  <motion.div 
+                    className="w-full md:w-1/2 flex items-center justify-center"
+                    style={isMobile ? {} : { x: card1Parallax }}
                   >
-                    <span className="font-extrabold text-[#f0ede8] block">Ground Truth</span>
-                    <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Engine</span>
-                  </motion.h3>
+                    <VaultVisualContainer>
+                      <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
+                        PROJECT // 01
+                      </div>
+                      <GroundTruthVisual />
+                    </VaultVisualContainer>
+                  </motion.div>
+                  <div className="w-full md:w-1/2 flex flex-col gap-6 max-w-lg relative">
+                    <div className="absolute -right-12 -top-20 font-mono text-[160px] font-black text-white/[0.015] leading-none pointer-events-none select-none hidden md:block">
+                      01
+                    </div>
+                    <SplitEntry from="left">
+                      <div className="section-marker">
+                        <span className="section-marker-line" />
+                        <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_01 // RAG_ARCHITECTURE</span>
+                      </div>
+                    </SplitEntry>
+                    <div className="overflow-hidden">
+                      <motion.h3
+                        className="tracking-tight leading-tight"
+                        style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
+                        initial={{ y: "100%" }}
+                        whileInView={{ y: "0%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <span className="font-extrabold text-[#f0ede8] block">Ground Truth</span>
+                        <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Engine</span>
+                      </motion.h3>
+                    </div>
+                    <SplitEntry from="bottom" delay={0.1}>
+                      <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                        <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Architecture Brief</span>
+                        <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">An advanced Retrieval-Augmented Generation platform engineered to remove hallucination risks. Employs a deterministic 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.</p>
+                      </div>
+                    </SplitEntry>
+                    <SplitEntry from="bottom" delay={0.2}>
+                      <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
+                        <li>5-layer parsing, routing, ranking, and database layout.</li>
+                        <li>Deterministic semantic classification using cosine vector calculations.</li>
+                        <li>pgvector integration yielding sub-180ms document indexing.</li>
+                      </ul>
+                    </SplitEntry>
+                    <SplitEntry from="bottom" delay={0.3}>
+                      <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
+                        <div>
+                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Latency Response</span>
+                          <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 180ms</span>
+                        </div>
+                        <div>
+                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Accuracy Target</span>
+                          <span className="text-lg font-bold font-mono text-[#f0ede8]">99.8% Hallucination-Free</span>
+                        </div>
+                      </div>
+                    </SplitEntry>
+                    <Magnetic>
+                      <Link href="/vessel/ground-truth-engine" data-cursor-label="GTE" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
+                        Inspect Repository Architecture <ArrowUpRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </Magnetic>
+                  </div>
                 </div>
-                <SplitEntry from="bottom" delay={0.1}>
-                  <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                    <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Architecture Brief</span>
-                    <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">An advanced Retrieval-Augmented Generation platform engineered to remove hallucination risks. Employs a deterministic 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.</p>
-                  </div>
-                </SplitEntry>
-                <SplitEntry from="bottom" delay={0.2}>
-                  <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                    <li>5-layer parsing, routing, ranking, and database layout.</li>
-                    <li>Deterministic semantic classification using cosine vector calculations.</li>
-                    <li>pgvector integration yielding sub-180ms document indexing.</li>
-                  </ul>
-                </SplitEntry>
-                <SplitEntry from="bottom" delay={0.3}>
-                  <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                    <div>
-                      <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Latency Response</span>
-                      <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 180ms</span>
-                    </div>
-                    <div>
-                      <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Accuracy Target</span>
-                      <span className="text-lg font-bold font-mono text-[#f0ede8]">99.8% Hallucination-Free</span>
-                    </div>
-                  </div>
-                </SplitEntry>
-                <Magnetic>
-                  <Link href="/vessel/ground-truth-engine" data-cursor-label="GTE" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
-                    Inspect Repository Architecture <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
-                </Magnetic>
               </div>
-            </div>
-          </VaultCard>
 
-          {/* PROJECT 02 */}
-          <VaultCard>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl mx-auto">
-              <div className="w-full md:w-1/2 flex items-center justify-center">
-                <VaultVisualContainer>
-                  <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
-                    PROJECT // 02
-                  </div>
-                  <WorkspaceVisual />
-                </VaultVisualContainer>
-              </div>
-              <div className="w-full md:w-1/2 flex flex-col gap-6 max-w-lg">
-                <SplitEntry from="left">
-                  <div className="section-marker">
-                    <span className="section-marker-line" />
-                    <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_02 // ENTERPRISE_PORTAL</span>
-                  </div>
-                </SplitEntry>
-                <div className="overflow-hidden">
-                  <motion.h3
-                    className="tracking-tight leading-tight"
-                    style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
-                    initial={{ y: "100%" }}
-                    whileInView={{ y: "0%" }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              {/* PROJECT 02 */}
+              <div className={isMobile ? "w-full flex flex-col px-6 py-20 border-b border-white/[0.05]" : "horizontal-scroll-card"}>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl mx-auto relative h-full">
+                  <motion.div 
+                    className="w-full md:w-1/2 flex items-center justify-center"
+                    style={isMobile ? {} : { x: card2Parallax }}
                   >
-                    <span className="font-extrabold text-[#f0ede8] block">Centralized</span>
-                    <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Workspace</span>
-                  </motion.h3>
+                    <VaultVisualContainer>
+                      <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
+                        PROJECT // 02
+                      </div>
+                      <WorkspaceVisual />
+                    </VaultVisualContainer>
+                  </motion.div>
+                  <div className="w-full md:w-1/2 flex flex-col gap-6 max-w-lg relative">
+                    <div className="absolute -right-12 -top-20 font-mono text-[160px] font-black text-white/[0.015] leading-none pointer-events-none select-none hidden md:block">
+                      02
+                    </div>
+                    <SplitEntry from="left">
+                      <div className="section-marker">
+                        <span className="section-marker-line" />
+                        <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_02 // ENTERPRISE_PORTAL</span>
+                      </div>
+                    </SplitEntry>
+                    <div className="overflow-hidden">
+                      <motion.h3
+                        className="tracking-tight leading-tight"
+                        style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
+                        initial={{ y: "100%" }}
+                        whileInView={{ y: "0%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <span className="font-extrabold text-[#f0ede8] block">Centralized</span>
+                        <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Workspace</span>
+                      </motion.h3>
+                    </div>
+                    <SplitEntry from="bottom" delay={0.1}>
+                      <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                        <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Enterprise Brief</span>
+                        <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Consolidates databases, proxies legacy Oracle systems, and manages staff operations.</p>
+                      </div>
+                    </SplitEntry>
+                    <SplitEntry from="bottom" delay={0.2}>
+                      <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
+                        <li>Servicing 15,000+ active enterprise directory profiles with RBAC.</li>
+                        <li>Real-time legacy sync middleware proxying Oracle tables securely.</li>
+                        <li>API caching reducing database query latency to 45ms.</li>
+                      </ul>
+                    </SplitEntry>
+                    <SplitEntry from="bottom" delay={0.3}>
+                      <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
+                        <div>
+                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Deployed Footprint</span>
+                          <span className="text-lg font-bold font-mono text-[#f0ede8]">15K+ Active Users</span>
+                        </div>
+                        <div>
+                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Proxy Speed</span>
+                          <span className="text-lg font-bold font-mono text-[#f0ede8]">45ms Avg Latency</span>
+                        </div>
+                      </div>
+                    </SplitEntry>
+                    <Magnetic>
+                      <Link href="/vessel/blw-portal" data-cursor-label="BLW" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
+                        Read Enterprise Case Study <ArrowUpRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </Magnetic>
+                  </div>
                 </div>
-                <SplitEntry from="bottom" delay={0.1}>
-                  <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                    <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Enterprise Brief</span>
-                    <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Consolidates databases, proxies legacy Oracle systems, and manages staff operations.</p>
-                  </div>
-                </SplitEntry>
-                <SplitEntry from="bottom" delay={0.2}>
-                  <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                    <li>Servicing 15,000+ active enterprise directory profiles with RBAC.</li>
-                    <li>Real-time legacy sync middleware proxying Oracle tables securely.</li>
-                    <li>API caching reducing database query latency to 45ms.</li>
-                  </ul>
-                </SplitEntry>
-                <SplitEntry from="bottom" delay={0.3}>
-                  <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                    <div>
-                      <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Deployed Footprint</span>
-                      <span className="text-lg font-bold font-mono text-[#f0ede8]">15K+ Active Users</span>
-                    </div>
-                    <div>
-                      <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Proxy Speed</span>
-                      <span className="text-lg font-bold font-mono text-[#f0ede8]">45ms Avg Latency</span>
-                    </div>
-                  </div>
-                </SplitEntry>
-                <Magnetic>
-                  <Link href="/vessel/blw-portal" data-cursor-label="BLW" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
-                    Read Enterprise Case Study <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
-                </Magnetic>
               </div>
-            </div>
-          </VaultCard>
 
-          {/* PROJECT 03 */}
-          <VaultCard>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl mx-auto">
-              <div className="w-full md:w-1/2 flex items-center justify-center">
-                <VaultVisualContainer>
-                  <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
-                    PROJECT // 03
-                  </div>
-                  <BroccoliVisual />
-                </VaultVisualContainer>
-              </div>
-              <div className="w-full md:w-1/2 flex flex-col gap-6 max-w-lg">
-                <SplitEntry from="left">
-                  <div className="section-marker">
-                    <span className="section-marker-line" />
-                    <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_03 // WEB_SYSTEM</span>
-                  </div>
-                </SplitEntry>
-                <div className="overflow-hidden">
-                  <motion.h3
-                    className="tracking-tight leading-tight"
-                    style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
-                    initial={{ y: "100%" }}
-                    whileInView={{ y: "0%" }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              {/* PROJECT 03 */}
+              <div className={isMobile ? "w-full flex flex-col px-6 py-20" : "horizontal-scroll-card"}>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl mx-auto relative h-full">
+                  <motion.div 
+                    className="w-full md:w-1/2 flex items-center justify-center"
+                    style={isMobile ? {} : { x: card3Parallax }}
                   >
-                    <span className="font-extrabold text-[#f0ede8] block">pink-broccoli</span>
-                    <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Laminar build.</span>
-                  </motion.h3>
+                    <VaultVisualContainer>
+                      <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
+                        PROJECT // 03
+                      </div>
+                      <BroccoliVisual />
+                    </VaultVisualContainer>
+                  </motion.div>
+                  <div className="w-full md:w-1/2 flex flex-col gap-6 max-w-lg relative">
+                    <div className="absolute -right-12 -top-20 font-mono text-[160px] font-black text-white/[0.015] leading-none pointer-events-none select-none hidden md:block">
+                      03
+                    </div>
+                    <SplitEntry from="left">
+                      <div className="section-marker">
+                        <span className="section-marker-line" />
+                        <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_03 // WEB_SYSTEM</span>
+                      </div>
+                    </SplitEntry>
+                    <div className="overflow-hidden">
+                      <motion.h3
+                        className="tracking-tight leading-tight"
+                        style={{ fontSize: "clamp(2.4rem, 4.5vw, 4rem)" }}
+                        initial={{ y: "100%" }}
+                        whileInView={{ y: "0%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <span className="font-extrabold text-[#f0ede8] block">pink-broccoli</span>
+                        <span className="serif-display text-[#f0ede8]/70 block" style={{ fontSize: "0.9em" }}>Laminar build.</span>
+                      </motion.h3>
+                    </div>
+                    <SplitEntry from="bottom" delay={0.1}>
+                      <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                        <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Frontend Brief</span>
+                        <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-velocity, design-forward web application compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero GC delays.</p>
+                      </div>
+                    </SplitEntry>
+                    <SplitEntry from="bottom" delay={0.2}>
+                      <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
+                        <li>Lighthouse Performance score hitting 100/100 across platforms.</li>
+                        <li>Virtualized list rendering with zero layout thrashing.</li>
+                        <li>Extremely low memory footprint and high frontend velocity.</li>
+                      </ul>
+                    </SplitEntry>
+                    <SplitEntry from="bottom" delay={0.3}>
+                      <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
+                        <div>
+                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">LCP Load Speed</span>
+                          <span className="text-lg font-bold font-mono text-[#f0ede8]">0.52 Seconds</span>
+                        </div>
+                        <div>
+                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Gzipped Bundle</span>
+                          <span className="text-lg font-bold font-mono text-[#f0ede8]">0.52 Seconds</span>
+                        </div>
+                      </div>
+                    </SplitEntry>
+                    <Magnetic>
+                      <Link href="/vessel/Laminar" data-cursor-label="BROCCOLI" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
+                        View Interactive UI Build <ArrowUpRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </Magnetic>
+                  </div>
                 </div>
-                <SplitEntry from="bottom" delay={0.1}>
-                  <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                    <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Frontend Brief</span>
-                    <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-velocity, design-forward web application compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero GC delays.</p>
-                  </div>
-                </SplitEntry>
-                <SplitEntry from="bottom" delay={0.2}>
-                  <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                    <li>Lighthouse Performance score hitting 100/100 across platforms.</li>
-                    <li>Virtualized list rendering with zero layout thrashing.</li>
-                    <li>Extremely low memory footprint and high frontend velocity.</li>
-                  </ul>
-                </SplitEntry>
-                <SplitEntry from="bottom" delay={0.3}>
-                  <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                    <div>
-                      <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">LCP Load Speed</span>
-                      <span className="text-lg font-bold font-mono text-[#f0ede8]">0.52 Seconds</span>
-                    </div>
-                    <div>
-                      <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Gzipped Bundle</span>
-                      <span className="text-lg font-bold font-mono text-[#f0ede8]">0.52 Seconds</span>
-                    </div>
-                  </div>
-                </SplitEntry>
-                <Magnetic>
-                  <Link href="/vessel/Laminar" data-cursor-label="BROCCOLI" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
-                    View Interactive UI Build <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
-                </Magnetic>
               </div>
-            </div>
-          </VaultCard>
+            </motion.div>
+          </div>
         </div>
+
+        {/* Dynamic bottom HUD for the horizontal scroll deck */}
+        {!isMobile && (
+          <div className="absolute left-8 bottom-8 md:bottom-12 font-mono text-[10px] tracking-widest text-[#f0ede8]/30 flex items-center gap-3 z-30 animate-fade-in">
+            <span className="text-[#f0ede8] font-bold">0{activeCardIndex}</span>
+            <div className="w-12 h-[1px] bg-white/10 relative">
+              <motion.div 
+                className="absolute top-0 left-0 h-full bg-[#f0ede8]"
+                animate={{ width: `${(activeCardIndex / 3) * 100}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+            <span>03</span>
+          </div>
+        )}
       </section>
 
       {/* ── FOOTER ──────────────────────────────────────────────────────── */}

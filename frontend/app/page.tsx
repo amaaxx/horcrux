@@ -934,7 +934,7 @@ export default function Home() {
           <span className="font-mono text-[9px] text-[#3a3a3a] tracking-[0.25em] uppercase">SELECTED_WORKS</span>
         </motion.div>
 
-        <div className={isMobile ? "w-full flex flex-col" : "horizontal-scroll-container"} ref={isMobile ? undefined : worksSectionRef}>
+        <div className={isMobile ? "w-full flex flex-col" : "horizontal-scroll-container"} ref={worksSectionRef}>
           <div className={isMobile ? "w-full flex flex-col" : "horizontal-scroll-sticky"}>
             <motion.div
               className={isMobile ? "w-full flex flex-col" : "horizontal-scroll-track"}

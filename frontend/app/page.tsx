@@ -392,10 +392,7 @@ const marqueeR: Variants = {
 
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────────
 export default function Home() {
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+
 
   // Smooth scroll
   useEffect(() => {
@@ -514,9 +511,7 @@ export default function Home() {
     }
   };
 
-  if (!isMounted) {
-    return <div className="min-h-screen bg-[#080808]" />;
-  }
+
 
   return (
     <motion.main

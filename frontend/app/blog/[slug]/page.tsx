@@ -68,7 +68,7 @@ export default function BlogPostPage() {
   }
 
   return (
-    <main className="relative w-full min-h-screen pt-32 pb-32 px-6 md:px-16 lg:px-24 z-10 flex flex-col items-center overflow-x-clip selection:bg-white/20 selection:text-white">
+    <main className="relative w-full min-h-screen pt-44 pb-32 px-6 md:px-16 lg:px-24 z-10 flex flex-col items-center overflow-x-clip selection:bg-white/20 selection:text-white">
       {/* Scroll progress bar */}
       <ScrollProgressBar />
 
@@ -106,7 +106,7 @@ export default function BlogPostPage() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-16"
+          className="mb-20"
         >
           <Link href="/blog" className="inline-flex items-center gap-2 text-[#5a5a5a] hover:text-[#f0ede8] transition-colors group text-sm font-mono uppercase tracking-widest" data-cursor-label="BACK">
             <ArrowLeft className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" />
@@ -115,12 +115,12 @@ export default function BlogPostPage() {
         </motion.div>
 
         {/* Header Section */}
-        <header className="mb-16 border-b border-white/[0.06] pb-12">
+        <header className="mb-14 border-b border-white/[0.06] pb-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-wrap gap-3 mb-8"
+            className="flex flex-wrap gap-3 mb-6"
           >
             {post.tags.map(tag => (
               <span key={tag} className="tag">{tag}</span>
@@ -131,7 +131,7 @@ export default function BlogPostPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#f0ede8] mb-8 leading-[1.1]"
+            className="text-4xl md:text-5xl lg:text-[54px] font-bold tracking-tight text-[#f0ede8] mb-10 leading-[1.25]"
           >
             {post.title}
           </motion.h1>

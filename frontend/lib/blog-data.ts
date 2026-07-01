@@ -17,8 +17,6 @@ export const blogPosts: BlogPost[] = [
     readTime: "10 min read",
     tags: ["RAG", "FastAPI", "Systems", "AI"],
     content: `
-# How a Classroom Joke Forced Me to Build a Production-Grade RAG Engine (And Survive Deployment Hell)
-
 "Who’s your mentor?" my professor asked.
 "ChatGPT," I replied. 
 
@@ -145,8 +143,6 @@ I didn't just build an AI wrapper. I learned how to build resilient, asynchronou
     readTime: "6 min read",
     tags: ["Frontend", "React", "Next.js"],
     content: `
-# The State of Frontend Engineering in 2026
-
 The lines between client and server have ceased to exist. In 2026, the modern web application is a distributed edge function, streaming React Server Components (RSC) to high-performance layouts.
 
 ---

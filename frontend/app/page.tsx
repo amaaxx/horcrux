@@ -632,6 +632,17 @@ export default function Home() {
               </button>
             </Magnetic>
 
+            <Magnetic range={55}>
+              <Link
+                href="/blog"
+                data-cursor-label="READ"
+                className="group btn-ghost px-7 py-3.5 text-[#f0ede8] font-semibold rounded-full flex items-center gap-3 text-sm cursor-none"
+              >
+                <span>Read Transmissions</span>
+                <ArrowUpRight className="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+              </Link>
+            </Magnetic>
+
             <div className="flex gap-2.5 items-center">
               {[
                 { href: "https://github.com/amaaxx", Icon: GithubIcon, label: "GITHUB" },

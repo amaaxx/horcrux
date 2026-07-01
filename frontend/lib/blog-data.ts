@@ -24,9 +24,9 @@ export const blogPosts: BlogPost[] = [
 
 The entire classroom erupted into laughter. My professor quickly pointed out that LLMs hallucinate, make things up, and can't be trusted with factual accuracy. Honestly? He was right. But instead of taking the L, I became obsessed with fixing that exact flaw.
 
-I set out to build a system that grounds LLMs in verifiable truth. I called it **Halkill** (Hallucination Kill).
+I set out to build a system that grounds LLMs in verifiable truth. I called it **Halkill** (Hallucination Killer).
 
-When I started on January 13th, my stack was just HTML, CSS, and basic JavaScript. I didn’t know backend architecture, Python, or the vector math behind Retrieval-Augmented Generation (RAG). Five months later—after juggling mid-sem exams, fighting dependency conflicts, and failing at deployment over 100 times—I finally shipped a live, production-grade asynchronous backend.
+When I started on January 13th, my stack was just HTML, CSS, and basic JavaScript. I didn’t know backend architecture, Python, or the vector math behind Retrieval-Augmented Generation (RAG). Five months later—after juggling mid-sem exams, crying over dependency conflicts, and failing at deployment over 100 times—I finally shipped a live, production-grade asynchronous backend that can ingest almost any file type.
 
 Here is the architectural journey of how I built it, the final tech stack, and the engineering patterns I used to solve production constraints.
 
@@ -72,7 +72,12 @@ But even with the models offloaded, I was still hitting memory spikes. Here is h
 
 ## Phase 3: The Engineering Deep Dive
 
-### 1. Zero-RAM File Offloading (Celery + Redis)
+### 1. Ingesting Everything: PDFs, Excel, and Images
+A real-world RAG engine can't just rely on clean text files. I engineered the ingestion pipeline to handle PDFs, tabular data (\`.xls\`, \`.xlsx\`), and even raw images. 
+
+Normalizing all these formats into clean, vector-ready text chunks was a massive headache. Whether it's extracting text from PDFs, parsing messy Excel rows with Pandas, or using vision capabilities to read images, the FastAPI layer standardizes the incoming stream so the vector database receives consistent data.
+
+### 2. Zero-RAM File Offloading (Celery + Redis)
 If a user uploads a 50MB PDF and you use \`await file.read()\` in FastAPI, that entire 50MB goes straight into your server's RAM. Do that with a few concurrent users, and Render kills your container. 
 
 To fix this, I made sure the FastAPI web layer *never* holds the file in memory. Instead, it streams the incoming document directly to a temporary disk path (\`/tmp\`) using Python's \`shutil.copyfileobj\`. 
@@ -85,9 +90,15 @@ with open(temp_file_path, "wb") as buffer:
 # Firing off the background worker
 process_document_task.delay(file_path=temp_file_path, user_id=current_user.id)
 \`\`\`
-The HTTP request instantly returns a "Processing" status to the user. Meanwhile, a detached **Celery worker** (communicating via **Redis**) picks up the file, chunks it, hits the Google API for embeddings, pushes the vectors to Supabase, and deletes the temp file. The web server's RAM stays completely untouched.
+The HTTP request instantly returns a "Processing" status to the user. Meanwhile, a detached **Celery worker** (communicating via **Redis**) picks up the file, handles the multi-modal parsing, hits the Google API for embeddings, pushes the vectors to Supabase, and deletes the temp file. The web server's RAM stays completely untouched.
 
-### 2. The Streaming Citation Problem 
+### 3. The "Hallucination Kill" Switch: Strict vs. Hybrid Modes
+The whole point of this project was to kill hallucinations. But sometimes users *want* the AI to use its general knowledge if the uploaded document doesn't have the answer. To solve this, I engineered two dynamic routing modes:
+
+* **Strict Mode:** The ultimate hallucination killer. The LLM is heavily restricted by system prompts. If the vector search yields zero relevant context, the system outright refuses to answer, returning: *"I don't have knowledge of this in the provided documents."* Zero guessing allowed.
+* **Hybrid Mode:** The system searches the uploaded vectors first. If it finds the answer, it cites it. If the document doesn't contain the answer, it seamlessly falls back to its base training data to help the user out.
+
+### 4. The Streaming Citation Problem 
 One of the most annoying things about standard AI chatbots is waiting for a massive response to finish generating before you see where the information came from. 
 
 LangChain makes it weirdly difficult to extract metadata and stream it *before* the LLM tokens start flowing. So, I bypassed the standard LangChain retrievers and wrote a custom RPC call in Supabase (\`hybrid_search\`) that uses both dense vector similarity and sparse keyword matching.
@@ -99,12 +110,12 @@ data: METADATA_SOURCES:{"docs": [{"page": 4, "source": "report.pdf"}]}||| The qu
 \`\`\`
 The React frontend is programmed to intercept that exact \`METADATA_SOURCES\` tag, instantly render a citation card on the UI, and then seamlessly print the rest of the AI's text. 
 
-### 3. API Rate Limit Throttling
+### 5. API Rate Limit Throttling
 When you process a massive PDF, you generate hundreds of text chunks. If you fire hundreds of embedding requests at Google's API at once, you get slapped with an HTTP 429 (Too Many Requests) error, and your pipeline dies.
 
 I had to engineer a custom \`CloudEmbeddings\` wrapper with an exponential backoff algorithm (\`wait = (2 ** attempt) * 2\`). When the Celery worker inserts data into Supabase, I force it to batch chunks of 20 and trigger a \`time.sleep(1)\`. It intentionally slows down the ingestion process to guarantee the system stays under the 1,500 Requests-Per-Minute quota.
 
-### 4. Bulletproofing the Database
+### 6. Bulletproofing the Database
 Serverless databases drop connections. It's just a fact of life. To stop SQLAlchemy from throwing connection errors, I had to configure the engine with aggressive connection pooling: \`pool_size=10\`, \`max_overflow=20\`, and \`pool_pre_ping=True\`.
 
 I also built cascading data cleanups. If a user deletes a document, the backend doesn't just delete the relational row. It fires an API call to purge the raw file from Supabase Storage, and executes a targeted JSONB \`.contains()\` query to wipe all orphaned vector chunks from the \`pgvector\` table, keeping the database perfectly clean.
@@ -117,7 +128,7 @@ When I finally wired Vercel, Render, and Supabase together, I thought I was done
 
 After my first "successful" deployment, the app broke at least 100 times in production. Environment variables failed, CORS policies blocked requests, Redis connections timed out, and the Celery workers kept losing track of tasks. There were days I seriously considered just giving up. 
 
-But I didn't. I ended up pushing 3 to 5 commits a day—sometimes 10+—chasing down every single bug. I added hallucination scoring, strict API rate limiting with SlowAPI (restricting users to 20 messages a minute), and JWT authentication. 
+But I didn't. I ended up pushing 3 to 5 commits a day—sometimes 10+—chasing down every single bug. I added the hallucination scoring, strict API rate limiting with SlowAPI (restricting users to 20 messages a minute), and JWT authentication. 
 
 Today, Halkill has been live and healthy for a month. 
 

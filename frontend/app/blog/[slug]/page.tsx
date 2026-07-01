@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { getBlogPostBySlug } from "@/lib/blog-data";
 import Lenis from "lenis";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -101,15 +102,8 @@ export default function BlogPostPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="prose-container"
         >
-          {/* 
-            Since we don't have MDX setup yet, we'll render the text nicely. 
-            When you integrate actual content, this is where you map paragraphs or render MDX.
-          */}
-          <div className="text-[#a0a0a0] text-lg leading-relaxed font-light whitespace-pre-wrap">
-            {post.content}
-          </div>
+          <MarkdownRenderer content={post.content || ""} />
         </motion.div>
 
       </article>

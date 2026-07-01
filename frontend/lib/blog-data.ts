@@ -24,7 +24,7 @@ The entire classroom laughed. My professor quickly pointed out that AI hallucina
 
 I decided to build a system that grounded LLMs in verifiable truth. I called it **Halkill** (Hallucination Killer).
 
-When I started this on January 13th, my tech stack was literally just HTML, CSS, and JavaScript. I didn’t know backend architecture, I didn’t know Python, and I definitely didn't know the vector math behind Retrieval-Augmented Generation (RAG). 
+When I started this on January 13th, my tech stack was literally just \`HTML\`, \`CSS\`, and \`JavaScript\`. I didn’t know backend architecture, I didn’t know \`Python\`, and I definitely didn't know the vector math behind Retrieval-Augmented Generation (RAG). 
 
 Five months later—after juggling mid-sem exams, crying over dependency conflicts, and failing at deployment over 100 times—I finally had a live, production-grade asynchronous backend that can ingest almost any file type.
 
@@ -36,12 +36,12 @@ Here’s the story of how I built it, the tech stack I used, and the architectur
 
 Before we get into the details, here is the stack I eventually landed on after months of trial and error:
 
-* **Frontend:** React (State management was a nightmare to sync with streaming AI), deployed on Vercel.
-* **Backend:** Python, FastAPI (chosen for its asynchronous speed), deployed on Render.
-* **Database & Storage:** PostgreSQL via Supabase (using \`pgvector\` for similarity search and Supabase Storage for raw files).
-* **AI & Embeddings:** Google Gemini (\`gemini-2.5-flash-lite\`) and \`gemini-embedding-001\`, orchestrated with LangChain.
-* **Background Workers:** Celery + Redis (to decouple heavy embedding tasks from the web server).
-* **Security & Perf:** JWT for Auth, SlowAPI for rate limiting, SQLAlchemy + Alembic for ORM/migrations.
+* **Frontend:** \`React\` (State management was a nightmare to sync with streaming AI), deployed on \`Vercel\`.
+* **Backend:** \`Python\`, \`FastAPI\` (chosen for its asynchronous speed), deployed on \`Render\`.
+* **Database & Storage:** \`PostgreSQL\` via \`Supabase\` (using \`pgvector\` for similarity search and \`Supabase Storage\` for raw files).
+* **AI & Embeddings:** \`Google Gemini\` (\`gemini-2.5-flash-lite\`) and \`gemini-embedding-001\`, orchestrated with \`LangChain\`.
+* **Background Workers:** \`Celery\` + \`Redis\` (to decouple heavy embedding tasks from the web server).
+* **Security & Perf:** \`JWT\` for Auth, \`SlowAPI\` for rate limiting, \`SQLAlchemy\` + \`Alembic\` for ORM/migrations.
 
 ---
 

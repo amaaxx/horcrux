@@ -198,8 +198,8 @@ export default function BlogPostPage() {
           margin-bottom: 1.5rem;
           font-family: var(--font-geist-sans), sans-serif;
           line-height: 1.8;
-          color: #a0a0a0;
-          font-weight: 300;
+          color: #c0c0c0;
+          font-weight: 400;
         }
         .prose-container strong {
           color: #f0ede8;

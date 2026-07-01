@@ -101,7 +101,7 @@ export default function MarkdownRenderer({ content }: { content: string }) {
       );
     } else if (currentBlockType === 'paragraph') {
       blocks.push(
-        <p key={key} className="mb-6 text-base md:text-[17px] text-[#a0a0a0] font-light leading-relaxed">
+        <p key={key} className="mb-6 text-base md:text-[17px] text-[#c0c0c0] font-normal leading-relaxed">
           {parseInline(accumulatedLines.join('\n'))}
         </p>
       );
@@ -163,6 +163,15 @@ export default function MarkdownRenderer({ content }: { content: string }) {
         <h3 key={blockKey++} className="text-xl md:text-2xl font-semibold text-[#f0ede8] tracking-tight mt-8 mb-4 leading-tight">
           {parseInline(trimmed.slice(4))}
         </h3>
+      );
+      continue;
+    }
+    if (trimmed.startsWith('#### ')) {
+      flushBlock(blockKey++);
+      blocks.push(
+        <h4 key={blockKey++} className="text-lg md:text-xl font-semibold text-[#f0ede8] tracking-tight mt-6 mb-3 leading-tight">
+          {parseInline(trimmed.slice(5))}
+        </h4>
       );
       continue;
     }

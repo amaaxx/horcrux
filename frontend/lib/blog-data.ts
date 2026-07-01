@@ -11,116 +11,130 @@ export interface BlogPost {
 export const blogPosts: BlogPost[] = [
   {
     slug: "classroom-joke-to-production-rag",
-    title: "Engineering Halkill: Architecture & Constraints of a Production-Grade RAG Engine",
-    excerpt: "An architectural deep dive into constructing an asynchronous, multi-modal RAG system within a 512MB RAM footprint.",
+    title: "How a Classroom Joke Forced Me to Build a Production-Grade RAG Engine (And Survive Deployment Hell)",
+    excerpt: "The story of how I built Halkill: an asynchronous, production-grade RAG engine that can ingest PDFs, Excel, and images, built under Render's strict 512MB RAM budget.",
     date: "2026-07-02",
     readTime: "10 min read",
     tags: ["RAG", "FastAPI", "Systems", "AI"],
     content: `
-# Engineering Halkill: Architecture & Constraints of a Production-Grade RAG Engine
+# How a Classroom Joke Forced Me to Build a Production-Grade RAG Engine (And Survive Deployment Hell)
 
-The project originated from a fundamental question posed in an academic lecture hall: *Can generative language models be trusted with enterprise-grade data integrity?* The standard consensus was negative, citing the inherent tendency of LLMs to hallucinate.
+"Who’s your mentor?" my professor asked.
+"ChatGPT," I replied. 
 
-Rather than accepting hallucination as an structural inevitability, I began engineering a system designed to enforce grounding constraints and ground LLMs in mathematical, verifiable truth. The result was **Halkill** (Hallucination Killer)—an asynchronous, multi-modal RAG (Retrieval-Augmented Generation) engine built from the ground up to process, vectorize, and retrieve source data with absolute precision.
+The entire classroom laughed. My professor quickly pointed out that AI hallucinates, makes things up, and can't be trusted with factual accuracy. Honestly? He was right. But instead of just taking the L, I got completely obsessed with fixing that exact flaw. 
 
-What began as a challenge evolved into a five-month engineering process, scaling a local python prototype into a live, production-grade asynchronous backend capable of parsing, embedding, and querying heterogeneous datasets.
+I decided to build a system that grounded LLMs in verifiable truth. I called it **Halkill** (Hallucination Killer).
 
----
+When I started this on January 13th, my tech stack was literally just HTML, CSS, and JavaScript. I didn’t know backend architecture, I didn’t know Python, and I definitely didn't know the vector math behind Retrieval-Augmented Generation (RAG). 
 
-## System Architecture & Tech Stack
+Five months later—after juggling mid-sem exams, crying over dependency conflicts, and failing at deployment over 100 times—I finally had a live, production-grade asynchronous backend that can ingest almost any file type.
 
-To ensure high availability and low latency within server resource boundaries, the application implements a decoupled, event-driven topology:
-
-* **Presentation Layer:** React with custom Server-Sent Events (SSE) stream interceptors, deployed on Vercel.
-* **Application Core:** Asynchronous Python (FastAPI), acting as a low-overhead orchestrator, deployed on Render.
-* **Storage & Vector Indexing:** PostgreSQL via Supabase, utilizing \`pgvector\` for dense vector similarity search.
-* **Model Inference:** Google Gemini API (\`gemini-2.5-flash-lite\` and \`gemini-embedding-001\`), managed through LangChain abstractions.
-* **Ingestion Pipeline:** Celery + Redis, managing background file parsing and batch vectorization.
-* **Database Pool & Migrations:** SQLAlchemy (ORM) and Alembic, with strict connection pooling.
+Here’s the story of how I built it, the tech stack I used, and the architectural nightmares I had to solve along the way.
 
 ---
 
-## Phase 1: Local Prototyping & Runtime Isolation
+### The Final Tech Stack
 
-The initial development phase adhered to a depth-first methodology: establishing a robust backend execution layer prior to developing the user interface. 
+Before we get into the details, here is the stack I eventually landed on after months of trial and error:
 
-The first hurdle involved setting up a stable, isolated local environment. Early iterations utilized local SQLite-based vector storage via ChromaDB and local HuggingFace embedding models. While functional in local-only environments, local model inference quickly became a bottleneck, and building stateful citation memory across multiple sessions proved to be the primary architectural hurdle.
-
----
-
-## Phase 2: Memory Optimization under 512MB Constraints
-
-Deploying the prototype to cloud infrastructure introduced severe hardware constraints. The target runtime environment (Render's free tier) imposed a strict **512MB memory limit**.
-
-The local HuggingFace embedding models alone required **1.2GB RAM**, resulting in immediate Out-Of-Memory (OOM) kernel panics upon server boot. To resolve this, I re-engineered the backend for cloud orchestration:
-1. Migrated vector storage from local memory to a remote PostgreSQL instance on **Supabase** running \`pgvector\`.
-2. Offloaded embedding generation to **Google's Embedding API**, shrinking the application's runtime footprint to less than 180MB.
+* **Frontend:** React (State management was a nightmare to sync with streaming AI), deployed on Vercel.
+* **Backend:** Python, FastAPI (chosen for its asynchronous speed), deployed on Render.
+* **Database & Storage:** PostgreSQL via Supabase (using \`pgvector\` for similarity search and Supabase Storage for raw files).
+* **AI & Embeddings:** Google Gemini (\`gemini-2.5-flash-lite\`) and \`gemini-embedding-001\`, orchestrated with LangChain.
+* **Background Workers:** Celery + Redis (to decouple heavy embedding tasks from the web server).
+* **Security & Perf:** JWT for Auth, SlowAPI for rate limiting, SQLAlchemy + Alembic for ORM/migrations.
 
 ---
 
-## Phase 3: Architectural Deep Dive
+### Phase 1: The \"Localhost Works Fine\" Trap
 
-### 1. Multi-Modal Document Normalization
-A production-grade RAG pipeline must process more than raw text. Halkill’s ingestion engine standardizes incoming files across three formats:
-* **Structured Document Trees (PDFs):** Parsing hierarchy and structural metadata.
-* **Tabular Matrices (Excel/CSV):** Normalizing rows into contextually relevant representations via Pandas.
-* **Raw Images:** Executing visual analysis models to extract text from diagrams and charts.
+I’m a big believer in a depth-first approach. A rock-solid backend with a terrible UI is infinitely better than a beautiful frontend that doesn't actually work. So, I dove straight into Python and FastAPI.
 
-The FastAPI gateway normalizes these heterogeneous streams into standardized text chunks, ensuring the downstream vector index remains uniform.
+The first week was brutal. I spent three days and two sleepless nights just fighting dependency conflicts and broken virtual environments. I literally cried out of frustration because I couldn't figure out why my libraries were overwriting each other. When it finally compiled and ran, the relief was pure euphoria. 
 
-### 2. Zero-RAM File Streaming (Celery + Redis)
-Reading a 50MB file directly into memory via FastAPI's default handlers (\`await file.read()\`) scales poorly, risking server termination under concurrent load. 
+My initial build used ChromaDB (because it was free and limitless locally) and HuggingFace transformers for local embeddings. It worked great on my machine. I even showed it to my friends, and a few of them said, *"ChatGPT can already do this, why are you building it?"* It stung, but I knew that building a wrapper is easy; building a context-aware RAG engine with stateful memory is a different beast. I kept coding.
 
-To eliminate memory spikes, the system implements a zero-RAM disk-streaming pipeline:
+---
+
+### Phase 2: The 512MB Reality Check 
+
+In February, I had to pause Halkill to build a project for the Indian Railways. When I came back in May to deploy Halkill, reality hit me like a truck.
+
+I tried deploying my backend to Render. Render’s free tier gives you 512MB of RAM. 
+My local HuggingFace embedding model was 1.2GB. 
+
+Every time the server spun up, it immediately threw an Out-Of-Memory (OOM) error and crashed. I was stuck. If I kept the local model, I couldn't deploy. If I changed the architecture, I risked making the model stupid. 
+
+I had no choice but to tear down my local stack and re-architect for the cloud. I stripped out ChromaDB and migrated my database to **Supabase**. I dumped the HuggingFace transformers and wired up **Google's Embedding APIs** to offload the compute. 
+
+But even with the models offloaded, I was still hitting memory spikes. Here is how I actually fixed the system for production.
+
+---
+
+### Phase 3: The Engineering Deep Dive
+
+#### 1. Ingesting Everything: PDFs, Excel, and Images
+A real-world RAG engine can't just rely on clean text files. I engineered the ingestion pipeline to handle PDFs, tabular data (\`.xls\`, \`.xlsx\`), and even raw images. 
+
+Normalizing all these formats into clean, vector-ready text chunks was a massive headache. Whether it's extracting text from PDFs, parsing messy Excel rows with Pandas, or using vision capabilities to read images, the FastAPI layer standardizes the incoming stream so the vector database receives consistent data.
+
+#### 2. Zero-RAM File Offloading (Celery + Redis)
+If a user uploads a 50MB PDF and you use \`await file.read()\` in FastAPI, that entire 50MB goes straight into your server's RAM. Do that with a few concurrent users, and Render kills your container. 
+
+To fix this, I made sure the FastAPI web layer *never* holds the file in memory. Instead, it streams the incoming document directly to a temporary disk path (\`/tmp\`) using Python's \`shutil.copyfileobj\`. 
 
 \`\`\`python
-# Stream incoming file directly to disk space to bypass memory allocation
+# Streaming the file to disk instantly
 with open(temp_file_path, "wb") as buffer:
     shutil.copyfileobj(upload_file.file, buffer)
 
-# Delegate compute-heavy parsing to the worker pool
+# Firing off the background worker
 process_document_task.delay(file_path=temp_file_path, user_id=current_user.id)
 \`\`\`
+The HTTP request instantly returns a "Processing" status to the user. Meanwhile, a detached **Celery worker** (communicating via **Redis**) picks up the file, handles the multi-modal parsing, hits the Google API for embeddings, pushes the vectors to Supabase, and deletes the temp file. The web server's RAM stays completely untouched.
 
-The HTTP worker immediately returns a \`202 Accepted\` status, freeing the main thread. A detached **Celery worker** reads the file from disk, generates embeddings, uploads vectors to Supabase, and purges the temporary storage.
+#### 3. The \"Hallucination Kill\" Switch: Strict vs. Hybrid Modes
+The whole point of this project was to kill hallucinations. But sometimes users *want* the AI to use its general knowledge if the uploaded document doesn't have the answer. To solve this, I engineered two dynamic routing modes:
 
-### 3. Grounding Guards: Strict vs. Hybrid Routing
-To eliminate hallucinations, Halkill introduces two distinct routing paradigms:
-* **Strict Mode:** The system enforces strict contextual boundaries. If vector query retrieval yields zero results above a similarity threshold, the system immediately returns a deterministic response: *"Context not found within source documents."* No speculative generation is permitted.
-* **Hybrid Mode:** The engine attempts vector grounding first. If the source material is insufficient, it falls back to base LLM parameters while clearly flagging the transition.
+* **Strict Mode:** The ultimate hallucination killer. The LLM is heavily restricted by system prompts. If the vector search yields zero relevant context, the system outright refuses to answer, returning: *"I don't have knowledge of this in the provided documents."* Zero guessing allowed.
+* **Hybrid Mode:** The system searches the uploaded vectors first. If it finds the answer, it cites it. If the document doesn't contain the answer, it seamlessly falls back to its base training data to help the user out.
 
-### 4. High-Performance SSE Citation Streaming
-Standard LLM wrappers stream text tokens but force the user to wait until completion to view source citations. To solve this, Halkill uses a custom Server-Sent Events (SSE) format to stream citation metadata *first*.
+#### 4. The Streaming Citation Problem 
+One of the most annoying things about standard AI chatbots is waiting for a massive response to finish generating before you see where the information came from. 
 
-I bypassed standard LangChain retrievers and built a custom RPC call in Supabase (\`hybrid_search\`) combining dense cosine similarity with BM25 keyword matching. The API formats the response stream with a metadata header:
+LangChain makes it weirdly difficult to extract metadata and stream it *before* the LLM tokens start flowing. So, I bypassed the standard LangChain retrievers and wrote a custom RPC call in Supabase (\`hybrid_search\`) that uses both dense vector similarity and sparse keyword matching.
 
-\`\`\`text
-data: METADATA_SOURCES:{"docs": [{"page": 4, "source": "report.pdf"}]}||| The system output starts here...
-\`\`\`
-
-The React client detects the \`METADATA_SOURCES\` token, renders the citation card in the UI, and streams the subsequent text tokens in real time.
-
-### 5. Exponential Backoff Rate Limiting
-Batch-processing large documents generates hundreds of embedding requests. To prevent HTTP 429 rate limit errors from Google's API, the Celery pipeline is wrapped in an exponential backoff routine:
+I then built a spliced stream using Server-Sent Events (SSE). Right before the AI starts typing, my backend injects a custom delimiter string into the stream:
 
 \`\`\`text
-wait_time = (2 ** attempt_number) * 2 seconds
+data: METADATA_SOURCES:{"docs": [{"page": 4, "source": "report.pdf"}]}||| The quarterly revenue...
 \`\`\`
+The React frontend is programmed to intercept that exact \`METADATA_SOURCES\` tag, instantly render a citation card on the UI, and then seamlessly print the rest of the AI's text. 
 
-Workers process vector uploads in batches of 20, incorporating a 1-second delay between batches to ensure compliance with API limits.
+#### 5. API Rate Limit Throttling
+When you process a massive PDF, you generate hundreds of text chunks. If you fire hundreds of embedding requests at Google's API at once, you get slapped with an HTTP 429 (Too Many Requests) error, and your pipeline dies.
 
-### 6. Relational Pool & Cleanup Constraints
-Serverless database configurations are prone to connection drops. The SQLAlchemy engine is configured with connection pools designed to survive drops: \`pool_size=10\`, \`max_overflow=20\`, and \`pool_pre_ping=True\`.
+I had to engineer a custom \`CloudEmbeddings\` wrapper with an exponential backoff algorithm (\`wait = (2 ** attempt) * 2\`). When the Celery worker inserts data into Supabase, I force it to batch chunks of 20 and trigger a \`time.sleep(1)\`. It intentionally slows down the ingestion process to guarantee the system stays under the 1,500 Requests-Per-Minute quota.
 
-Additionally, data deletion uses cascade constraints: deleting a document triggers an API request to purge the binary file from Supabase Storage and executes a JSONB search to clean up corresponding vector space in \`pgvector\`.
+#### 6. Bulletproofing the Database
+Serverless databases drop connections. It's just a fact of life. To stop SQLAlchemy from throwing connection errors, I had to configure the engine with aggressive connection pooling: \`pool_size=10\`, \`max_overflow=20\`, and \`pool_pre_ping=True\`.
+
+I also built cascading data cleanups. If a user deletes a document, the backend doesn't just delete the relational row. It fires an API call to purge the raw file from Supabase Storage, and executes a targeted JSONB \`.contains()\` query to wipe all orphaned vector chunks from the \`pgvector\` table, keeping the database perfectly clean.
 
 ---
 
-## Conclusion & Core Takeaways
+### The Aftermath
 
-Transitioning Halkill from localhost to production highlighted a key engineering principle: system resilience is determined by how well the architecture handles constraints.
+When I finally wired Vercel, Render, and Supabase together, I thought I was done. I wasn't. 
 
-By implementing asynchronous job processing, zero-RAM streaming, and deterministic grounding guards, the system scales reliably on minimal resources. Halkill has maintained 100% uptime over its first month in production, proving that engineering discipline and clean architectural boundaries can overcome severe infrastructure limits.
+After my first "successful" deployment, the app broke at least 100 times in production. Environment variables failed, CORS policies blocked requests, Redis connections timed out, and the Celery workers kept losing track of tasks. There were days I seriously considered just giving up. 
+
+But I didn't. I ended up pushing 3 to 5 commits a day—sometimes 10+—chasing down every single bug. I added the hallucination scoring, strict API rate limiting with SlowAPI (restricting users to 20 messages a minute), and JWT authentication. 
+
+Today, Halkill has been live and healthy for a month. 
+
+I didn't just build an AI wrapper. I learned how to build resilient, asynchronous infrastructure. It started with a joke in a classroom, but it ended with the most complex piece of software I’ve ever engineered.
     `
   },
   {
@@ -133,7 +147,7 @@ By implementing asynchronous job processing, zero-RAM streaming, and determinist
     content: `
 # The State of Frontend Engineering in 2026
 
-The boundaries between client and server have ceased to exist. In 2026, the modern web application is a distributed edge function, streaming React Server Components (RSC) to high-performance layouts.
+The lines between client and server have ceased to exist. In 2026, the modern web application is a distributed edge function, streaming React Server Components (RSC) to high-performance layouts.
 
 ---
 

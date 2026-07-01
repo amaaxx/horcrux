@@ -2,10 +2,32 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue, useSpring, useScroll, useTransform } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock } from "lucide-react";
 import { blogPosts, BlogPost } from "@/lib/blog-data";
 import Lenis from "lenis";
+
+// ── HOOK: GLOBAL MOUSE POSITION ───────────────────────────────────────────────
+function useMousePosition() {
+  const mouse = { x: useMotionValue(-200), y: useMotionValue(-200) };
+  useEffect(() => {
+    const move = (e: MouseEvent) => { mouse.x.set(e.clientX); mouse.y.set(e.clientY); };
+    window.addEventListener("mousemove", move, { passive: true });
+    return () => window.removeEventListener("mousemove", move);
+  }, [mouse.x, mouse.y]);
+  return mouse;
+}
+
+// ── COMPONENT: SCROLL PROGRESS BAR ────────────────────────────────────────────
+function ScrollProgressBar() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 25, restDelta: 0.001 });
+  return (
+    <div className="scroll-progress-bar">
+      <motion.div className="scroll-progress-fill" style={{ scaleX, transformOrigin: "0%" }} />
+    </div>
+  );
+}
 
 // ── COMPONENT: 3D TILT CARD (Adapted for Blog) ────────────────────────────────
 function BlogTiltCard({ post, index }: { post: BlogPost; index: number }) {
@@ -135,9 +157,46 @@ export default function BlogIndex() {
     return () => lenis.destroy();
   }, []);
 
+  const { x: mx, y: my } = useMousePosition();
+  const glowX = useSpring(mx, { stiffness: 70, damping: 24 });
+  const glowY = useSpring(my, { stiffness: 70, damping: 24 });
+
+  const { scrollY } = useScroll();
+  const gridY = useTransform(scrollY, [0, 4000], [0, -180]);
+
   return (
-    <main className="relative w-full min-h-screen pt-32 pb-24 px-6 md:px-16 lg:px-24 z-10 flex flex-col items-center">
-      <div className="max-w-6xl w-full">
+    <main className="relative w-full min-h-screen pt-32 pb-24 px-6 md:px-16 lg:px-24 z-10 flex flex-col items-center overflow-x-clip">
+      {/* Scroll progress bar */}
+      <ScrollProgressBar />
+
+      {/* Parallax dot grid */}
+      <motion.div style={{ y: gridY }} className="parallax-grid-bg" />
+
+      {/* Structural schematic lines */}
+      <div className="schematic-grid hidden md:flex">
+        {[0, 1, 2, 3].map(i => <div key={i} className="schematic-line-v" />)}
+      </div>
+      <div className="schematic-grid-h hidden md:flex">
+        {[0, 1, 2].map(i => <div key={i} className="schematic-line-h" />)}
+      </div>
+
+      {/* Subtle mouse follow glow */}
+      <motion.div
+        className="fixed top-0 left-0 pointer-events-none z-0 hidden md:block"
+        style={{
+          x: glowX,
+          y: glowY,
+          translateX: "-50%",
+          translateY: "-50%",
+          width: 500,
+          height: 500,
+          borderRadius: "50%",
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.025) 0%, transparent 70%)",
+          willChange: "transform",
+        }}
+      />
+
+      <div className="max-w-6xl w-full relative z-20">
         {/* Navigation / Header */}
         <div className="w-full flex items-center justify-between mb-24 relative z-20">
           <Link href="/" className="btn-ghost flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono tracking-widest uppercase" data-cursor-label="HOME">

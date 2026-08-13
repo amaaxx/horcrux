@@ -175,6 +175,46 @@ function TiltCard({ children, className = "", spotlightColor = "rgba(212, 199, 1
   );
 }
 
+// ── COMPONENT: MOBILE FLOATING HUD ──────────────────────────────────────────
+function MobileNav() {
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <header className="fixed top-3 left-3 right-3 z-50 md:hidden pointer-events-auto">
+      <div className="glass-surface rounded-full px-4 py-2.5 border border-white/12 flex items-center justify-between shadow-2xl bg-[#08080c]/85 backdrop-blur-md">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#81D1D0] animate-pulse" />
+          <span className="font-mono text-[10px] font-bold text-[#f0ede8] tracking-widest uppercase">
+            AMAAN<span className="text-[#CDAA4B]">.DEV</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => scrollTo("selected-works-vault")}
+            className="font-mono text-[9px] text-white/75 hover:text-white uppercase tracking-wider py-1 px-2.5 rounded-full bg-white/[0.04] active:scale-95 transition-all"
+          >
+            Works
+          </button>
+          <button
+            onClick={() => scrollTo("tech-arsenal-section")}
+            className="font-mono text-[9px] text-white/75 hover:text-white uppercase tracking-wider py-1 px-2.5 rounded-full bg-white/[0.04] active:scale-95 transition-all"
+          >
+            Arsenal
+          </button>
+          <Link
+            href="mailto:amaaxx1301@outlook.com"
+            className="font-mono text-[9px] text-[#0a0a0a] bg-[#D5B38E] font-bold uppercase tracking-wider py-1 px-3 rounded-full active:scale-95 transition-all shadow-sm"
+          >
+            Contact
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 // ── COMPONENT: MANIFESTO WORD ─────────────────────────────────────────────────
 function ManifestoWord({ word, index, total, progress }: {
   word: string; index: number; total: number; progress: MotionValue<number>;
@@ -187,12 +227,10 @@ function ManifestoWord({ word, index, total, progress }: {
     [start - 0.02, start + 0.01, end],
     ["#2a2a2a", "#ffffff", "#f0ede8"]
   );
-  const blur = useTransform(progress, [start, end], [4, 0]);
-  const y = useTransform(progress, [start, end], [8, 0]);
-  const blurFilter = useMotionTemplate`blur(${blur}px)`;
+  const y = useTransform(progress, [start, end], [6, 0]);
   return (
     <motion.span
-      style={{ opacity, color, filter: blurFilter, y, willChange: "opacity, color, transform, filter" }}
+      style={{ opacity, color, y, willChange: "opacity, color, transform" }}
       className="inline-block mr-[0.22em] font-sans font-semibold text-xl sm:text-3xl md:text-5xl lg:text-6xl tracking-tight"
     >
       {word}
@@ -409,19 +447,34 @@ const marqueeR: Variants = {
 
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────────
 export default function Home() {
+  const [isMobile, setIsMobile] = useState(true);
 
-
-  // Smooth scroll
   useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Smooth scroll (desktop only: preserve native 120Hz hardware momentum scroll on smartphones)
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window.innerWidth < 768 || window.matchMedia("(pointer: coarse)").matches)) {
+      return;
+    }
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       gestureOrientation: "vertical",
       smoothWheel: true,
+      syncTouch: false,
     });
-    const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
-    requestAnimationFrame(raf);
-    return () => lenis.destroy();
+    let rafId: number;
+    const raf = (t: number) => { lenis.raf(t); rafId = requestAnimationFrame(raf); };
+    rafId = requestAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
   }, []);
 
   const { x: mx, y: my } = useMousePosition();
@@ -457,14 +510,6 @@ export default function Home() {
 
   // Vault ref
   const vaultRef = useRef<HTMLElement>(null);
-
-  const [isMobile, setIsMobile] = useState(true);
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const worksSectionRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: worksScrollProgress } = useScroll({
@@ -521,20 +566,21 @@ export default function Home() {
     show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } }
   };
   const bentoCard: Variants = {
-    hidden: { opacity: 0, y: 48, scale: 0.93, rotateZ: -1.5, filter: "blur(6px)" },
+    hidden: { opacity: 0, y: 32, scale: 0.96, rotateZ: 0, filter: "none" },
     show: {
-      opacity: 1, y: 0, scale: 1, rotateZ: 0, filter: "blur(0px)",
+      opacity: 1, y: 0, scale: 1, rotateZ: 0, filter: "none",
       transition: { type: "spring", stiffness: 240, damping: 24 }
     }
   };
-
-
 
   return (
     <motion.main
       className="relative w-full min-h-dvh text-[#f0ede8] overflow-x-clip font-sans"
       suppressHydrationWarning
     >
+      {/* Mobile Floating HUD */}
+      <MobileNav />
+
       {/* Scroll progress bar */}
       <ScrollProgressBar />
 
@@ -542,7 +588,7 @@ export default function Home() {
       <SectionHud activeSection={activeSection} />
 
       {/* Parallax dot grid */}
-      <motion.div style={{ y: gridY }} className="parallax-grid-bg" />
+      <motion.div style={isMobile ? {} : { y: gridY }} className="parallax-grid-bg" />
 
       {/* Structural schematic lines */}
       <div className="schematic-grid hidden md:flex">
@@ -568,28 +614,28 @@ export default function Home() {
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
         ref={(el) => { heroRef.current = el!; sectionRefs.current[0] = el; }}
-        className="relative w-full min-h-dvh flex flex-col justify-center px-4 sm:px-8 md:px-16 lg:px-24 z-10 select-none overflow-hidden py-16 sm:py-20 md:py-0"
+        className="relative w-full min-h-dvh flex flex-col justify-center px-4 sm:px-8 md:px-16 lg:px-24 z-10 select-none overflow-hidden pt-20 pb-16 sm:py-20 md:py-0"
         suppressHydrationWarning
       >
         {/* Depth background layer — slowest parallax */}
         <motion.div
           className="hero-depth-bg"
-          style={{ y: heroBgY, willChange: "transform" }}
+          style={isMobile ? {} : { y: heroBgY, willChange: "transform" }}
         />
 
         {/* Vignette */}
         <div className="hero-vignette" />
 
-        {/* Main hero content — medium parallax */}
+        {/* Main hero content */}
         <motion.div
-          style={{
+          style={isMobile ? {} : {
             y: heroY,
             scale: heroScale,
             opacity: heroOpacity,
             filter: heroBlurFilter,
             willChange: "transform, opacity, filter"
           }}
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 18 }}
           className="max-w-6xl w-full flex flex-col gap-6 sm:gap-8 md:gap-12 relative z-10"
@@ -764,10 +810,11 @@ export default function Home() {
 
       {/* ── TECH ARSENAL ────────────────────────────────────────────────── */}
       <section
+        id="tech-arsenal-section"
         ref={(el) => { sectionRefs.current[2] = el; }}
         className="relative py-16 sm:py-20 px-4 sm:px-8 md:px-16 lg:px-24 z-10 max-w-6xl mx-auto flex flex-col gap-10 md:gap-16"
       >
-        <motion.div style={{ skewY: surfaceSkewY }}>
+        <motion.div style={{ skewY: isMobile ? 0 : surfaceSkewY }}>
           <ScrollRevealHeader subtitle="SYSTEM CORE COMPONENTS" title="The Tech Arsenal" />
         </motion.div>
 
@@ -776,8 +823,8 @@ export default function Home() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.08 }}
-          style={{ skewY: surfaceSkewY, transformStyle: "preserve-3d" }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4"
+          style={{ skewY: isMobile ? 0 : surfaceSkewY, transformStyle: isMobile ? "flat" : "preserve-3d" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-3.5 md:gap-4"
         >
           {/* CARD — Next.js (wide) */}
           <motion.div variants={bentoCard} className="md:col-span-2">

@@ -67,9 +67,15 @@ export default function Hero3DCanvas() {
     const camDist = 320;
     const pitch = 0.85; // Tilt down
     const yaw = -0.55;    // Tilt slightly side
+    let isIntersecting = true;
 
     // Main animation loop
     const animate = () => {
+      if (!isIntersecting) {
+        animationId = 0;
+        return;
+      }
+
       time += 0.015;
 
       // Smooth mouse interpolation
@@ -145,8 +151,8 @@ export default function Hero3DCanvas() {
         });
       }
 
-      // Draw Grid Lines with Heritage Palette interpolation (Peacock Teal <-> Sandstone Gold)
-      ctx.lineWidth = 1.0;
+      // Draw wireframe grid connections
+      ctx.lineWidth = 1;
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -196,7 +202,22 @@ export default function Hero3DCanvas() {
       animationId = requestAnimationFrame(animate);
     };
 
-    animate();
+    // IntersectionObserver to freeze canvas when off-screen
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry.isIntersecting;
+        if (isIntersecting && !animationId) {
+          animationId = requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.02 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    animationId = requestAnimationFrame(animate);
 
     // Mouse movement listener
     const handleMouseMove = (e: MouseEvent) => {
@@ -218,7 +239,8 @@ export default function Hero3DCanvas() {
     }
 
     return () => {
-      cancelAnimationFrame(animationId);
+      if (animationId) cancelAnimationFrame(animationId);
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
       if (container) {
         container.removeEventListener("mousemove", handleMouseMove);

@@ -163,6 +163,17 @@ html.lenis, html.lenis body { height: auto; }
   animation: aurora-breathe 36s infinite alternate-reverse ease-in-out;
 }
 
+@media (max-width: 767px) {
+  .aurora-1 {
+    filter: blur(45px);
+    animation: none;
+  }
+  .aurora-2 {
+    filter: blur(50px);
+    animation: none;
+  }
+}
+
 @keyframes aurora-breathe {
   0%   { transform: translate3d(0, 0, 0) scale(1); }
   50%  { transform: translate3d(3vw, 4vh, 0) scale(1.06); }

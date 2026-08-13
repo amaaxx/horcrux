@@ -1,6 +1,6 @@
-import CustomCursor from "@/components/CustomCursor";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import CustomCursor from "@/components/CustomCursor";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,6 +19,14 @@ const playfairDisplay = Playfair_Display({
   weight: ["400", "500", "700"],
   style: ["normal", "italic"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#05050A",
+};
 
 export const metadata: Metadata = {
   title: "Horcrux // Amaan",

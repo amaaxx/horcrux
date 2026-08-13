@@ -19,6 +19,26 @@ export default function Hero3DCanvas() {
     let animationId: number;
     let width = 0;
     let height = 0;
+    let cols = 28;
+    let rows = 28;
+    let points: { x: number; y: number; z: number }[] = [];
+
+    // Initialize responsive 3D plane
+    const initGrid = (isMobile: boolean) => {
+      cols = isMobile ? 16 : 28;
+      rows = isMobile ? 16 : 28;
+      points = [];
+      const spacingX = 220 / (cols - 1);
+      const spacingZ = 220 / (rows - 1);
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = -110 + c * spacingX;
+          const z = -110 + r * spacingZ;
+          points.push({ x, y: 0, z });
+        }
+      }
+    };
 
     // Resize handler
     const handleResize = () => {
@@ -26,9 +46,12 @@ export default function Hero3DCanvas() {
       const rect = containerRef.current.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
+      const isMobile = width < 768;
       
-      // Support high DPI screens
-      const dpr = window.devicePixelRatio || 1;
+      initGrid(isMobile);
+
+      // Support high DPI screens with capped DPR on mobile for smooth 60fps
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
@@ -38,23 +61,6 @@ export default function Hero3DCanvas() {
 
     handleResize();
     window.addEventListener("resize", handleResize);
-
-    // Grid details
-    const cols = 28;
-    const rows = 28;
-    const points: { x: number; y: number; z: number }[] = [];
-
-    // Initialize 3D plane
-    const spacingX = 220 / (cols - 1);
-    const spacingZ = 220 / (rows - 1);
-
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const x = -110 + c * spacingX;
-        const z = -110 + r * spacingZ;
-        points.push({ x, y: 0, z });
-      }
-    }
 
     // Interaction state variables
     let time = 0;

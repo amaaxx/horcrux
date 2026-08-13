@@ -5,15 +5,32 @@ import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motio
 
 export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(true);
   const [label, setLabel] = useState<string | null>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(-100);
+  const mouseY = useMotionValue(-100);
 
   // High-end spring physics for the trailing effect
   const springX = useSpring(mouseX, { stiffness: 450, damping: 28, mass: 0.5 });
   const springY = useSpring(mouseY, { stiffness: 450, damping: 28, mass: 0.5 });
 
   useEffect(() => {
+    // Detect touch / coarse pointer or mobile width
+    const checkTouch = () => {
+      const isTouch = 
+        window.matchMedia("(pointer: coarse)").matches || 
+        window.innerWidth < 768 ||
+        "ontouchstart" in window;
+      setIsTouchDevice(isTouch);
+      return isTouch;
+    };
+
+    if (checkTouch()) return;
+
+    const handleResize = () => {
+      checkTouch();
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!isVisible) setIsVisible(true);
       mouseX.set(e.clientX);
@@ -32,18 +49,20 @@ export default function CustomCursor() {
       }
     };
 
+    window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave, { passive: true });
     window.addEventListener("mouseover", handleMouseOver, { passive: true });
 
     return () => {
+      window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("mouseover", handleMouseOver);
     };
   }, [mouseX, mouseY, isVisible]);
 
-  if (!isVisible) return null;
+  if (isTouchDevice || !isVisible) return null;
 
   return (
     <>

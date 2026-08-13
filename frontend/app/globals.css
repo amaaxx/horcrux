@@ -26,7 +26,7 @@
 /* ── BASE ────────────────────────────────────────────────────────────────────── */
 html, body {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--bg);
   color: var(--text-primary);
   overflow-x: clip;
@@ -58,8 +58,8 @@ html.lenis, html.lenis body { height: auto; }
 .lenis-stopped { overflow: hidden; }
 .lenis-scrolling iframe { pointer-events: none; }
 
-/* ── HIDE DEFAULT CURSOR ─────────────────────────────────────────────────────── */
-@media (hover: hover) and (pointer: fine) {
+/* ── HIDE DEFAULT CURSOR (DESKTOP ONLY) ──────────────────────────────────────── */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
   body, a, button, [role="button"], select, textarea, [data-cursor="pointer"] {
     cursor: none !important;
   }
@@ -374,22 +374,22 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ── TYPOGRAPHY SCALE ────────────────────────────────────────────────────────── */
 .text-huge {
-  font-size: clamp(2.8rem, 7.5vw, 8.5rem);
-  line-height: 0.92;
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  line-height: 0.95;
   letter-spacing: -0.04em;
   font-weight: 900;
 }
 
 .text-section-title {
-  font-size: clamp(2.2rem, 5.5vw, 5.5rem);
-  line-height: 0.92;
+  font-size: clamp(1.8rem, 5.5vw, 4.5rem);
+  line-height: 0.95;
   letter-spacing: -0.03em;
   font-weight: 800;
 }
 
 .text-marquee {
-  font-size: clamp(5rem, 14vw, 15rem);
-  line-height: 0.83;
+  font-size: clamp(3rem, 12vw, 10rem);
+  line-height: 0.85;
   letter-spacing: -0.055em;
   font-weight: 950;
 }
@@ -819,7 +819,7 @@ html.lenis, html.lenis body { height: auto; }
 .horizontal-scroll-sticky {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -836,7 +836,7 @@ html.lenis, html.lenis body { height: auto; }
 
 .horizontal-scroll-card {
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -845,7 +845,7 @@ html.lenis, html.lenis body { height: auto; }
   padding: 2rem 4rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .horizontal-scroll-container {
     height: auto;
   }
@@ -862,6 +862,6 @@ html.lenis, html.lenis body { height: auto; }
   .horizontal-scroll-card {
     width: 100%;
     height: auto;
-    padding: 4rem 1.5rem;
+    padding: 3rem 1rem;
   }
 }

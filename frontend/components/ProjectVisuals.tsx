@@ -66,7 +66,7 @@ export function GroundTruthVisual() {
       
       {/* High-Fidelity Network Graph SVG */}
       <svg 
-        className="w-[90%] h-[90%] max-w-[420px] max-h-[300px] z-10 pointer-events-auto mb-10" 
+        className="w-[95%] sm:w-[90%] h-[90%] max-w-[320px] sm:max-w-[420px] max-h-[260px] sm:max-h-[300px] z-10 pointer-events-auto mb-8 sm:mb-10" 
         viewBox="0 0 400 240" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
@@ -348,7 +348,7 @@ export function WorkspaceVisual() {
           transformStyle: "preserve-3d",
           transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)"
         }}
-        className="relative w-[300px] h-[300px] md:w-[340px] md:h-[340px] flex items-center justify-center z-10 mb-8"
+        className="relative w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] md:w-[340px] md:h-[340px] flex items-center justify-center z-10 mb-6 sm:mb-8"
       >
         {/* Layer 1: System Base Grid (Deepest) */}
         <motion.div 
@@ -580,7 +580,7 @@ export function BroccoliVisual() {
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="relative w-[85%] h-[80%] max-w-[340px] max-h-[220px] rounded-2xl border border-[#88393C]/30 bg-[#0c0608]/90 backdrop-blur-md shadow-2xl p-4 flex flex-col justify-between z-10 mb-8"
+        className="relative w-[92%] sm:w-[85%] h-[85%] sm:h-[80%] max-w-[340px] max-h-[220px] rounded-2xl border border-[#88393C]/30 bg-[#0c0608]/90 backdrop-blur-md shadow-2xl p-3.5 sm:p-4 flex flex-col justify-between z-10 mb-6 sm:mb-8"
       >
         <div className="flex items-center justify-between border-b border-[#88393C]/20 pb-2.5">
           <div className="flex gap-1.5">

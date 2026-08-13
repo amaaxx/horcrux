@@ -33,7 +33,7 @@ const vesselData: Record<string, VesselProject> = {
     title: "Ground Truth Engine",
     subtitle: "Deterministic RAG Architecture",
     problem: "AI hallucination is a critical failure point in enterprise deployments. Standard LLMs generate confident but factually incorrect responses, making them unsuitable for rigid, data-sensitive environments.",
-    solution: "By implementing a strict Retrieval-Augmented Generation (RAG) pipeline, we anchor the LLM's generative capabilities to a deterministic vector database, ensuring zero-hallucination outputs based solely on verified internal documents.",
+    solution: "By implementing a strict Retrieval-Augmented Generation (RAG) pipeline, I anchor the LLM's generative capabilities to a deterministic vector database, ensuring zero-hallucination outputs based solely on verified internal documents.",
     stack: ["Python", "Vector DB", "FastAPI", "Next.js"],
     links: {
       live: "https://halkill.vercel.app",

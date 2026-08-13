@@ -495,7 +495,7 @@ export default function Home() {
     document.getElementById("selected-works-vault")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const manifestoText = "We engineer systems that endure. Coding is more than writing logic—it is about sculpting digital architecture that flows with absolute speed and physical precision. Every frame matters. Every compile counts. We build with hardware-accelerated layouts, tactile responsive animations, and cinematic aesthetics to deliver an experience that feels alive.";
+  const manifestoText = "I engineer systems that endure. Architecture is more than writing syntax—it is about sculpting resilient digital foundations that operate with uncompromising speed and physical precision. Every frame matters. Every compile counts. I build deterministic backends, low-latency pipelines, and hardware-accelerated interfaces designed to scale effortlessly and feel genuinely alive.";
   const manifestoWords = manifestoText.split(" ");
 
   // Bento variants — upgraded with rotateZ micro-tilt and blur
@@ -577,20 +577,16 @@ export default function Home() {
           transition={{ type: "spring", stiffness: 100, damping: 18 }}
           className="max-w-6xl w-full flex flex-col gap-8 md:gap-12 relative z-10"
         >
-          {/* Status */}
+          {/* Identifier Tag */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="flex items-center gap-4"
+            className="flex items-center gap-3"
           >
-            <div className="status-badge">
-              <span className="status-dot" />
-              Available for Work
-            </div>
-            <span className="h-[1px] w-8 bg-white/10" />
-            <span className="font-mono text-[10px] text-[#3a3a3a] tracking-[0.25em] uppercase">
-              AMAAN // PLATFORM ENGINE
+            <span className="h-[1px] w-6 bg-white/20" />
+            <span className="font-mono text-[10px] text-white/50 tracking-[0.25em] uppercase">
+              AMAAN // SOFTWARE & SYSTEMS ARCHITECTURE
             </span>
           </motion.div>
 
@@ -681,7 +677,7 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        {/* Foreground layer — fastest parallax (creates depth illusion) */}
+        {/* Bottom discipline indicator */}
         <motion.div
           className="absolute bottom-12 right-8 md:right-16 pointer-events-none hidden md:block"
           style={{ y: heroFgY, opacity: heroOpacity, willChange: "transform, opacity" }}
@@ -689,16 +685,9 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
         >
-          <div className="font-mono text-[8px] text-[#1e1e1e] tracking-[0.3em] uppercase flex flex-col gap-1 text-right">
-            <span>HORCRUX // ENGINE</span>
-            <span>v2.0.1 // STABLE</span>
-            <motion.span
-              className="text-[#2e2e2e]"
-              animate={{ opacity: [0.3, 0.8, 0.3] }}
-              transition={{ duration: 2.5, repeat: Infinity }}
-            >
-              ● SYSTEM NOMINAL
-            </motion.span>
+          <div className="font-mono text-[8px] text-[#3a3a3a] tracking-[0.25em] uppercase flex flex-col gap-1 text-right">
+            <span>FULL-STACK // DISTRIBUTED SYSTEMS</span>
+            <span>2026 REPOSITORY</span>
           </div>
         </motion.div>
 
@@ -1008,11 +997,20 @@ export default function Home() {
                         </div>
                       </div>
                     </SplitEntry>
-                    <Magnetic>
-                      <Link href="/vessel/ground-truth-engine" data-cursor-label="GTE" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
-                        Inspect Repository Architecture <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </Magnetic>
+                    <div className="pt-2">
+                      <Magnetic range={45}>
+                        <Link
+                          href="/vessel/ground-truth-engine"
+                          data-cursor-label="EXPLORE"
+                          className="btn-project-cta group cursor-none"
+                        >
+                          <span>Explore Architecture Dossier</span>
+                          <div className="cta-icon-badge">
+                            <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
+                          </div>
+                        </Link>
+                      </Magnetic>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1079,11 +1077,20 @@ export default function Home() {
                         </div>
                       </div>
                     </SplitEntry>
-                    <Magnetic>
-                      <Link href="/vessel/blw-portal" data-cursor-label="BLW" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
-                        Read Enterprise Case Study <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </Magnetic>
+                    <div className="pt-2">
+                      <Magnetic range={45}>
+                        <Link
+                          href="/vessel/blw-portal"
+                          data-cursor-label="CASE STUDY"
+                          className="btn-project-cta group cursor-none"
+                        >
+                          <span>Read Enterprise Case Study</span>
+                          <div className="cta-icon-badge">
+                            <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
+                          </div>
+                        </Link>
+                      </Magnetic>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1146,15 +1153,24 @@ export default function Home() {
                         </div>
                         <div>
                           <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Gzipped Bundle</span>
-                          <span className="text-lg font-bold font-mono text-[#f0ede8]">0.52 Seconds</span>
+                          <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 42 KB</span>
                         </div>
                       </div>
                     </SplitEntry>
-                    <Magnetic>
-                      <Link href="/vessel/Laminar" data-cursor-label="BROCCOLI" className="inline-flex items-center gap-2 font-mono text-xs text-[#5a5a5a] hover:text-[#f0ede8] transition-colors cursor-none animated-underline">
-                        View Interactive UI Build <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </Magnetic>
+                    <div className="pt-2">
+                      <Magnetic range={45}>
+                        <Link
+                          href="/vessel/Laminar"
+                          data-cursor-label="LIVE DEMO"
+                          className="btn-project-cta group cursor-none"
+                        >
+                          <span>Launch Interactive UI Build</span>
+                          <div className="cta-icon-badge">
+                            <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
+                          </div>
+                        </Link>
+                      </Magnetic>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1303,7 +1319,7 @@ function FooterSection({
         >
           <div className="font-mono text-[9px] text-[#2e2e2e] text-center md:text-left leading-relaxed">
             <div>DESIGNED & ENGINEERED BY AMAAN</div>
-            <div>© 2026 HORCRUX ENGINE • ALL RIGHTS RESERVED</div>
+            <div>© 2026 AMAAN • ALL RIGHTS RESERVED</div>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-[8px] text-[#2e2e2e]">BUILT WITH</span>

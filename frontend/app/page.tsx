@@ -106,9 +106,10 @@ function SectionHud({ activeSection }: { activeSection: number }) {
 interface TiltCardProps {
   children: React.ReactNode;
   className?: string;
+  spotlightColor?: string;
 }
 
-function TiltCard({ children, className = "" }: TiltCardProps) {
+function TiltCard({ children, className = "", spotlightColor = "rgba(212, 199, 146, 0.08)" }: TiltCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(true);
   const x = useMotionValue(0);
@@ -143,7 +144,7 @@ function TiltCard({ children, className = "" }: TiltCardProps) {
   };
   const onLeave = () => { x.set(0); y.set(0); spotOpacity.set(0); cachedRect.current = null; };
 
-  const spotlight = useMotionTemplate`radial-gradient(280px circle at ${spotX}px ${spotY}px, rgba(255,255,255,0.04), rgba(255,255,255,0.005) 60%, transparent 100%)`;
+  const spotlight = useMotionTemplate`radial-gradient(320px circle at ${spotX}px ${spotY}px, ${spotlightColor}, transparent 75%)`;
 
   return (
     <motion.div
@@ -176,8 +177,12 @@ function ManifestoWord({ word, index, total, progress }: {
 }) {
   const start = 0.15 + (index / total) * 0.55;
   const end = start + 0.04;
-  const opacity = useTransform(progress, [start, end], [0.1, 1]);
-  const color = useTransform(progress, [start, end], ["#2e2e2e", "#f0ede8"]);
+  const opacity = useTransform(progress, [start - 0.02, start + 0.01], [0.15, 1]);
+  const color = useTransform(
+    progress,
+    [start - 0.02, start, start + 0.02, end + 0.02],
+    ["#2e2e2e", "#CDAA4B", "#CDAA4B", "#f0ede8"]
+  );
   const blur = useTransform(progress, [start, end], [4, 0]);
   const y = useTransform(progress, [start, end], [8, 0]);
   const blurFilter = useMotionTemplate`blur(${blur}px)`;
@@ -584,8 +589,8 @@ export default function Home() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="flex items-center gap-3"
           >
-            <span className="h-[1px] w-6 bg-white/20" />
-            <span className="font-mono text-[10px] text-white/50 tracking-[0.25em] uppercase">
+            <span className="h-[1px] w-6 bg-[#D5B38E]/50" />
+            <span className="font-mono text-[10px] text-[#D5B38E] tracking-[0.25em] uppercase font-medium">
               AMAAN // SOFTWARE & SYSTEMS ARCHITECTURE
             </span>
           </motion.div>
@@ -764,35 +769,35 @@ export default function Home() {
         >
           {/* CARD — Next.js (wide) */}
           <motion.div variants={bentoCard} className="md:col-span-2">
-            <TiltCard className="min-h-[240px]">
+            <TiltCard className="min-h-[240px]" spotlightColor="rgba(19, 115, 122, 0.18)">
               <div className="flex justify-between items-start w-full">
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">CORE_FRAMEWORK // 01</span>
-                <Cpu className="w-4 h-4 text-[#3a3a3a]" />
+                <span className="font-mono text-[9px] text-[#81D1D0]/80 tracking-wider uppercase">CORE_FRAMEWORK // 01</span>
+                <Cpu className="w-4 h-4 text-[#81D1D0]/70" />
               </div>
               <div className="mt-8 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
                 <div className="flex-1">
                   <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-[#f0ede8] mb-2">Next.js 15</h3>
-                  <p className="text-[#5a5a5a] text-xs md:text-sm max-w-md leading-relaxed mb-4">
+                  <p className="text-[#8a8a8a] text-xs md:text-sm max-w-md leading-relaxed mb-4">
                     Leveraging Next.js 15 with React 19 concurrent features. Architecting production systems utilizing advanced Server Actions, edge routing, and zero-bundle server components.
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {["React 19", "Server Components", "Edge Handlers", "Hydration Optimizations"].map(t => (
-                      <span key={t} className="tag">{t}</span>
+                      <span key={t} className="tag border-[#13737A]/30 text-[#81D1D0]/70">{t}</span>
                     ))}
                   </div>
                 </div>
-                <div className="w-full md:w-32 h-24 shrink-0 rounded-xl border border-white/[0.05] bg-black/40 flex items-center justify-center">
+                <div className="w-full md:w-32 h-24 shrink-0 rounded-xl border border-[#13737A]/20 bg-black/40 flex items-center justify-center">
                   <svg className="w-20 h-16" viewBox="0 0 100 80" fill="none">
-                    <circle cx="50" cy="40" r="10" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-                    <circle cx="50" cy="40" r="4" fill="rgba(255,255,255,0.35)" />
-                    <path d="M50 30 L50 12" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
-                    <path d="M40 40 L15 40" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
-                    <path d="M60 40 L85 40" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
-                    <path d="M50 50 L50 68" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
-                    <circle r="2" fill="rgba(255,255,255,0.6)"><animateMotion path="M 50 30 L 50 12" dur="1s" repeatCount="indefinite" /></circle>
-                    <circle r="2" fill="rgba(255,255,255,0.6)"><animateMotion path="M 50 50 L 50 68" dur="1.3s" repeatCount="indefinite" /></circle>
-                    <circle r="2" fill="rgba(255,255,255,0.4)"><animateMotion path="M 40 40 L 15 40" dur="0.9s" repeatCount="indefinite" /></circle>
-                    <circle r="2" fill="rgba(255,255,255,0.4)"><animateMotion path="M 60 40 L 85 40" dur="1.1s" repeatCount="indefinite" /></circle>
+                    <circle cx="50" cy="40" r="10" stroke="rgba(129, 209, 208, 0.3)" strokeWidth="1.5" />
+                    <circle cx="50" cy="40" r="4" fill="rgba(19, 115, 122, 0.6)" />
+                    <path d="M50 30 L50 12" stroke="rgba(129, 209, 208, 0.2)" strokeWidth="1.5" />
+                    <path d="M40 40 L15 40" stroke="rgba(129, 209, 208, 0.2)" strokeWidth="1.5" />
+                    <path d="M60 40 L85 40" stroke="rgba(129, 209, 208, 0.2)" strokeWidth="1.5" />
+                    <path d="M50 50 L50 68" stroke="rgba(129, 209, 208, 0.2)" strokeWidth="1.5" />
+                    <circle r="2" fill="#81D1D0"><animateMotion path="M 50 30 L 50 12" dur="1s" repeatCount="indefinite" /></circle>
+                    <circle r="2" fill="#81D1D0"><animateMotion path="M 50 50 L 50 68" dur="1.3s" repeatCount="indefinite" /></circle>
+                    <circle r="2" fill="#13737A"><animateMotion path="M 40 40 L 15 40" dur="0.9s" repeatCount="indefinite" /></circle>
+                    <circle r="2" fill="#13737A"><animateMotion path="M 60 40 L 85 40" dur="1.1s" repeatCount="indefinite" /></circle>
                   </svg>
                 </div>
               </div>
@@ -801,19 +806,19 @@ export default function Home() {
 
           {/* CARD — FastAPI */}
           <motion.div variants={bentoCard}>
-            <TiltCard className="min-h-[240px]">
+            <TiltCard className="min-h-[240px]" spotlightColor="rgba(246, 163, 51, 0.18)">
               <div className="flex justify-between items-start w-full">
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">BACKEND // 02</span>
-                <Server className="w-4 h-4 text-[#3a3a3a]" />
+                <span className="font-mono text-[9px] text-[#F6A333]/80 tracking-wider uppercase">BACKEND // 02</span>
+                <Server className="w-4 h-4 text-[#F6A333]/70" />
               </div>
               <div className="mt-8">
                 <h3 className="text-2xl font-bold tracking-tight text-[#f0ede8] mb-2">Python & FastAPI</h3>
-                <p className="text-[#5a5a5a] text-xs leading-relaxed mb-4">
+                <p className="text-[#8a8a8a] text-xs leading-relaxed mb-4">
                   High-performance async API endpoints. Strict type validation with Pydantic and async-native database drivers.
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {["AsyncIO", "Pydantic v2", "FastAPI", "Uvicorn"].map(t => (
-                    <span key={t} className="tag">{t}</span>
+                    <span key={t} className="tag border-[#F6A333]/30 text-[#F6A333]/70">{t}</span>
                   ))}
                 </div>
               </div>
@@ -822,19 +827,19 @@ export default function Home() {
 
           {/* CARD — React */}
           <motion.div variants={bentoCard}>
-            <TiltCard className="min-h-[220px]">
+            <TiltCard className="min-h-[220px]" spotlightColor="rgba(129, 209, 208, 0.18)">
               <div className="flex justify-between items-start w-full">
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">UI_LAYER // 03</span>
-                <Activity className="w-4 h-4 text-[#3a3a3a]" />
+                <span className="font-mono text-[9px] text-[#81D1D0]/80 tracking-wider uppercase">UI_LAYER // 03</span>
+                <Activity className="w-4 h-4 text-[#81D1D0]/70" />
               </div>
               <div className="mt-8">
                 <h3 className="text-2xl font-bold tracking-tight text-[#f0ede8] mb-2">React</h3>
-                <p className="text-[#5a5a5a] text-xs leading-relaxed mb-4">
+                <p className="text-[#8a8a8a] text-xs leading-relaxed mb-4">
                   State machines, list virtualization, and custom hook bindings tailored for smooth rendering and high visual velocity.
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {["Fiber", "Concurrent UI", "Hooks Engine"].map(t => (
-                    <span key={t} className="tag">{t}</span>
+                    <span key={t} className="tag border-[#81D1D0]/30 text-[#81D1D0]/70">{t}</span>
                   ))}
                 </div>
               </div>
@@ -843,19 +848,19 @@ export default function Home() {
 
           {/* CARD — LangChain */}
           <motion.div variants={bentoCard}>
-            <TiltCard className="min-h-[220px]">
+            <TiltCard className="min-h-[220px]" spotlightColor="rgba(0, 68, 55, 0.22)">
               <div className="flex justify-between items-start w-full">
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">AI // 04</span>
-                <BrainCircuit className="w-4 h-4 text-[#3a3a3a]" />
+                <span className="font-mono text-[9px] text-[#D4C792]/80 tracking-wider uppercase">AI // 04</span>
+                <BrainCircuit className="w-4 h-4 text-[#D4C792]/70" />
               </div>
               <div className="mt-8">
                 <h3 className="text-2xl font-bold tracking-tight text-[#f0ede8] mb-2">LangChain</h3>
-                <p className="text-[#5a5a5a] text-xs leading-relaxed mb-4">
+                <p className="text-[#8a8a8a] text-xs leading-relaxed mb-4">
                   Multi-agent reasoning graphs, vector space routing algorithms, and hybrid RAG data pipelines for LLM integration.
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {["Agentic Graphs", "Vector Embeddings", "RAG Pipelines"].map(t => (
-                    <span key={t} className="tag">{t}</span>
+                    <span key={t} className="tag border-[#D4C792]/30 text-[#D4C792]/70">{t}</span>
                   ))}
                 </div>
               </div>
@@ -864,19 +869,19 @@ export default function Home() {
 
           {/* CARD — C++ */}
           <motion.div variants={bentoCard}>
-            <TiltCard className="min-h-[220px]">
+            <TiltCard className="min-h-[220px]" spotlightColor="rgba(136, 57, 60, 0.22)">
               <div className="flex justify-between items-start w-full">
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">SYSTEMS // 05</span>
-                <Zap className="w-4 h-4 text-[#3a3a3a]" />
+                <span className="font-mono text-[9px] text-[#88393C]/80 tracking-wider uppercase">SYSTEMS // 05</span>
+                <Zap className="w-4 h-4 text-[#88393C]/70" />
               </div>
               <div className="mt-8">
                 <h3 className="text-2xl font-bold tracking-tight text-[#f0ede8] mb-2">C++ & DSA</h3>
-                <p className="text-[#5a5a5a] text-xs leading-relaxed mb-4">
+                <p className="text-[#8a8a8a] text-xs leading-relaxed mb-4">
                   Deterministic memory-efficient routines, low-latency algorithms, and high-performance compute bottlenecks.
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {["STL Algorithms", "Memory Control", "Thread Pools"].map(t => (
-                    <span key={t} className="tag">{t}</span>
+                    <span key={t} className="tag border-[#88393C]/30 text-[#88393C]/70">{t}</span>
                   ))}
                 </div>
               </div>
@@ -885,20 +890,20 @@ export default function Home() {
 
           {/* CARD — PostgreSQL (full width) */}
           <motion.div variants={bentoCard} className="md:col-span-3">
-            <TiltCard className="min-h-[180px]">
+            <TiltCard className="min-h-[180px]" spotlightColor="rgba(205, 170, 75, 0.18)">
               <div className="flex justify-between items-start w-full">
-                <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">DATASTORAGE // 06</span>
-                <Database className="w-4 h-4 text-[#3a3a3a]" />
+                <span className="font-mono text-[9px] text-[#CDAA4B]/80 tracking-wider uppercase">DATASTORAGE // 06</span>
+                <Database className="w-4 h-4 text-[#CDAA4B]/70" />
               </div>
               <div className="mt-8 flex flex-col md:flex-row justify-between md:items-end gap-6">
                 <div className="flex-1">
                   <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-[#f0ede8] mb-2">PostgreSQL</h3>
-                  <p className="text-[#5a5a5a] text-xs md:text-sm max-w-xl leading-relaxed mb-4">
+                  <p className="text-[#8a8a8a] text-xs md:text-sm max-w-xl leading-relaxed mb-4">
                     Managing transactional integrity and complex vector querying. Optimizing relational query execution plans, indexing schemas (GIN/GiST), and dedicated pgvector storage.
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {["ACID Transactions", "pgvector Indexing", "Query Optimization", "CDC Pipeline"].map(t => (
-                      <span key={t} className="tag">{t}</span>
+                      <span key={t} className="tag border-[#CDAA4B]/30 text-[#CDAA4B]/70">{t}</span>
                     ))}
                   </div>
                 </div>
@@ -1270,12 +1275,19 @@ function FooterSection({
           data-cursor-label="TALK"
           className="w-full overflow-hidden flex flex-col gap-2 border-t border-b border-white/[0.1] py-8 md:py-10 cursor-none"
         >
-          <motion.div variants={marqueeL as Variants} animate="animate" className="flex text-marquee leading-none uppercase font-black tracking-tighter w-[200%] gap-12 select-none text-[#f0ede8]">
+          <motion.div 
+            variants={marqueeL as Variants} 
+            animate="animate" 
+            className="flex text-marquee leading-none uppercase font-black tracking-tighter w-[200%] gap-12 select-none text-[#f0ede8]"
+            style={{
+              textShadow: "0 0 35px rgba(246, 163, 51, 0.2), 0 0 70px rgba(19, 115, 122, 0.16)"
+            }}
+          >
             {[0, 1].map(i => (
               <div key={i} className="flex justify-around min-w-full shrink-0 gap-12">
-                <span>LET&apos;S TALK</span><span className="text-white/30">•</span>
-                <span>LET&apos;S TALK</span><span className="text-white/30">•</span>
-                <span>LET&apos;S TALK</span><span className="text-white/30">•</span>
+                <span>LET&apos;S TALK</span><span className="text-[#F6A333]/50">•</span>
+                <span>LET&apos;S TALK</span><span className="text-[#13737A]/50">•</span>
+                <span>LET&apos;S TALK</span><span className="text-[#D4C792]/50">•</span>
               </div>
             ))}
           </motion.div>

@@ -139,19 +139,24 @@ export default function Hero3DCanvas() {
         });
       }
 
-      // Draw Grid Lines
+      // Draw Grid Lines with Heritage Palette interpolation (Peacock Teal <-> Sandstone Gold)
       ctx.lineWidth = 1.0;
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const i = r * cols + c;
           const p1 = projected[i];
+          const colorRatio = (c / cols + r / rows) / 2; // Diagonal color gradient
+          // Lerp between Peacock Teal rgb(19, 115, 122) and Sandstone Gold rgb(212, 199, 146)
+          const red = Math.round(19 + (212 - 19) * colorRatio);
+          const green = Math.round(115 + (199 - 115) * colorRatio);
+          const blue = Math.round(122 + (146 - 122) * colorRatio);
 
           // Right link
           if (c < cols - 1) {
             const p2 = projected[i + 1];
             const avgOpacity = (p1.opacity + p2.opacity) / 2;
-            ctx.strokeStyle = `rgba(240, 237, 232, ${avgOpacity * 0.12})`;
+            ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${avgOpacity * 0.18})`;
             ctx.beginPath();
             ctx.moveTo(p1.px, p1.py);
             ctx.lineTo(p2.px, p2.py);
@@ -162,7 +167,7 @@ export default function Hero3DCanvas() {
           if (r < rows - 1) {
             const p2 = projected[i + cols];
             const avgOpacity = (p1.opacity + p2.opacity) / 2;
-            ctx.strokeStyle = `rgba(240, 237, 232, ${avgOpacity * 0.12})`;
+            ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${avgOpacity * 0.18})`;
             ctx.beginPath();
             ctx.moveTo(p1.px, p1.py);
             ctx.lineTo(p2.px, p2.py);
@@ -170,10 +175,13 @@ export default function Hero3DCanvas() {
           }
 
           // Subtle nodes / dots at random crossings to add visual richness
-          if (i % 73 === 0) {
-            ctx.fillStyle = `rgba(240, 237, 232, ${p1.opacity * 0.45})`;
+          if (i % 59 === 0 || i % 73 === 0) {
+            const isGoldNode = i % 2 === 0;
+            ctx.fillStyle = isGoldNode 
+              ? `rgba(212, 199, 146, ${p1.opacity * 0.65})` 
+              : `rgba(19, 115, 122, ${p1.opacity * 0.75})`;
             ctx.beginPath();
-            ctx.arc(p1.px, p1.py, 1.5, 0, Math.PI * 2);
+            ctx.arc(p1.px, p1.py, 1.8, 0, Math.PI * 2);
             ctx.fill();
           }
         }

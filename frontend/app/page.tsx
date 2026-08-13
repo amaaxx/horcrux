@@ -203,12 +203,12 @@ function MobileNav() {
           >
             Arsenal
           </button>
-          <Link
+          <a
             href="mailto:amaaxx1301@outlook.com"
             className="font-mono text-[9px] text-[#0a0a0a] bg-[#D5B38E] font-bold uppercase tracking-wider py-1 px-3 rounded-full active:scale-95 transition-all shadow-sm"
           >
             Contact
-          </Link>
+          </a>
         </div>
       </div>
     </header>
@@ -993,214 +993,213 @@ export default function Home() {
           <span className="font-mono text-[9px] text-[#8a8a8a] tracking-[0.25em] uppercase">SELECTED_WORKS</span>
         </motion.div>
 
-        {isMobile ? (
-          /* Mobile Stacked Project Feed — Zero Scroll Trapping */
-          <div className="w-full flex flex-col gap-12 sm:gap-16 py-16 sm:py-20 px-4 sm:px-8">
-            {/* PROJECT 01 (Mobile) */}
-            <div className="w-full flex flex-col gap-6 pb-12 border-b border-white/[0.08]">
-              <div className="w-full max-w-lg mx-auto">
-                <VaultVisualContainer>
-                  <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
-                    PROJECT // 01
-                  </div>
-                  <GroundTruthVisual />
-                </VaultVisualContainer>
-              </div>
-              <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
-                <div className="section-marker">
-                  <span className="section-marker-line" />
-                  <span className="font-mono text-[10px] text-[#D5B38E] tracking-[0.25em] font-semibold uppercase">PROJECT_01 // DETERMINISTIC_RAG</span>
+        {/* Mobile Stacked Project Feed — Zero Scroll Trapping */}
+        <div className="block md:hidden w-full flex flex-col gap-12 sm:gap-16 py-16 sm:py-20 px-4 sm:px-8">
+          {/* PROJECT 01 (Mobile) */}
+          <div className="w-full flex flex-col gap-6 pb-12 border-b border-white/[0.08]">
+            <div className="w-full max-w-lg mx-auto">
+              <VaultVisualContainer>
+                <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
+                  PROJECT // 01
                 </div>
-                <h3 className="tracking-tight leading-tight text-3xl font-extrabold text-[#f0ede8]">
-                  Ground Truth <span className="serif-display text-[#f0ede8]/70 italic font-normal block text-2xl">Engine</span>
-                </h3>
-                <div className="p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
-                    <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Architecture Brief</span>
-                  </div>
-                  <p className="text-[#d8d5d0] text-xs sm:text-sm leading-relaxed font-normal antialiased">
-                    An advanced Retrieval-Augmented Generation platform engineered to eliminate hallucination risks. Employs a deterministic 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.
-                  </p>
-                </div>
-                <ul className="space-y-2">
-                  {[
-                    "5-layer deterministic ingestion, intent parsing, and semantic routing pipeline.",
-                    "Strict cosine-similarity vector thresholds preventing hallucination leaks.",
-                    "pgvector storage engine achieving sub-180ms document indexation and retrieval."
-                  ].map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 text-xs text-[#b8b5b0] leading-relaxed">
-                      <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
-                        //
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="grid grid-cols-2 gap-4 border-y border-white/[0.08] py-3.5 bg-white/[0.01]">
-                  <div className="border-r border-white/[0.06] pr-3">
-                    <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Latency Response</span>
-                    <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">&lt; 180ms</span>
-                  </div>
-                  <div className="pl-2">
-                    <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Accuracy Target</span>
-                    <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">99.8% Precision</span>
-                  </div>
-                </div>
-                <div className="pt-1">
-                  <Link
-                    href="/vessel/ground-truth-engine"
-                    className="btn-project-cta group w-full justify-between"
-                  >
-                    <span>Explore Architecture Dossier</span>
-                    <div className="cta-icon-badge">
-                      <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
-                    </div>
-                  </Link>
-                </div>
-              </div>
+                <GroundTruthVisual />
+              </VaultVisualContainer>
             </div>
-
-            {/* PROJECT 02 (Mobile) */}
-            <div className="w-full flex flex-col gap-6 pb-12 border-b border-white/[0.08]">
-              <div className="w-full max-w-lg mx-auto">
-                <VaultVisualContainer>
-                  <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
-                    PROJECT // 02
-                  </div>
-                  <WorkspaceVisual />
-                </VaultVisualContainer>
+            <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
+              <div className="section-marker">
+                <span className="section-marker-line" />
+                <span className="font-mono text-[10px] text-[#D5B38E] tracking-[0.25em] font-semibold uppercase">PROJECT_01 // DETERMINISTIC_RAG</span>
               </div>
-              <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
-                <div className="section-marker">
-                  <span className="section-marker-line" />
-                  <span className="font-mono text-[10px] text-[#D5B38E] tracking-[0.25em] font-semibold uppercase">PROJECT_02 // ENTERPRISE_PORTAL</span>
+              <h3 className="tracking-tight leading-tight text-3xl font-extrabold text-[#f0ede8]">
+                Ground Truth <span className="serif-display text-[#f0ede8]/70 italic font-normal block text-2xl">Engine</span>
+              </h3>
+              <div className="p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
+                  <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Architecture Brief</span>
                 </div>
-                <h3 className="tracking-tight leading-tight text-3xl font-extrabold text-[#f0ede8]">
-                  Centralized <span className="serif-display text-[#f0ede8]/70 italic font-normal block text-2xl">Workspace</span>
-                </h3>
-                <div className="p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
-                    <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Enterprise Brief</span>
-                  </div>
-                  <p className="text-[#d8d5d0] text-xs sm:text-sm leading-relaxed font-normal antialiased">
-                    A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Consolidates databases, proxies legacy Oracle systems, and manages staff operations.
-                  </p>
+                <p className="text-[#d8d5d0] text-xs sm:text-sm leading-relaxed font-normal antialiased">
+                  An advanced Retrieval-Augmented Generation platform engineered to eliminate hallucination risks. Employs a deterministic 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.
+                </p>
+              </div>
+              <ul className="space-y-2">
+                {[
+                  "5-layer deterministic ingestion, intent parsing, and semantic routing pipeline.",
+                  "Strict cosine-similarity vector thresholds preventing hallucination leaks.",
+                  "pgvector storage engine achieving sub-180ms document indexation and retrieval."
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5 text-xs text-[#b8b5b0] leading-relaxed">
+                    <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
+                      //
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="grid grid-cols-2 gap-4 border-y border-white/[0.08] py-3.5 bg-white/[0.01]">
+                <div className="border-r border-white/[0.06] pr-3">
+                  <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Latency Response</span>
+                  <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">&lt; 180ms</span>
                 </div>
-                <ul className="space-y-2">
-                  {[
-                    "Servicing 15,000+ active enterprise directory profiles with RBAC security.",
-                    "Real-time legacy sync middleware proxying Oracle tables securely.",
-                    "Edge-cached API endpoints reducing database query latency to 45ms."
-                  ].map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 text-xs text-[#b8b5b0] leading-relaxed">
-                      <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
-                        //
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="grid grid-cols-2 gap-4 border-y border-white/[0.08] py-3.5 bg-white/[0.01]">
-                  <div className="border-r border-white/[0.06] pr-3">
-                    <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Deployed Footprint</span>
-                    <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">15K+ Active Users</span>
-                  </div>
-                  <div className="pl-2">
-                    <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Proxy Speed</span>
-                    <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">45ms Avg Latency</span>
-                  </div>
-                </div>
-                <div className="pt-1">
-                  <Link
-                    href="/vessel/blw-portal"
-                    className="btn-project-cta group w-full justify-between"
-                  >
-                    <span>Read Enterprise Case Study</span>
-                    <div className="cta-icon-badge">
-                      <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
-                    </div>
-                  </Link>
+                <div className="pl-2">
+                  <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Accuracy Target</span>
+                  <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">99.8% Precision</span>
                 </div>
               </div>
-            </div>
-
-            {/* PROJECT 03 (Mobile) */}
-            <div className="w-full flex flex-col gap-6">
-              <div className="w-full max-w-lg mx-auto">
-                <VaultVisualContainer>
-                  <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
-                    PROJECT // 03
+              <div className="pt-1">
+                <Link
+                  href="/vessel/ground-truth-engine"
+                  className="btn-project-cta group w-full justify-between"
+                >
+                  <span>Explore Architecture Dossier</span>
+                  <div className="cta-icon-badge">
+                    <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
                   </div>
-                  <BroccoliVisual />
-                </VaultVisualContainer>
-              </div>
-              <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
-                <div className="section-marker">
-                  <span className="section-marker-line" />
-                  <span className="font-mono text-[10px] text-[#D5B38E] tracking-[0.25em] font-semibold uppercase">PROJECT_03 // WEB_SYSTEM</span>
-                </div>
-                <h3 className="tracking-tight leading-tight text-3xl font-extrabold text-[#f0ede8]">
-                  pink-broccoli <span className="serif-display text-[#f0ede8]/70 italic font-normal block text-2xl">Laminar build.</span>
-                </h3>
-                <div className="p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
-                    <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Frontend Architecture</span>
-                  </div>
-                  <p className="text-[#d8d5d0] text-xs sm:text-sm leading-relaxed font-normal antialiased">
-                    A high-velocity, design-forward web application compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero GC delays.
-                  </p>
-                </div>
-                <ul className="space-y-2">
-                  {[
-                    "Lighthouse Performance score hitting a flawless 100/100 across platforms.",
-                    "Virtualized list rendering engine with zero layout thrashing or stutter.",
-                    "Minimalist memory footprint with instant hydration and high visual velocity."
-                  ].map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 text-xs text-[#b8b5b0] leading-relaxed">
-                      <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
-                        //
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="grid grid-cols-2 gap-4 border-y border-white/[0.08] py-3.5 bg-white/[0.01]">
-                  <div className="border-r border-white/[0.06] pr-3">
-                    <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">LCP Load Speed</span>
-                    <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">0.52 Seconds</span>
-                  </div>
-                  <div className="pl-2">
-                    <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Gzipped Bundle</span>
-                    <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">&lt; 42 KB</span>
-                  </div>
-                </div>
-                <div className="pt-1">
-                  <Link
-                    href="/vessel/Laminar"
-                    className="btn-project-cta group w-full justify-between"
-                  >
-                    <span>Launch Interactive UI Build</span>
-                    <div className="cta-icon-badge">
-                      <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
-                    </div>
-                  </Link>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
-        ) : (
-          /* Desktop Horizontal Scroll Rail */
-          <div className="horizontal-scroll-container" ref={worksSectionRef}>
-            <div className="horizontal-scroll-sticky">
-              <motion.div
-                className="horizontal-scroll-track"
-                style={{ x: worksSpringX }}
-              >
-                {/* PROJECT 01 */}
-                <div className="horizontal-scroll-card">
+
+          {/* PROJECT 02 (Mobile) */}
+          <div className="w-full flex flex-col gap-6 pb-12 border-b border-white/[0.08]">
+            <div className="w-full max-w-lg mx-auto">
+              <VaultVisualContainer>
+                <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
+                  PROJECT // 02
+                </div>
+                <WorkspaceVisual />
+              </VaultVisualContainer>
+            </div>
+            <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
+              <div className="section-marker">
+                <span className="section-marker-line" />
+                <span className="font-mono text-[10px] text-[#D5B38E] tracking-[0.25em] font-semibold uppercase">PROJECT_02 // ENTERPRISE_PORTAL</span>
+              </div>
+              <h3 className="tracking-tight leading-tight text-3xl font-extrabold text-[#f0ede8]">
+                Centralized <span className="serif-display text-[#f0ede8]/70 italic font-normal block text-2xl">Workspace</span>
+              </h3>
+              <div className="p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
+                  <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Enterprise Brief</span>
+                </div>
+                <p className="text-[#d8d5d0] text-xs sm:text-sm leading-relaxed font-normal antialiased">
+                  A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Consolidates databases, proxies legacy Oracle systems, and manages staff operations.
+                </p>
+              </div>
+              <ul className="space-y-2">
+                {[
+                  "Servicing 15,000+ active enterprise directory profiles with RBAC security.",
+                  "Real-time legacy sync middleware proxying Oracle tables securely.",
+                  "Edge-cached API endpoints reducing database query latency to 45ms."
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5 text-xs text-[#b8b5b0] leading-relaxed">
+                    <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
+                      //
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="grid grid-cols-2 gap-4 border-y border-white/[0.08] py-3.5 bg-white/[0.01]">
+                <div className="border-r border-white/[0.06] pr-3">
+                  <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Deployed Footprint</span>
+                  <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">15K+ Active Users</span>
+                </div>
+                <div className="pl-2">
+                  <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Proxy Speed</span>
+                  <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">45ms Avg Latency</span>
+                </div>
+              </div>
+              <div className="pt-1">
+                <Link
+                  href="/vessel/blw-portal"
+                  className="btn-project-cta group w-full justify-between"
+                >
+                  <span>Read Enterprise Case Study</span>
+                  <div className="cta-icon-badge">
+                    <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* PROJECT 03 (Mobile) */}
+          <div className="w-full flex flex-col gap-6">
+            <div className="w-full max-w-lg mx-auto">
+              <VaultVisualContainer>
+                <div className="absolute top-4 left-4 font-mono text-[8px] text-white/20 z-50 pointer-events-none select-none">
+                  PROJECT // 03
+                </div>
+                <BroccoliVisual />
+              </VaultVisualContainer>
+            </div>
+            <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
+              <div className="section-marker">
+                <span className="section-marker-line" />
+                <span className="font-mono text-[10px] text-[#D5B38E] tracking-[0.25em] font-semibold uppercase">PROJECT_03 // WEB_SYSTEM</span>
+              </div>
+              <h3 className="tracking-tight leading-tight text-3xl font-extrabold text-[#f0ede8]">
+                pink-broccoli <span className="serif-display text-[#f0ede8]/70 italic font-normal block text-2xl">Laminar build.</span>
+              </h3>
+              <div className="p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
+                  <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Frontend Architecture</span>
+                </div>
+                <p className="text-[#d8d5d0] text-xs sm:text-sm leading-relaxed font-normal antialiased">
+                  A high-velocity, design-forward web application compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero GC delays.
+                </p>
+              </div>
+              <ul className="space-y-2">
+                {[
+                  "Lighthouse Performance score hitting a flawless 100/100 across platforms.",
+                  "Virtualized list rendering engine with zero layout thrashing or stutter.",
+                  "Minimalist memory footprint with instant hydration and high visual velocity."
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5 text-xs text-[#b8b5b0] leading-relaxed">
+                    <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
+                      //
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="grid grid-cols-2 gap-4 border-y border-white/[0.08] py-3.5 bg-white/[0.01]">
+                <div className="border-r border-white/[0.06] pr-3">
+                  <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">LCP Load Speed</span>
+                  <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">0.52 Seconds</span>
+                </div>
+                <div className="pl-2">
+                  <span className="font-mono text-[8.5px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-0.5">Gzipped Bundle</span>
+                  <span className="text-lg font-bold font-mono text-[#f5f3ef] tracking-tight">&lt; 42 KB</span>
+                </div>
+              </div>
+              <div className="pt-1">
+                <Link
+                  href="/vessel/Laminar"
+                  className="btn-project-cta group w-full justify-between"
+                >
+                  <span>Launch Interactive UI Build</span>
+                  <div className="cta-icon-badge">
+                    <ArrowUpRight className="w-3.5 h-3.5 text-white/80 group-hover:text-white" />
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Horizontal Scroll Rail */}
+        <div className="hidden md:block horizontal-scroll-container" ref={worksSectionRef}>
+          <div className="horizontal-scroll-sticky">
+            <motion.div
+              className="horizontal-scroll-track"
+              style={{ x: worksSpringX }}
+            >
+              {/* PROJECT 01 */}
+              <div className="horizontal-scroll-card">
                   <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl mx-auto relative h-full">
                     <motion.div 
                       className="w-full md:w-1/2 flex items-center justify-center"
@@ -1477,22 +1476,19 @@ export default function Home() {
               </motion.div>
             </div>
           </div>
-        )}
 
         {/* Dynamic bottom HUD for the horizontal scroll deck */}
-        {!isMobile && (
-          <div className="absolute left-8 bottom-8 md:bottom-12 font-mono text-[10px] tracking-widest text-[#f0ede8]/30 flex items-center gap-3 z-30 animate-fade-in">
-            <span className="text-[#f0ede8] font-bold">0{activeCardIndex}</span>
-            <div className="w-12 h-[1px] bg-white/10 relative">
-              <motion.div 
-                className="absolute top-0 left-0 h-full bg-[#f0ede8]"
-                animate={{ width: `${(activeCardIndex / 3) * 100}%` }}
-                transition={{ duration: 0.3 }}
-              />
-            </div>
-            <span>03</span>
+        <div className="hidden md:flex absolute left-8 bottom-8 md:bottom-12 font-mono text-[10px] tracking-widest text-[#f0ede8]/30 items-center gap-3 z-30 animate-fade-in">
+          <span className="text-[#f0ede8] font-bold">0{activeCardIndex}</span>
+          <div className="w-12 h-[1px] bg-white/10 relative">
+            <motion.div 
+              className="absolute top-0 left-0 h-full bg-[#f0ede8]"
+              animate={{ width: `${(activeCardIndex / 3) * 100}%` }}
+              transition={{ duration: 0.3 }}
+            />
           </div>
-        )}
+          <span>03</span>
+        </div>
       </section>
 
       {/* ── FOOTER ──────────────────────────────────────────────────────── */}

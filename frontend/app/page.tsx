@@ -177,11 +177,11 @@ function ManifestoWord({ word, index, total, progress }: {
 }) {
   const start = 0.15 + (index / total) * 0.55;
   const end = start + 0.04;
-  const opacity = useTransform(progress, [start - 0.02, start + 0.01], [0.15, 1]);
+  const opacity = useTransform(progress, [start - 0.02, start + 0.02], [0.15, 1]);
   const color = useTransform(
     progress,
-    [start - 0.02, start, start + 0.02, end + 0.02],
-    ["#2e2e2e", "#CDAA4B", "#CDAA4B", "#f0ede8"]
+    [start - 0.02, start + 0.01, end],
+    ["#2a2a2a", "#ffffff", "#f0ede8"]
   );
   const blur = useTransform(progress, [start, end], [4, 0]);
   const y = useTransform(progress, [start, end], [8, 0]);

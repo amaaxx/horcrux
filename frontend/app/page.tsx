@@ -956,7 +956,7 @@ export default function Home() {
                     <SplitEntry from="left">
                       <div className="section-marker">
                         <span className="section-marker-line" />
-                        <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_01 // RAG_ARCHITECTURE</span>
+                        <span className="font-mono text-[10px] text-white/50 tracking-[0.25em] font-semibold uppercase">PROJECT_01 // DETERMINISTIC_RAG</span>
                       </div>
                     </SplitEntry>
                     <div className="overflow-hidden">
@@ -973,27 +973,39 @@ export default function Home() {
                       </motion.h3>
                     </div>
                     <SplitEntry from="bottom" delay={0.1}>
-                      <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                        <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Architecture Brief</span>
-                        <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">An advanced Retrieval-Augmented Generation platform engineered to remove hallucination risks. Employs a deterministic 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.</p>
+                      <div className="p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
+                          <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Architecture Brief</span>
+                        </div>
+                        <p className="text-[#d8d5d0] text-sm md:text-[14.5px] leading-relaxed font-normal antialiased">An advanced Retrieval-Augmented Generation platform engineered to eliminate hallucination risks. Employs a deterministic 5-layer framework that parses documents, routes semantic intent, and synthesizes vectorized context.</p>
                       </div>
                     </SplitEntry>
                     <SplitEntry from="bottom" delay={0.2}>
-                      <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                        <li>5-layer parsing, routing, ranking, and database layout.</li>
-                        <li>Deterministic semantic classification using cosine vector calculations.</li>
-                        <li>pgvector integration yielding sub-180ms document indexing.</li>
+                      <ul className="space-y-2.5">
+                        {[
+                          "5-layer deterministic ingestion, intent parsing, and semantic routing pipeline.",
+                          "Strict cosine-similarity vector thresholds preventing hallucination leaks.",
+                          "pgvector storage engine achieving sub-180ms document indexation and retrieval."
+                        ].map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3 text-[12.5px] md:text-[13px] text-[#b8b5b0] leading-relaxed">
+                            <span className="mt-1 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
+                              //
+                            </span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
                       </ul>
                     </SplitEntry>
                     <SplitEntry from="bottom" delay={0.3}>
-                      <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                        <div>
-                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Latency Response</span>
-                          <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 180ms</span>
+                      <div className="grid grid-cols-2 gap-6 border-y border-white/[0.08] py-4 bg-white/[0.01] px-1">
+                        <div className="border-r border-white/[0.06] pr-4">
+                          <span className="font-mono text-[9px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-1">Latency Response</span>
+                          <span className="text-xl md:text-2xl font-bold font-mono text-[#f5f3ef] tracking-tight">&lt; 180ms</span>
                         </div>
-                        <div>
-                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Accuracy Target</span>
-                          <span className="text-lg font-bold font-mono text-[#f0ede8]">99.8% Hallucination-Free</span>
+                        <div className="pl-2">
+                          <span className="font-mono text-[9px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-1">Accuracy Target</span>
+                          <span className="text-xl md:text-2xl font-bold font-mono text-[#f5f3ef] tracking-tight">99.8% Hallucination-Free</span>
                         </div>
                       </div>
                     </SplitEntry>
@@ -1036,7 +1048,7 @@ export default function Home() {
                     <SplitEntry from="left">
                       <div className="section-marker">
                         <span className="section-marker-line" />
-                        <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_02 // ENTERPRISE_PORTAL</span>
+                        <span className="font-mono text-[10px] text-white/50 tracking-[0.25em] font-semibold uppercase">PROJECT_02 // ENTERPRISE_PORTAL</span>
                       </div>
                     </SplitEntry>
                     <div className="overflow-hidden">
@@ -1053,27 +1065,39 @@ export default function Home() {
                       </motion.h3>
                     </div>
                     <SplitEntry from="bottom" delay={0.1}>
-                      <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                        <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Enterprise Brief</span>
-                        <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Consolidates databases, proxies legacy Oracle systems, and manages staff operations.</p>
+                      <div className="p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
+                          <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Enterprise Brief</span>
+                        </div>
+                        <p className="text-[#d8d5d0] text-sm md:text-[14.5px] leading-relaxed font-normal antialiased">A high-security, low-latency intranet dashboard portal servicing Banaras Locomotive Works. Consolidates databases, proxies legacy Oracle systems, and manages staff operations.</p>
                       </div>
                     </SplitEntry>
                     <SplitEntry from="bottom" delay={0.2}>
-                      <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                        <li>Servicing 15,000+ active enterprise directory profiles with RBAC.</li>
-                        <li>Real-time legacy sync middleware proxying Oracle tables securely.</li>
-                        <li>API caching reducing database query latency to 45ms.</li>
+                      <ul className="space-y-2.5">
+                        {[
+                          "Servicing 15,000+ active enterprise directory profiles with RBAC security.",
+                          "Real-time legacy sync middleware proxying Oracle tables securely.",
+                          "Edge-cached API endpoints reducing database query latency to 45ms."
+                        ].map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3 text-[12.5px] md:text-[13px] text-[#b8b5b0] leading-relaxed">
+                            <span className="mt-1 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
+                              //
+                            </span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
                       </ul>
                     </SplitEntry>
                     <SplitEntry from="bottom" delay={0.3}>
-                      <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                        <div>
-                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Deployed Footprint</span>
-                          <span className="text-lg font-bold font-mono text-[#f0ede8]">15K+ Active Users</span>
+                      <div className="grid grid-cols-2 gap-6 border-y border-white/[0.08] py-4 bg-white/[0.01] px-1">
+                        <div className="border-r border-white/[0.06] pr-4">
+                          <span className="font-mono text-[9px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-1">Deployed Footprint</span>
+                          <span className="text-xl md:text-2xl font-bold font-mono text-[#f5f3ef] tracking-tight">15K+ Active Users</span>
                         </div>
-                        <div>
-                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Proxy Speed</span>
-                          <span className="text-lg font-bold font-mono text-[#f0ede8]">45ms Avg Latency</span>
+                        <div className="pl-2">
+                          <span className="font-mono text-[9px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-1">Proxy Speed</span>
+                          <span className="text-xl md:text-2xl font-bold font-mono text-[#f5f3ef] tracking-tight">45ms Avg Latency</span>
                         </div>
                       </div>
                     </SplitEntry>
@@ -1116,7 +1140,7 @@ export default function Home() {
                     <SplitEntry from="left">
                       <div className="section-marker">
                         <span className="section-marker-line" />
-                        <span className="font-mono text-[9px] text-[#3a3a3a] tracking-wider uppercase">PROJECT_03 // WEB_SYSTEM</span>
+                        <span className="font-mono text-[10px] text-white/50 tracking-[0.25em] font-semibold uppercase">PROJECT_03 // WEB_SYSTEM</span>
                       </div>
                     </SplitEntry>
                     <div className="overflow-hidden">
@@ -1133,27 +1157,39 @@ export default function Home() {
                       </motion.h3>
                     </div>
                     <SplitEntry from="bottom" delay={0.1}>
-                      <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                        <span className="font-mono text-[8px] text-[#3a3a3a] font-bold block mb-1.5 uppercase tracking-widest">Frontend Brief</span>
-                        <p className="text-[#5a5a5a] text-sm leading-relaxed font-light">A high-velocity, design-forward web application compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero GC delays.</p>
+                      <div className="p-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-md shadow-xl">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#f0ede8]/60" />
+                          <span className="font-mono text-[9.5px] text-[#f0ede8]/60 font-semibold uppercase tracking-[0.2em]">Frontend Architecture</span>
+                        </div>
+                        <p className="text-[#d8d5d0] text-sm md:text-[14.5px] leading-relaxed font-normal antialiased">A high-velocity, design-forward web application compiled with custom layout structures, pre-rendered vector graphics, and optimized component pipelines achieving near-zero GC delays.</p>
                       </div>
                     </SplitEntry>
                     <SplitEntry from="bottom" delay={0.2}>
-                      <ul className="space-y-1.5 text-xs text-[#5a5a5a] font-light list-disc list-inside">
-                        <li>Lighthouse Performance score hitting 100/100 across platforms.</li>
-                        <li>Virtualized list rendering with zero layout thrashing.</li>
-                        <li>Extremely low memory footprint and high frontend velocity.</li>
+                      <ul className="space-y-2.5">
+                        {[
+                          "Lighthouse Performance score hitting a flawless 100/100 across platforms.",
+                          "Virtualized list rendering engine with zero layout thrashing or stutter.",
+                          "Minimalist memory footprint with instant hydration and high visual velocity."
+                        ].map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3 text-[12.5px] md:text-[13px] text-[#b8b5b0] leading-relaxed">
+                            <span className="mt-1 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] border border-white/10 text-[8px] font-mono text-[#f0ede8]/60">
+                              //
+                            </span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
                       </ul>
                     </SplitEntry>
                     <SplitEntry from="bottom" delay={0.3}>
-                      <div className="grid grid-cols-2 gap-4 border-t border-b border-white/[0.05] py-4">
-                        <div>
-                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">LCP Load Speed</span>
-                          <span className="text-lg font-bold font-mono text-[#f0ede8]">0.52 Seconds</span>
+                      <div className="grid grid-cols-2 gap-6 border-y border-white/[0.08] py-4 bg-white/[0.01] px-1">
+                        <div className="border-r border-white/[0.06] pr-4">
+                          <span className="font-mono text-[9px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-1">LCP Load Speed</span>
+                          <span className="text-xl md:text-2xl font-bold font-mono text-[#f5f3ef] tracking-tight">0.52 Seconds</span>
                         </div>
-                        <div>
-                          <span className="font-mono text-[8px] text-[#3a3a3a] block uppercase tracking-widest">Gzipped Bundle</span>
-                          <span className="text-lg font-bold font-mono text-[#f0ede8]">&lt; 42 KB</span>
+                        <div className="pl-2">
+                          <span className="font-mono text-[9px] text-[#8a8a8a] block uppercase tracking-[0.2em] mb-1">Gzipped Bundle</span>
+                          <span className="text-xl md:text-2xl font-bold font-mono text-[#f5f3ef] tracking-tight">&lt; 42 KB</span>
                         </div>
                       </div>
                     </SplitEntry>
@@ -1213,26 +1249,18 @@ function FooterSection({
   marqueeExtraX: MotionValue<number>;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-5% 0px" });
 
   return (
-    <motion.footer
+    <footer
       ref={(el) => { (ref as React.MutableRefObject<HTMLElement | null>).current = el; sectionRef(el); }}
-      className="relative w-full z-10 pt-32 pb-16 px-6 md:px-16 lg:px-24 flex flex-col justify-end min-h-[70vh] border-t border-white/[0.05] select-none overflow-hidden"
-      style={{ background: "linear-gradient(to bottom, transparent, rgba(8,8,8,0.98))" }}
-      initial={{ opacity: 0, y: 60, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+      className="relative w-full z-20 pt-28 pb-16 px-6 md:px-16 lg:px-24 flex flex-col justify-end min-h-[55vh] border-t border-white/[0.1] select-none overflow-hidden bg-[#090909]"
     >
-      {/* Dramatic radial glow at footer entry */}
-      <motion.div
+      {/* Dramatic ambient radial glow */}
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,255,255,0.015) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 70%)",
         }}
-        animate={isInView ? { opacity: [0, 1, 0.5] } : { opacity: 0 }}
-        transition={{ duration: 2, ease: "easeOut" }}
       />
 
       <div className="max-w-6xl w-full mx-auto flex flex-col gap-12 md:gap-16 relative z-10">
@@ -1240,21 +1268,21 @@ function FooterSection({
         <motion.div
           style={{ scale: marqueeScale, skewY: marqueeSkew, x: marqueeExtraX, willChange: "transform" }}
           data-cursor-label="TALK"
-          className="w-full overflow-hidden flex flex-col gap-1 border-t border-b border-white/[0.05] py-6 md:py-8 cursor-none"
+          className="w-full overflow-hidden flex flex-col gap-2 border-t border-b border-white/[0.1] py-8 md:py-10 cursor-none"
         >
-          <motion.div variants={marqueeL as Variants} animate="animate" className="flex text-marquee leading-none uppercase font-black tracking-tighter w-[200%] gap-12 select-none">
+          <motion.div variants={marqueeL as Variants} animate="animate" className="flex text-marquee leading-none uppercase font-black tracking-tighter w-[200%] gap-12 select-none text-[#f0ede8]">
             {[0, 1].map(i => (
-              <div key={i} className="flex justify-around min-w-full shrink-0 gap-12 text-[#f0ede8]">
-                <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
-                <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
-                <span>LET&apos;S TALK</span><span className="text-white/20">•</span>
+              <div key={i} className="flex justify-around min-w-full shrink-0 gap-12">
+                <span>LET&apos;S TALK</span><span className="text-white/30">•</span>
+                <span>LET&apos;S TALK</span><span className="text-white/30">•</span>
+                <span>LET&apos;S TALK</span><span className="text-white/30">•</span>
               </div>
             ))}
           </motion.div>
           {/* Second line — italic serif */}
           <motion.div variants={marqueeR as Variants} animate="animate" className="flex leading-none w-[200%] gap-12 select-none" style={{ fontSize: "clamp(1.5rem, 4vw, 4rem)" }}>
             {[0, 1].map(i => (
-              <div key={i} className="flex justify-around min-w-full shrink-0 gap-12 serif-display text-white/12">
+              <div key={i} className="flex justify-around min-w-full shrink-0 gap-12 serif-display text-white/40">
                 <span>Build something real.</span><span>•</span>
                 <span>Build something real.</span><span>•</span>
                 <span>Build something real.</span><span>•</span>
@@ -1263,72 +1291,57 @@ function FooterSection({
           </motion.div>
         </motion.div>
 
-        {/* Contact row — staggered entry */}
-        <motion.div
-          className="flex flex-col md:flex-row items-center justify-between gap-8"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          variants={{
-            hidden: { opacity: 0 },
-            show: { opacity: 1, transition: { staggerChildren: 0.12 } }
-          }}
-        >
-          <motion.div variants={{ hidden: { opacity: 0, x: -30 }, show: { opacity: 1, x: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}>
-            <Magnetic range={40}>
-              <a
-                href="mailto:amaan@example.com"
-                data-cursor-label="EMAIL"
-                className="group flex items-center gap-3 px-5 py-3 rounded-full btn-ghost transition-all duration-300 cursor-none"
-              >
-                <Mail className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
-                <span className="font-mono text-sm text-white/40 group-hover:text-white/70 transition-colors">amaan@example.com</span>
-                <ArrowUpRight className="w-3.5 h-3.5 text-white/20 group-hover:text-white/50 transition-colors" />
-              </a>
-            </Magnetic>
-          </motion.div>
-          <motion.div
-            className="flex gap-6 items-center"
-            variants={{ hidden: { opacity: 0, x: 30 }, show: { opacity: 1, x: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
-          >
-            {["GITHUB", "LINKEDIN"].map((l, i) => (
-              <React.Fragment key={l}>
-                {i > 0 && <span className="w-[1px] h-3 bg-white/10" />}
+        {/* Contact row */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <Magnetic range={40}>
+            <a
+              href="mailto:amaaxx1301@outlook.com"
+              data-cursor-label="EMAIL"
+              className="group flex items-center gap-3 px-6 py-3.5 rounded-full bg-white/[0.05] border border-white/15 hover:border-white/40 hover:bg-white/[0.1] transition-all duration-300 cursor-none shadow-lg"
+            >
+              <Mail className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
+              <span className="font-mono text-sm text-[#f0ede8] font-medium tracking-wide">amaaxx1301@outlook.com</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-white/50 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+            </a>
+          </Magnetic>
+
+          <div className="flex gap-6 items-center">
+            {[
+              { label: "GITHUB", href: "https://github.com/amaaxx" },
+              { label: "LINKEDIN", href: "https://linkedin.com/in/amaaxx" },
+            ].map(({ label, href }, i) => (
+              <React.Fragment key={label}>
+                {i > 0 && <span className="w-[1px] h-3 bg-white/20" />}
                 <Magnetic>
                   <a
-                    href={l === "GITHUB" ? "https://github.com/amaaxx" : "https://linkedin.com/in/amaaxx"}
-                    target="_blank" rel="noopener noreferrer"
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     data-cursor-label="EXTERNAL"
-                    className="font-mono text-[10px] text-[#3a3a3a] hover:text-[#f0ede8] transition-colors cursor-none"
+                    className="font-mono text-xs text-white/70 hover:text-white font-medium tracking-wider transition-colors cursor-none py-1"
                   >
-                    {l}
+                    {label}
                   </a>
                 </Magnetic>
               </React.Fragment>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Bottom bar */}
-        <motion.div
-          className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/[0.04]"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-        >
-          <div className="font-mono text-[9px] text-[#2e2e2e] text-center md:text-left leading-relaxed">
-            <div>DESIGNED & ENGINEERED BY AMAAN</div>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-white/[0.08]">
+          <div className="font-mono text-[10px] text-white/50 text-center md:text-left leading-relaxed">
+            <div className="font-semibold text-white/70">DESIGNED & ENGINEERED BY AMAAN</div>
             <div>© 2026 AMAAN • ALL RIGHTS RESERVED</div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[8px] text-[#2e2e2e]">BUILT WITH</span>
-            {["NEXT.JS", "FRAMER MOTION", "LENIS"].map(tech => (
-              <span key={tech} className="px-2 py-0.5 rounded font-mono text-[7px] bg-white/[0.03] border border-white/[0.05] text-[#2e2e2e]">{tech}</span>
+            <span className="font-mono text-[9px] text-white/40 font-medium">BUILT WITH</span>
+            {["NEXT.JS 15", "FRAMER MOTION", "LENIS", "TAILWIND"].map(tech => (
+              <span key={tech} className="px-2.5 py-1 rounded-full font-mono text-[8px] font-medium bg-white/[0.06] border border-white/10 text-white/80">{tech}</span>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
-    </motion.footer>
+    </footer>
   );
 }

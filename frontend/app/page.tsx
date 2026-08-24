@@ -31,6 +31,8 @@ import {
   WorkspaceVisual,
   BroccoliVisual
 } from "@/components/ProjectVisuals";
+import HeroSpotlight from "@/components/HeroSpotlight";
+import TextMaskWindow from "@/components/TextMaskWindow";
 
 // ── HOOK: GLOBAL MOUSE POSITION ───────────────────────────────────────────────
 function useMousePosition() {
@@ -638,95 +640,81 @@ export default function Home() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 100, damping: 18 }}
-          className="max-w-6xl w-full flex flex-col gap-6 sm:gap-8 md:gap-12 relative z-10"
+          className="max-w-6xl w-full flex flex-col gap-6 sm:gap-8 md:gap-10 relative z-10"
         >
-          {/* Identifier Tag */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="flex items-center gap-3"
-          >
-            <span className="h-[1px] w-6 bg-[#D5B38E]/50" />
-            <span className="font-mono text-[9.5px] sm:text-[10px] text-[#D5B38E] tracking-[0.25em] uppercase font-medium">
-              AMAAN // SOFTWARE & SYSTEMS ARCHITECTURE
-            </span>
-          </motion.div>
+          {/* ReactBits Spotlight Iridescence Name Hero */}
+          <HeroSpotlight
+            name="A M A A N"
+            subtitle="AMAAN // SOFTWARE & SYSTEMS ARCHITECTURE"
+            role="Software Engineer & Systems Architect."
+          />
 
-          {/* Headline */}
-          <h1 className="tracking-tight leading-tight flex flex-col gap-1">
-            <span className="clip-mask text-huge font-extrabold text-[#f0ede8]">
-              <LetterReveal text="Software Engineer." delayOffset={0.1} />
-            </span>
-            <span className="clip-mask serif-display" style={{ fontSize: "clamp(1.75rem, 5.5vw, 7rem)", lineHeight: 1.05 }}>
-              <LetterReveal text="Architecting systems that endure." delayOffset={0.3} />
-            </span>
-          </h1>
+          {/* Subtitle & Action Controls */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <motion.p
+              initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
+              className="text-[#8a8a8a] text-sm md:text-base font-light tracking-wide max-w-xl leading-relaxed"
+            >
+              Developing low-latency pipelines, scalable web microservices, and hardware-accelerated user interfaces with meticulous engineering practices.
+            </motion.p>
 
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.8 }}
-            className="text-[#8a8a8a] text-sm md:text-base font-light tracking-wide max-w-xl leading-relaxed"
-          >
-            Developing low-latency pipelines, scalable web microservices, and high-performance user interfaces with meticulous engineering practices.
-          </motion.p>
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.7 }}
+              className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 items-stretch sm:items-center w-full md:w-auto"
+            >
+              <Magnetic range={55}>
+                <button
+                  onClick={scrollToWorks}
+                  data-cursor-label="EXPLORE"
+                  className="group btn-primary px-7 py-3.5 text-[#0a0a0a] font-semibold rounded-full flex items-center justify-center gap-3 text-sm cursor-none w-full sm:w-auto shadow-md active:scale-95 transition-all"
+                >
+                  <span>Explore Selected Works</span>
+                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform duration-300" />
+                </button>
+              </Magnetic>
 
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.95 }}
-            className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto"
-          >
-            <Magnetic range={55}>
-              <button
-                onClick={scrollToWorks}
-                data-cursor-label="EXPLORE"
-                className="group btn-primary px-7 py-3.5 text-[#0a0a0a] font-semibold rounded-full flex items-center justify-center gap-3 text-sm cursor-none w-full sm:w-auto shadow-md active:scale-95 transition-all"
-              >
-                <span>Explore Selected Works</span>
-                <ArrowRight className="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform duration-300" />
-              </button>
-            </Magnetic>
+              <Magnetic range={55}>
+                <Link
+                  href="/blog"
+                  data-cursor-label="READ"
+                  className="group btn-ghost px-7 py-3.5 text-[#f0ede8] font-semibold rounded-full flex items-center justify-center gap-3 text-sm cursor-none w-full sm:w-auto active:scale-95 transition-all"
+                >
+                  <span>Read Transmissions</span>
+                  <ArrowUpRight className="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                </Link>
+              </Magnetic>
 
-            <Magnetic range={55}>
-              <Link
-                href="/blog"
-                data-cursor-label="READ"
-                className="group btn-ghost px-7 py-3.5 text-[#f0ede8] font-semibold rounded-full flex items-center justify-center gap-3 text-sm cursor-none w-full sm:w-auto active:scale-95 transition-all"
-              >
-                <span>Read Transmissions</span>
-                <ArrowUpRight className="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
-              </Link>
-            </Magnetic>
-
-            <div className="flex gap-2.5 items-center justify-center sm:justify-start pt-1 sm:pt-0">
-              {[
-                { href: "https://github.com/amaaxx", Icon: GithubIcon, label: "GITHUB" },
-                { href: "https://linkedin.com/in/amaaxx", Icon: LinkedinIcon, label: "LINKEDIN" },
-              ].map(({ href, Icon, label }) => (
-                <Magnetic key={label} range={35}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-cursor-label={label}
-                    className="flex items-center justify-center p-3 rounded-full btn-ghost transition-all duration-300 cursor-none w-10 h-10"
-                  >
-                    <Icon className="w-4 h-4 shrink-0" />
-                  </a>
-                </Magnetic>
-              ))}
-            </div>
-          </motion.div>
+              <div className="flex gap-2.5 items-center justify-center sm:justify-start pt-1 sm:pt-0">
+                {[
+                  { href: "https://github.com/amaaxx", Icon: GithubIcon, label: "GITHUB" },
+                  { href: "https://linkedin.com/in/amaaxx", Icon: LinkedinIcon, label: "LINKEDIN" },
+                ].map(({ href, Icon, label }) => (
+                  <Magnetic key={label} range={35}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-cursor-label={label}
+                      className="flex items-center justify-center p-3 rounded-full btn-ghost transition-all duration-300 cursor-none w-10 h-10"
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                    </a>
+                  </Magnetic>
+                ))}
+              </div>
+            </motion.div>
+          </div>
 
           {/* Stats — staggered counter reveal */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.1 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
             className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-8 pt-4 border-t border-white/[0.05]"
           >
             {[
@@ -735,7 +723,7 @@ export default function Home() {
               { label: "Uptime Target", value: "99.9%" },
               { label: "Users Served", value: "15K+" },
             ].map((s, i) => (
-              <AnimatedCounter key={i} value={s.value} label={s.label} delay={1.2 + i * 0.08} />
+              <AnimatedCounter key={i} value={s.value} label={s.label} delay={1.0 + i * 0.08} />
             ))}
           </motion.div>
         </motion.div>
@@ -774,10 +762,10 @@ export default function Home() {
       {/* ── HAIRLINE DIVIDER ────────────────────────────────────────────── */}
       <WipeDivider className="relative z-10 mx-4 sm:mx-8 md:mx-16 lg:mx-24" />
 
-      {/* ── MANIFESTO ───────────────────────────────────────────────────── */}
+      {/* ── MANIFESTO / PHILOSOPHY ─────────────────────────────────────── */}
       <section
         ref={(el) => { manifestoRef.current = el!; sectionRefs.current[1] = el; }}
-        className="relative py-20 sm:py-28 md:py-32 px-4 sm:px-8 md:px-16 lg:px-24 z-10 max-w-5xl mx-auto flex flex-col justify-center min-h-[50vh] sm:min-h-[70vh]"
+        className="relative py-20 sm:py-28 md:py-32 px-4 sm:px-8 md:px-16 lg:px-24 z-10 max-w-6xl mx-auto flex flex-col justify-center min-h-[50vh] sm:min-h-[70vh]"
       >
         {/* Ambient depth glow behind manifesto */}
         <motion.div
@@ -788,24 +776,20 @@ export default function Home() {
           }}
         />
 
-        <div className="mb-10 sm:mb-12">
-          <ScrollRevealHeader subtitle="PHILOSOPHY & VISION" title="Core Manifesto" />
-        </div>
+        {/* ReactBits Image Text Mask Window */}
+        <TextMaskWindow title="THE PHILOSOPHY" subtitle="CORE MANIFESTO // 2026">
+          <div className="flex flex-wrap leading-relaxed max-w-4xl mx-auto justify-center text-center">
+            {manifestoWords.map((word, idx) => (
+              <ManifestoWord key={idx} word={word} index={idx} total={manifestoWords.length} progress={manifestoScroll} />
+            ))}
+          </div>
 
-        {/* Manifesto words with blur+color+y scroll reveal */}
-        <div className="flex flex-wrap leading-relaxed max-w-4xl">
-          {manifestoWords.map((word, idx) => (
-            <ManifestoWord key={idx} word={word} index={idx} total={manifestoWords.length} progress={manifestoScroll} />
-          ))}
-        </div>
-
-        {/* Side decorative lines — slide in from edges */}
-        <SplitEntry from="left" delay={0.3} className="mt-10 sm:mt-12">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center gap-4 mt-8">
             <div className="h-[1px] w-12 bg-white/10" />
             <span className="font-mono text-[9px] text-[#8a8a8a] tracking-[0.2em]">ENGINEERING PHILOSOPHY // 2026</span>
+            <div className="h-[1px] w-12 bg-white/10" />
           </div>
-        </SplitEntry>
+        </TextMaskWindow>
       </section>
 
       {/* ── TECH ARSENAL ────────────────────────────────────────────────── */}
